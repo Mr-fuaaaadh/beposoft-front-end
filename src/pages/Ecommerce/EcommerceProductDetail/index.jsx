@@ -28,7 +28,7 @@ import { createSelector } from "reselect";
 const EcommerceProductDetail = props => {
 
   //meta title
-  document.title = "Product Details | Skote - Vite React Admin & Dashboard Template";
+  document.title = "beposoft | Skote - Vite React Admin & Dashboard Template";
 
   const dispatch = useDispatch()
 

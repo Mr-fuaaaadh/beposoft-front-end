@@ -13,6 +13,9 @@ import withRouter from "../Common/withRouter";
 import { withTranslation } from "react-i18next";
 import { useCallback } from "react";
 
+import { FaUsers } from 'react-icons/fa'; 
+import { FaUserTie } from "react-icons/fa";
+
 const SidebarContent = (props) => {
   const ref = useRef();
   const path = useLocation();
@@ -179,7 +182,6 @@ const SidebarContent = (props) => {
                 <span>{props.t("Calendar")}</span>
               </Link>
             </li>
-
             <li>
               <Link to="/chat" className="">
                 <i className="bx bx-chat"></i>
@@ -192,6 +194,131 @@ const SidebarContent = (props) => {
                 <span>{props.t("File Manager")}</span>
               </Link>
             </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUserTie size={17} style={{ marginRight: '6px' }} />
+                <span>{props.t("Staff")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-staffs">{props.t("Staffs")}</Link>
+                </li>
+                <li>
+                  <Link to="/add-staffs">{props.t("Add Staff")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Customers")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-customers/">{props.t("Customers")}</Link>
+                </li>
+                <li>
+                  <Link to="/add-customers/">{props.t("Add Customers")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Supervisor")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-supervisors/">{props.t("Supervisors")}</Link>
+                </li>
+                <li>
+                  <Link to="/add-supervisors/">{props.t("add Supervisors")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("States")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-states/">{props.t("States")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Department")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-departments/">{props.t("Departments")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Family")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/all-families/">{props.t("Families")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Attribute")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/attributes/">{props.t("attribute")}</Link>
+                </li>
+                <li>
+                  <Link to="/attribute-values/">{props.t("attribute-values")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Order")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/New/Order/">{props.t("new order")}</Link>
+                </li>
+                <li>
+                  <Link to="/attribute-values/">{props.t("order list")}</Link>
+                </li>
+              </ul>
+            </li>
+
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Bank")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/add/bank/">{props.t("Add Bank")}</Link>
+                </li>
+              </ul>
+            </li>
+
 
             <li>
               <Link to="/#" className="has-arrow">

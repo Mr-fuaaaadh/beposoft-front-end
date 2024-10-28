@@ -28,6 +28,7 @@ import ProjectsCreate from "../pages/Projects/projects-create";
 import EcommerceProducts from "../pages/Ecommerce/EcommerceProducts";
 import EcommerceProductVariant from "../pages/Ecommerce/ProductVariant";
 import ProductTableData from "../pages/Ecommerce/ProductTable"
+import VariantProductUpdate from  "../pages/Ecommerce/variantProductUpdate";
 
 import EcommerceProductDetail from "../pages/Ecommerce/EcommerceProductDetail/index";
 import EcommerceOrders from "../pages/Ecommerce/EcommerceOrders/index";
@@ -163,6 +164,42 @@ import UiPlaceholders from "../pages/Ui/UiPlaceholders";
 import UiToasts from "../pages/Ui/UiToast";
 import UiUtilities from "../pages/Ui/UiUtilities";
 
+
+// Staffs
+import StaffTable from "../pages/Staff/StaffTable";
+import StaffForm  from "../pages/Staff/RegisterStaff";
+import StaffEdit from "../pages/Staff/StaffUpdate";
+
+// Staffs
+import CustomerTable from "../pages/Customers/customerTable";
+import CustomerForm from "../pages/Customers/add-customers";
+import Address from "../pages/Customers/address";
+
+// supervisor
+
+import SupervisorTable from "../pages/Supervisor/supervisors";
+import SupervisorForm from "../pages/Supervisor/supervisor";
+
+
+import CreateOrder from "../pages/Order/OrderCreate";
+
+import States from "../pages/State/stateTable";
+import Departments from "../pages/Department/departments";
+import Family from "../pages/Family/Families";
+
+
+import Attrubutes from "../pages/Attributes/attribute";
+import AttributeValues from "../pages/Attributes/attribute-values";
+
+import ProductUpdate from "../pages/Ecommerce/ProductUpdateForm";
+
+
+import Bank from "../../src/pages/Bank/index";
+
+
+
+
+
 // //Pages
 import PagesStarter from "../pages/Utility/pages-starter";
 import PagesMaintenance from "../pages/Utility/pages-maintenance";
@@ -178,6 +215,7 @@ import ContactsGrid from "../pages/Contacts/contacts-grid";
 import ContactsList from "../pages/Contacts/ContactList/contacts-list";
 import ContactsProfile from "../pages/Contacts/ContactsProfile/index";
 import UiProgressbar from "../pages/Ui/UiProgressbar";
+import { components } from "react-select";
 // import UiProgressbar from "../../src/pages/Ui/UiProgressbar"
 
 const authProtectedRoutes = [
@@ -207,19 +245,56 @@ const authProtectedRoutes = [
   //   // //profile
   { path: "/profile", component: <UserProfile /> },
 
+
+  //stafs
+  { path: "/all-staffs", component: <StaffTable /> },
+  { path: "/add-staffs", component: <StaffForm /> },
+  { path: "/edit/staffs/:id/", component: <StaffEdit /> },
+
+
+  // customers
+  {path: "/all-customers/",component:<CustomerTable />},
+  {path: "/add-customers/",component:<CustomerForm />},
+  {path: "customer/address/:id/add/",component:<Address />},
+
+
+  //all supervisors
+
+  { path: "/all-supervisors/", component: <SupervisorTable /> },
+  { path: "/add-supervisors", component: <SupervisorForm /> },
+
+  { path: "/New/Order/", component: <CreateOrder /> },
+
+
+
+  // all states
+
+  { path: "/all-states/", component: <States /> },
+  { path: "/all-departments/", component: <Departments /> },
+  { path: "/all-families/", component: <Family /> },
+  { path: "/attributes", component: <Attrubutes /> },
+  { path: "/attribute-values/", component: <AttributeValues /> },
+
+
+
+
+
   //   //Ecommerce
   {
-    path: "/ecommerce-product-detail/:id",
+    path: "/ecommerce-product-detail/:id/:type/",
     component: <EcommerceProductDetail />,
   },
   { path: "/ecommerce-products", component: <ProductTableData /> },
   { path: "/ecommerce-product-variant/:id/:type/", component: <EcommerceProductVariant /> },
+  { path: "/ecommerce-product-edit/:id/", component: <ProductUpdate /> },
+
   { path: "/ecommerce-orders", component: <EcommerceOrders /> },
   { path: "/ecommerce-customers", component: <EcommerceCustomers /> },
   { path: "/ecommerce-cart", component: <EcommerceCart /> },
   { path: "/ecommerce-checkout", component: <EcommerceCheckout /> },
   { path: "/ecommerce-shops", component: <EcommerceShops /> },
   { path: "/ecommerce-add-product", component: <EcommerenceAddProduct /> },
+  { path: "/ecommerce/product/:id/update/", component: <VariantProductUpdate /> },
 
   //   //Email
   { path: "/email-inbox", component: <EmailInbox /> },
@@ -244,6 +319,11 @@ const authProtectedRoutes = [
   { path: "/projects-overview", component: <ProjectsOverview /> },
   { path: "/projects-overview/:id", component: <ProjectsOverview /> },
   { path: "/projects-create", component: <ProjectsCreate /> },
+
+  //Bank
+
+  { path: "/add/bank/", component: <Bank /> },
+
 
   //   //Blog
   { path: "/blog-list", component: <BlogList /> },

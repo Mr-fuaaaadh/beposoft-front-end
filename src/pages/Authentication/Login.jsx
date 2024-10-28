@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import withRouter from "../../components/Common/withRouter";
+import axios from "axios";
 
 // redux
 import { useSelector, useDispatch } from "react-redux";
@@ -11,9 +12,7 @@ import { createSelector } from "reselect";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
-// axios
-import axios from 'axios';
-
+// reactstrap components
 import {
   Row,
   Col,
@@ -32,12 +31,12 @@ import { loginUser, socialLogin } from "../../store/actions";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
-import logo from "../../assets/images/logo.svg";
+import logo from "../../../src/logo.png";
 import lightlogo from "../../assets/images/logo-light.svg";
 
 const Login = (props) => {
   // meta title
-  document.title = "Login | Beposoft";
+  document.title = "Beposoft | Authentication";
   const dispatch = useDispatch();
 
   const validation = useFormik({
@@ -55,46 +54,46 @@ const Login = (props) => {
 
     onSubmit: async (values) => {
       try {
-        // POST request to login endpoint using axios
-        const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}login/`, values);
-        
-        // Check the response status and handle accordingly
-        if (response.data.status === 'success') {
-          console.log('Login successful:', response.data);
+        // Using axios method for login
+        const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}login/`, values, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
     
-          // Save token and active status in local storage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('active', response.data.active);
-          localStorage.setItem('name', response.data.name);
+        const data = response.data;
+        console.log(data); // Log the response for debugging
     
-          // Dispatch the loginUser action with the token and other relevant data
+        if (data.status === 'success') {
+          // Handle successful login
+          console.log('Login successful:', data);
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('active', data.active);
+          localStorage.setItem('name', data.name);
+    
+          // Dispatch the loginUser action with the token and navigate
           dispatch(loginUser({
-            token: response.data.token,
-            active: response.data.active,
-            name: response.data.name,
-
-            // Add other user data if necessary
+            token: data.token,
+            active: data.active,
+            name: data.name,
           }, props.router.navigate));
     
-          // Navigate to the dashboard or another page
-          props.router.navigate('/dashboard'); // Adjust the path as needed
+          // Navigate to the dashboard
+          props.router.navigate('/dashboard');
         } else {
-          // Handle error messages from the response
-          console.error('Login failed:', response.data.message);
-          // Optionally, dispatch an error action or set local state to display an error
+          // Handle the error case
+          console.error('Login failed:', data.message);
         }
       } catch (error) {
         console.error('Error during login:', error);
-        // Optionally, handle network or other errors
       }
-    },
-    
+    },    
   });
 
   const LoginProperties = createSelector(
     (state) => state.Login,
     (login) => ({
-      error: login.error
+      error: login.error,
     })
   );
 
@@ -294,7 +293,3 @@ const Login = (props) => {
 };
 
 export default withRouter(Login);
-
-Login.propTypes = {
-  router: PropTypes.object.isRequired, // Adjusted prop type for router
-};

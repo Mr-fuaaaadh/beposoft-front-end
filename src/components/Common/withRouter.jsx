@@ -8,7 +8,7 @@ import {
 function withRouter(Component) {
     function ComponentWithRouterProp(props) {
         let location = useLocation();
-        let navigate = useNavigate();
+        let navigate = useNavigate('/dashboard');
         let params = useParams();
         return (
             <Component
@@ -17,8 +17,6 @@ function withRouter(Component) {
             />
         );
     }
-
     return ComponentWithRouterProp;
 }
-
 export default withRouter;

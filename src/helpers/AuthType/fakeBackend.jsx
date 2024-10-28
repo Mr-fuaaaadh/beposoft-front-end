@@ -111,11 +111,11 @@ const fakeBackend = () => {
         if (validUser["length"] === 1) {
           // You have to generate AccessToken by jwt. but this is fakeBackend so, right now its dummy
           const token = accessToken;
-          const userName = user.name;
+          const userName = user.id;
 
           // JWT AccessToken
           const tokenObj = { accessToken: token, username: userName }; // Token Obj
-          const validUserObj = { ...validUser[0], ...tokenObj, ...user.name }; // validUser Obj
+          const validUserObj = { ...validUser[0], ...tokenObj, ...user.id }; // validUser Obj
 
           resolve([200, validUserObj]);
         } else {
@@ -151,8 +151,8 @@ const fakeBackend = () => {
             users[objIndex].username = user.username;
 
             // Assign a value to locastorage
-            localStorage.removeItem("authUser");
-            localStorage.setItem("authUser", JSON.stringify(users[objIndex]));
+            localStorage.removeItem("token");
+            localStorage.setItem("token", JSON.stringify(users[objIndex]));
 
             resolve([200, "Profile Updated Successfully"]);
           } else {
@@ -182,8 +182,8 @@ const fakeBackend = () => {
           users[objIndex].username = user.username;
 
           // Assign a value to locastorage
-          localStorage.removeItem("authUser");
-          localStorage.setItem("authUser", JSON.stringify(users[objIndex]));
+          localStorage.removeItem("token");
+          localStorage.setItem("token", JSON.stringify(users[objIndex]));
 
           resolve([200, "Profile Updated Successfully"]);
         } else {

@@ -13,13 +13,15 @@ const EcommerenceAddProduct = () => {
   const [selectedFiles, setselectedFiles] = useState([]);
   const [productFamilies, setProductFamilies] = useState([]);
   const token = localStorage.getItem('token');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchProductFamilies = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
           headers: {
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
           },
         });
         setProductFamilies(response.data.data); // Adjust based on actual response structure
@@ -57,15 +59,6 @@ const EcommerenceAddProduct = () => {
 
     setselectedFiles(files);
   };
-
-  // const formatBytes = (bytes, decimals = 2) => {
-  //   if (bytes === 0) return "0 Bytes";
-  //   const k = 1024;
-  //   const dm = decimals < 0 ? 0 : decimals;
-  //   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + types[i];
-  // };
-
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -74,60 +67,84 @@ const EcommerenceAddProduct = () => {
       purchase_rate: '',
       type: '',
       tax: '',
-      unit:"",
+      unit: "",
       selling_price: '',
-    },
-    validationSchema: yup.object().shape({
-      name: yup.string().required('Please Enter Your Product Name'),
-      hsn_code: yup.string().required('Please Enter Your Manufacturer Name'),
-      family: yup.array().min(1, 'Please select at least one Feature'),
-      purchase_rate: yup.number().required('Please Enter Your purchase_rate'),
-      type: yup.string().required('Please Enter Your type'),
-      tax: yup.string().required('Please Enter Your Product Tax'),
-      unit: yup.string().required('Please Enter Your Product unit'),
-      selling_price: yup.string().required('Please Enter Your selling_price'),
-
-    }),
-    onSubmit: async (values) => {
-      console.log('Submitting values:', values);
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_APP_APIKEY}add/product/`,
-          values,
-          {
-            headers: {
-              'Authorization': `${token}`,
-            },
-          }
-        );
-        console.log('Product added successfully:', response.data);
-
-        formik.resetForm();
-      } catch (error) {
-        console.error('Error adding product:', error);
-      }
-      console.log(values)
-    },
-  });
-
-  const metaData = useFormik({
-    initialValues: {
-      name: '',
-      hsn_code: '',
-      selling_price: ''
+      stock: '',
+      image: null
     },
     validationSchema: yup.object().shape({
       name: yup.string().required('Please Enter Your Product Name'),
       hsn_code: yup.string().required('Please Enter Your HSN Code'),
-      selling_price: yup.string().required('Please Enter Your Selling price')
+      family: yup.array().min(1, 'Please select at least one Family'),
+      purchase_rate: yup.number().required('Please Enter Your Purchase Rate'),
+      type: yup.string().required('Please Enter Your Product Type'),
+      tax: yup.string().required('Please Enter Your Tax'),
+      unit: yup.string().required('Please Enter Your Product Unit'),
+      selling_price: yup.number().required('Please Enter Your Selling Price'),
+      // stock: yup.number().required('Please Enter Your Stock'),
+      image: yup.mixed()
+        .nullable()
+        .required('Please upload an image')
+        .test('fileSize', 'File size is too large', (value) => {
+          return value ? value.size <= 5 * 1024 * 1024 : true;
+        })
     }),
-    onSubmit: (values) => {
-      metaData.resetForm();
+    onSubmit: async (values) => {
+      console.log('Submitting values:', values);
+
+      console.log('Submitting values:', values); // Log all values
+      console.log('Family values:', values.family); // Log family values
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("hsn_code", values.hsn_code);
+
+      // Handle family array (appending as JSON or separate IDs)
+      values.family.forEach(familyId => {
+        formData.append("family[]", familyId); // Ensure the key matches what your backend expects
+      });
+
+      formData.append("purchase_rate", values.purchase_rate);
+      formData.append("type", values.type);
+      formData.append("tax", values.tax);
+      formData.append("unit", values.unit);
+      formData.append("selling_price", values.selling_price);
+
+      // Conditionally append stock for 'single' type
+      if (values.type === 'single') {
+        formData.append("stock", values.stock);
+      }
+
+      // Append image to formData if exists
+      if (values.image) {
+        formData.append("image", values.image);
+      }
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_APP_APIKEY}add/product/`,
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setSuccessMessage("Product added successfully!");
+        setErrorMessage("");
+        formik.resetForm();
+      } catch (error) {
+        console.error("Error adding product:", error);
+        setErrorMessage("Failed to add product. Please try again.");
+        setSuccessMessage("");
+      }
     },
+
   });
 
-  console.log("Formik Touched:", formik.touched);
-  console.log("Formik Errors:", formik.errors);
+
 
 
 
@@ -146,9 +163,16 @@ const EcommerenceAddProduct = () => {
                     Fill all information below
                   </p>
 
+                  {successMessage && (
+                    <div className="alert alert-success" role="alert">
+                      {successMessage}
+                    </div>
+                  )}
+
                   <Form onSubmit={formik.handleSubmit} autoComplete="off">
                     <Row>
                       <Col sm="6">
+                        {/* Product Name */}
                         <div className="mb-3">
                           <Label htmlFor="name">Product Name</Label>
                           <Input
@@ -158,14 +182,14 @@ const EcommerenceAddProduct = () => {
                             placeholder="Product Name"
                             value={formik.values.name}
                             onChange={formik.handleChange}
-                            invalid={
-                              formik.touched.name && formik.errors.name ? true : false
-                            }
+                            invalid={formik.touched.name && formik.errors.name ? true : false}
                           />
                           {formik.errors.name && formik.touched.name ? (
                             <FormFeedback type="invalid">{formik.errors.name}</FormFeedback>
                           ) : null}
                         </div>
+
+                        {/* HSN Code */}
                         <div className="mb-3">
                           <Label htmlFor="hsn_code">HSN CODE</Label>
                           <Input
@@ -175,14 +199,14 @@ const EcommerenceAddProduct = () => {
                             placeholder="HSN CODE"
                             value={formik.values.hsn_code}
                             onChange={formik.handleChange}
-                            invalid={
-                              formik.touched.hsn_code && formik.errors.hsn_code ? true : false
-                            }
+                            invalid={formik.touched.hsn_code && formik.errors.hsn_code ? true : false}
                           />
                           {formik.errors.hsn_code && formik.touched.hsn_code ? (
                             <FormFeedback type="invalid">{formik.errors.hsn_code}</FormFeedback>
                           ) : null}
                         </div>
+
+                        {/* Purchase Rate */}
                         <div className="mb-3">
                           <Label htmlFor="purchase_rate">Purchase Rate</Label>
                           <Input
@@ -192,15 +216,14 @@ const EcommerenceAddProduct = () => {
                             placeholder="Purchase Rate"
                             value={formik.values.purchase_rate}
                             onChange={formik.handleChange}
-                            invalid={
-                              formik.touched.purchase_rate && formik.errors.purchase_rate ? true : false
-                            }
+                            invalid={formik.touched.purchase_rate && formik.errors.purchase_rate ? true : false}
                           />
                           {formik.errors.purchase_rate && formik.touched.purchase_rate ? (
                             <FormFeedback type="invalid">{formik.errors.purchase_rate}</FormFeedback>
                           ) : null}
                         </div>
 
+                        {/* Tax */}
                         <div className="mb-3">
                           <Label htmlFor="tax">Tax</Label>
                           <Input
@@ -210,17 +233,32 @@ const EcommerenceAddProduct = () => {
                             placeholder="Tax"
                             value={formik.values.tax}
                             onChange={formik.handleChange}
-                            invalid={
-                              formik.touched.tax && formik.errors.tax ? true : false
-                            }
+                            invalid={formik.touched.tax && formik.errors.tax ? true : false}
                           />
                           {formik.errors.tax && formik.touched.tax ? (
                             <FormFeedback type="invalid">{formik.errors.tax}</FormFeedback>
                           ) : null}
                         </div>
+
+                        <div className="mb-3">
+                          <div className="control-label" style={{ marginBottom: "0.5rem" }}>Image</div>
+                          <Input
+                            id="image"
+                            name="image"
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => {
+                              formik.setFieldValue("image", event.currentTarget.files[0]);
+                            }}
+                            invalid={formik.touched.image && formik.errors.image ? true : false}
+                          />
+                        </div>
+
                       </Col>
 
+
                       <Col sm="6">
+                        {/* Unit Type */}
                         <div className="mb-3">
                           <div className="control-label" style={{ marginBottom: "0.5rem" }}>Unit Type</div>
                           <Select
@@ -230,25 +268,46 @@ const EcommerenceAddProduct = () => {
                             value={UNIT_TYPES.find((option) => option.value === formik.values.unit)}
                             onChange={(selectedOption) => formik.setFieldValue("unit", selectedOption.value)}
                           />
+                          {formik.errors.unit && formik.touched.unit ? (
+                            <span className="text-danger">{formik.errors.unit}</span>
+                          ) : null}
+                        </div>
+
+                        {/* Product Type */}
+                        <div className="mb-3">
+                          <div className="control-label" style={{ marginBottom: "0.5rem" }}>Product Type</div>
+                          <Select
+                            name="type"
+                            options={types}
+                            className="select2"
+                            value={types.find((option) => option.value === formik.values.type)}
+                            onChange={(selectedOption) => formik.setFieldValue("type", selectedOption.value)}
+                          />
                           {formik.errors.type && formik.touched.type ? (
                             <span className="text-danger">{formik.errors.type}</span>
                           ) : null}
                         </div>
 
-                        <div className="mb-3">
-                          <div className="control-label" style={{ marginBottom: "0.5rem" }}>Product Type</div>
-                          <Select
-                            name="size"
-                            options={types}
-                            className="select2"
-                            value={types.find((option) => option.value === formik.values.size)}
-                            onChange={(selectedOption) => formik.setFieldValue("type", selectedOption.value)}
-                          />
-                          {formik.errors.size && formik.touched.size ? (
-                            <span className="text-danger">{formik.errors.size}</span>
-                          ) : null}
-                        </div>
+                        {/* Conditionally Render Stock Field for "single" Product Type */}
+                        {formik.values.type === 'single' && (
+                          <div className="mb-3">
+                            <Label htmlFor="stock">Stock</Label>
+                            <Input
+                              id="stock"
+                              name="stock"
+                              type="number"
+                              placeholder="Stock"
+                              value={formik.values.stock}
+                              onChange={formik.handleChange}
+                              invalid={formik.touched.stock && formik.errors.stock ? true : false}
+                            />
+                            {formik.errors.stock && formik.touched.stock ? (
+                              <FormFeedback type="invalid">{formik.errors.stock}</FormFeedback>
+                            ) : null}
+                          </div>
+                        )}
 
+                        {/* Product Family */}
                         <div className="mb-3">
                           <div className="control-label" style={{ marginBottom: "0.5rem" }}>Product Family</div>
                           <Select
@@ -287,9 +346,7 @@ const EcommerenceAddProduct = () => {
                             placeholder="Selling Price"
                             value={formik.values.selling_price}
                             onChange={formik.handleChange}
-                            invalid={
-                              formik.touched.selling_price && formik.errors.selling_price ? true : false
-                            }
+                            invalid={formik.touched.selling_price && formik.errors.selling_price ? true : false}
                           />
                           {formik.errors.selling_price && formik.touched.selling_price ? (
                             <FormFeedback type="invalid">{formik.errors.selling_price}</FormFeedback>
@@ -297,149 +354,14 @@ const EcommerenceAddProduct = () => {
                         </div>
                       </Col>
                     </Row>
+
+                    {/* Action Buttons */}
                     <div className="d-flex flex-wrap gap-2">
                       <Button type="submit" color="primary">Save Changes</Button>
                       <Button type="button" color="secondary" onClick={() => formik.resetForm()}>Cancel</Button>
                     </div>
                   </Form>
-                </CardBody>
-              </Card>
 
-              <Card>
-                <CardBody>
-                  <CardTitle className="mb-3">Product Images</CardTitle>
-                  <Form>
-                    <Dropzone
-                      onDrop={(acceptedFiles) => handleAcceptedFiles(acceptedFiles)}
-                    >
-                      {({ getRootProps, getInputProps }) => (
-                        <div className="dropzone">
-                          <div
-                            className="dz-message needsclick"
-                            {...getRootProps()}
-                          >
-                            <input {...getInputProps()} />
-                            <div className="dz-message needsclick">
-                              <div className="mb-3">
-                                <i className="display-4 text-muted bx bxs-cloud-upload" />
-                              </div>
-                              <h4>Drop files here or click to upload.</h4>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </Dropzone>
-                    <ul className="list-unstyled mb-0" id="file-previews">
-                      {selectedFiles.map((file, index) => (
-                        <li className="mt-2 dz-image-preview" key={index}>
-                          <div className="border rounded">
-                            <div className="d-flex flex-wrap gap-2 p-2">
-                              <div className="flex-shrink-0 me-3">
-                                <div className="avatar-sm bg-light rounded p-2">
-                                  <img
-                                    data-dz-thumbnail=""
-                                    className="img-fluid rounded d-block"
-                                    src={file.preview}
-                                    alt={file.name}
-                                  />
-                                </div>
-                              </div>
-                              <div className="flex-grow-1">
-                                <div className="pt-1">
-                                  <h5 className="fs-md mb-1" data-dz-name>{file.path}</h5>
-                                  <strong className="error text-danger" data-dz-errormessage></strong>
-                                </div>
-                              </div>
-                              <div className="flex-shrink-0 ms-3">
-                                <Button color="danger" size="sm" onClick={() => {
-                                  const newImages = [...selectedFiles];
-                                  newImages.splice(index, 1);
-                                  setselectedFiles(newImages);
-                                }}>
-                                  Delete
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </Form>
-                </CardBody>
-              </Card>
-
-              <Card>
-                <CardBody>
-                  <CardTitle tag="h4">Meta Data</CardTitle>
-                  <p className="card-title-desc mb-3">
-                    Fill all information below
-                  </p>
-
-                  <Form onSubmit={metaData.handleSubmit} autoComplete="off">
-                    <Row>
-                      <Col sm={6}>
-                        <div className="mb-3">
-                          <Label htmlFor="metatitle">Meta title</Label>
-                          <Input
-                            id="metatitle"
-                            name="name"
-                            type="text"
-                            placeholder="Meta title"
-                            value={metaData.values.name}
-                            onChange={metaData.handleChange}
-                            invalid={
-                              metaData.touched.name && metaData.errors.name ? true : false
-                            }
-                          />
-                          {metaData.errors.name && metaData.touched.name ? (
-                            <FormFeedback type="invalid">{metaData.errors.name}</FormFeedback>
-                          ) : null}
-                        </div>
-                        <div className="mb-3">
-                          <Label htmlFor="metakeywords">Meta Keywords</Label>
-                          <Input
-                            id="metakeywords"
-                            name="hsn_code"
-                            type="text"
-                            placeholder="Meta Keywords"
-                            value={metaData.values.hsn_code}
-                            onChange={metaData.handleChange}
-                            invalid={
-                              metaData.touched.hsn_code && metaData.errors.hsn_code ? true : false
-                            }
-                          />
-                          {metaData.errors.hsn_code && metaData.touched.hsn_code ? (
-                            <FormFeedback type="invalid">{metaData.errors.hsn_code}</FormFeedback>
-                          ) : null}
-                        </div>
-                      </Col>
-
-                      <Col sm={6}>
-                        <div className="mb-3">
-                          <Label htmlFor="metadescription">Meta Description</Label>
-                          <Input
-                            name="metadescription"
-                            tag="textarea"
-                            id="metadescription"
-                            rows={5}
-                            placeholder="Meta Description"
-                            value={metaData.values.metadescription}
-                            onChange={metaData.handleChange}
-                            invalid={
-                              metaData.touched.metadescription && metaData.errors.metadescription ? true : false
-                            }
-                          />
-                          {metaData.errors.metadescription && metaData.touched.metadescription ? (
-                            <FormFeedback type="invalid">{metaData.errors.metadescription}</FormFeedback>
-                          ) : null}
-                        </div>
-                      </Col>
-                    </Row>
-                    <div className="d-flex flex-wrap gap-2">
-                      <Button type="submit" className="waves-effect waves-light" color="primary">Save Changes</Button>
-                      <Button type="button" className="waves-effect waves-light" color="secondary" onClick={() => metaData.resetForm()}>Cancel</Button>
-                    </div>
-                  </Form>
                 </CardBody>
               </Card>
             </Col>

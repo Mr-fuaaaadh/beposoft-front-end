@@ -5,9 +5,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import Select from "react-select";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-import axios from "axios";
-import { useDropzone } from 'react-dropzone'; // Import useDropzone
-import { useParams } from 'react-router-dom'; // Import useParams
+import { useParams } from 'react-router-dom';
 
 const EcommerenceAddProduct = () => {
     document.title = "Add Product | Skote - Vite React Admin & Dashboard Template";
@@ -18,44 +16,12 @@ const EcommerenceAddProduct = () => {
     const [imagePreview, setImagePreview] = useState(""); // State for image preview
     const token = localStorage.getItem('token');
 
-    useEffect(() => {
-        const fetchProductFamilies = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
-                    headers: {
-                        'Authorization': `${token}`,
-                    },
-                });
-                setProductFamilies(response.data.data);
-            } catch (error) {
-                console.error('Error fetching product families:', error);
-            }
-        };
-
-        fetchProductFamilies();
-    }, [token]);
-
-    const UNIT_TYPES = [
-        { value: 'NOS', label: 'NOS' },
-        { value: 'PRS', label: 'PRS' },
-        { value: 'BOX', label: 'BOX' },
-        { value: 'SET', label: 'SET' },
-        { value: 'SET OF 12', label: 'SET OF 12' },
-        { value: 'SET OF 16', label: 'SET OF 16' },
-        { value: 'SET OF 6', label: 'SET OF 6' },
-        { value: 'SET OF 8', label: 'SET OF 8' },
-    ];
+    console.log(`getd id ${id}`);
 
     const types = [
         { value: 'single', label: 'single' },
         { value: 'variant', label: 'variant' },
     ];
-
-    const handleAcceptedFiles = (files) => {
-        const file = files[0];
-        setSelectedFiles(files);
-        setImagePreview(URL.createObjectURL(file)); // Set image preview
-    };
 
     const formik = useFormik({
         initialValues: {
@@ -89,24 +55,101 @@ const EcommerenceAddProduct = () => {
             }
 
             try {
-                const response = await axios.ge(
+                const response = await fetch(
                     `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`, // Include the id in the URL
-                    formData,
                     {
+                        method: 'PUT',
                         headers: {
-                            'Authorization': `${token}`,
-                            'Content-Type': 'multipart/form-data',
+                            'Authorization': `Bearer ${token}`,
                         },
+                        body: formData,
                     }
                 );
-                console.log('Product added successfully:', response.data);
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error updating product');
+                }
+                console.log('Product updated successfully:', data);
                 formik.resetForm();
                 setImagePreview(""); // Reset image preview
             } catch (error) {
-                console.error('Error adding product:', error);
+                console.error('Error updating product:', error);
             }
         },
     });
+
+    const UNIT_TYPES = [
+        { value: 'NOS', label: 'NOS' },
+        { value: 'PRS', label: 'PRS' },
+        { value: 'BOX', label: 'BOX' },
+        { value: 'SET', label: 'SET' },
+        { value: 'SET OF 12', label: 'SET OF 12' },
+        { value: 'SET OF 16', label: 'SET OF 16' },
+        { value: 'SET OF 6', label: 'SET OF 6' },
+        { value: 'SET OF 8', label: 'SET OF 8' },
+    ];
+
+    useEffect(() => {
+        const fetchProductFamilies = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setProductFamilies(data.data);
+                } else {
+                    console.error('Error fetching product families:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching product families:', error);
+            }
+        };
+
+        const fetchProductData = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                const productData = await response.json();
+                console.log("Fetched product data:", productData);
+
+                if (response.ok && productData.data.data) {
+                    formik.setValues({
+                        name: productData.data.name || '',
+                        hsn_code: productData.data.hsn_code || '',
+                        family: productData.data.family.map(family => family.id) || [],
+                        purchase_rate: productData.data.purchase_rate || '',
+                        type: productData.data.type || '',
+                        tax: productData.data.tax || '',
+                        unit: productData.data.unit || '',
+                        selling_price: productData.data.selling_price || '',
+                    });
+                    if (productData.data.image) {
+                        setImagePreview(productData.data.image); // Set initial image preview if available
+                    }
+                } else {
+                    console.error('Error fetching product data:', productData.message);
+                }
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+            }
+        };
+
+        fetchProductFamilies();
+        fetchProductData(); // Fetch product data when the component mounts
+    }, [token, id]); // Include token and id in the dependency array
+
+    const handleAcceptedFiles = (files) => {
+        const file = files[0];
+        setSelectedFiles(files);
+        setImagePreview(URL.createObjectURL(file)); // Set image preview
+    };
 
     return (
         <React.Fragment>

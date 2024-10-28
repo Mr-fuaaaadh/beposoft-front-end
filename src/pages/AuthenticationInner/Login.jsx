@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import Axios from 'axios'; // Import Axios
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // Redux
 import { Link } from "react-router-dom";
 
-import { Row, Col, CardBody, Card, Container, Form, Input, Label, FormFeedback } from "reactstrap";
+import { Row, Col, CardBody, Card, Container, Form, Input, Label, FormFeedback, Alert } from "reactstrap";
 
 // Formik validation
 import * as Yup from "yup";
@@ -11,11 +13,13 @@ import { useFormik } from "formik";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
-import logo from "../../assets/images/logo.svg";
+import logo from "../../../src/logo.png";
 import lightlogo from "../../assets/images/logo-light.svg";
 
 const Login = () => {
   const [show, setShow] = useState(false);
+  const [message, setMessage] = useState(null); // State for message
+  const navigate = useNavigate(); // Initialize navigate
 
   //meta title
   document.title = "Login | Skote - Vite React Admin & Dashboard Template";
@@ -26,16 +30,43 @@ const Login = () => {
     enableReinitialize: true,
 
     initialValues: {
-      username: '',
+      email: '',
       password: '',
     },
     validationSchema: Yup.object({
-      username: Yup.string().required("Please Enter Your username"),
+      email: Yup.string().required("Please Enter Your email"),
       password: Yup.string().required("Please Enter Your Password"),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      try {
+        const response = await Axios.post(`${import.meta.env.VITE_APP_APIKEY}login/`, values);
+
+        if (response.status === 200) {
+          const { token, active, name } = response.data;
+
+          // Save token and user data in localStorage
+          localStorage.setItem('token', token);
+          localStorage.setItem('active', active);
+          localStorage.setItem('name', name);
+          console.log(response)
+
+          // Show success message
+          setMessage({ type: 'success', text: 'Login successful!' });
+
+          // Redirect to dashboard
+          navigate('/dashboard');
+        } else {
+          // Handle non-success status
+          setMessage({ type: 'danger', text: 'Login failed. Please try again.' });
+        }
+      } catch (error) {
+        // Handle errors
+        console.error("Login failed:", error);
+        setMessage({ type: 'danger', text: 'An error occurred. Please try again.' });
+      }
     }
   });
+
   return (
     <React.Fragment>      
       <div className="account-pages my-5 pt-sm-5">
@@ -91,22 +122,29 @@ const Login = () => {
                         return false;
                       }}
                     >
+                      {/* Display message */}
+                      {message && (
+                        <Alert color={message.type}>
+                          {message.text}
+                        </Alert>
+                      )}
+
                       <div className="mb-3">
-                        <Label className="form-label">Username</Label>
+                        <Label className="form-label">Email</Label>
                         <Input
-                          name="username"
+                          name="email"
                           className="form-control"
-                          placeholder="Enter username"
+                          placeholder="Enter email"
                           type="text"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
-                          value={validation.values.username || ""}
+                          value={validation.values.email || ""}
                           invalid={
-                            validation.touched.username && validation.errors.username ? true : false
+                            validation.touched.email && validation.errors.email ? true : false
                           }
                         />
-                        {validation.touched.username && validation.errors.username ? (
-                          <FormFeedback type="invalid">{validation.errors.username}</FormFeedback>
+                        {validation.touched.email && validation.errors.email ? (
+                          <FormFeedback type="invalid">{validation.errors.email}</FormFeedback>
                         ) : null}
                       </div>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import { Table, Row, Col, Card, CardBody, CardTitle, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem, UncontrolledTooltip, Input, Button } from "reactstrap";
-import { FaSearch } from 'react-icons/fa'; // Import search icon from react-icons
+import { FaSearch } from 'react-icons/fa';
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const BasicTable = () => {
         const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
           method: 'GET',
           headers: {
-            'Authorization': `${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -49,7 +49,7 @@ const BasicTable = () => {
 
         if (data && Array.isArray(data.data)) {
           setProducts(data.data);
-          setFilteredProducts(data.data); // Initialize filtered products
+          setFilteredProducts(data.data);
         } else {
           setError("No data found or unexpected response structure");
         }
@@ -82,13 +82,20 @@ const BasicTable = () => {
   };
 
   const handleAddProduct = () => {
-    // Navigate to the add product page or open a modal
-    navigate('/ecommerce-add-product'); // Example navigation
+    navigate('/ecommerce-add-product');
+  };
+
+
+  const handleEditVie = (productId) => {
+    navigate(`/ecommerce-product-edit/${productId}/`);
   };
 
   const handleProductClick = (productId, productType) => {
-    // Navigate to the product detail page with ID and type in the URL
     navigate(`/ecommerce-product-variant/${productId}/${productType}/`);
+  };
+
+  const handleViewProduct = (productId,productType) => {
+    navigate(`/ecommerce-product-detail/${productId}/${productType}/`); // Adjust this path as per your view product route
   };
 
   const onClickDelete = async (productId) => {
@@ -98,15 +105,14 @@ const BasicTable = () => {
         return;
       }
 
-      const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}product/delete/${productId}/`, {
+      const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}product/update/${productId}/`, {
         headers: {
-          'Authorization': `${token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
       if (response.status === 200) {
-        // Successfully deleted
         setProducts(products.filter(product => product.id !== productId));
         setFilteredProducts(filteredProducts.filter(product => product.id !== productId));
       } else {
@@ -154,7 +160,7 @@ const BasicTable = () => {
                       </Button>
                     </Col>
                   </Row>
-                  <CardTitle className="h4">Product Table</CardTitle>
+                  <CardTitle className="h4 text-center">Product Table</CardTitle>
                   {loading ? (
                     <p>Loading...</p>
                   ) : error ? (
@@ -163,8 +169,9 @@ const BasicTable = () => {
                     <div className="table-responsive">
                       <Table className="table mb-0">
                         <thead>
-                          <tr>
+                          <tr className="text-center">
                             <th>#</th>
+                            <th>Image</th>
                             <th>Name</th>
                             <th>HSN CODE</th>
                             <th>TYPE</th>
@@ -179,40 +186,50 @@ const BasicTable = () => {
                         <tbody>
                           {filteredProducts.length > 0 ? (
                             filteredProducts.map((product, index) => (
-                              <tr key={product.id}>
+                              <tr key={product.id} className="text-center">
                                 <th scope="row">{index + 1}</th>
-                                <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => handleProductClick(product.id, product.type)}>
+                                <td>
+                                  <img
+                                    src={`http://localhost:8000/${product.image}`}  // Combine API base URL with image path
+                                    alt={product.name}
+                                    style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "5px" }}
+                                  />
+                                </td>
+                                <td style={{ cursor: 'pointer' }} onClick={() => handleProductClick(product.id, product.type)}>
                                   {truncateText(product.name, 30)}
                                 </td>
-                                <td style={{ textAlign: 'center' }}>{product.hsn_code}</td>
-                                <td style={{ textAlign: 'center' }}>{product.type}</td>
-                                <td style={{ textAlign: 'center' }}>{product.unit}</td>
-                                <td style={{ textAlign: 'center' }}>{product.purchase_rate}</td>
-                                <td style={{ textAlign: 'center' }}>{product.tax}%</td>
-                                <td style={{ textAlign: 'center' }}>{Math.floor(product.exclude_price)}</td>
-                                <td style={{ textAlign: 'center' }}>{product.selling_price}</td>
-                                <td style={{ textAlign: 'center' }}>
+                                <td>{product.hsn_code}</td>
+                                <td>{product.type}</td>
+                                <td>{product.unit}</td>
+                                <td>{product.purchase_rate}</td>
+                                <td>{product.tax}%</td>
+                                <td>{Math.floor(product.exclude_price)}</td>
+                                <td>{product.selling_price}</td>
+                                <td>
                                   <UncontrolledDropdown>
                                     <DropdownToggle tag="a" className="card-drop">
                                       <i className="mdi mdi-dots-horizontal font-size-18"></i>
                                     </DropdownToggle>
                                     <DropdownMenu className="dropdown-menu-end">
-                                      <DropdownItem
-                                        onClick={() => handleCustomerClick(product)}
-                                      >
+                                      <DropdownItem onClick={() => handleEditVie(product.id)}>
                                         <i className="mdi mdi-pencil font-size-16 text-success me-1" id={`edittooltip-${product.id}`}></i>
                                         Edit
                                         <UncontrolledTooltip placement="top" target={`edittooltip-${product.id}`}>
                                           Edit
                                         </UncontrolledTooltip>
                                       </DropdownItem>
-                                      <DropdownItem
-                                        onClick={() => onClickDelete(product.id)}
-                                      >
+                                      <DropdownItem onClick={() => onClickDelete(product.id)}>
                                         <i className="mdi mdi-trash-can font-size-16 text-danger me-1" id={`deletetooltip-${product.id}`}></i>
                                         Delete
                                         <UncontrolledTooltip placement="top" target={`deletetooltip-${product.id}`}>
                                           Delete
+                                        </UncontrolledTooltip>
+                                      </DropdownItem>
+                                      <DropdownItem onClick={() => handleViewProduct(product.id,product.type)}>
+                                        <i className="mdi mdi-eye font-size-16 text-info me-1" id={`viewtooltip-${product.id}`}></i>
+                                        View
+                                        <UncontrolledTooltip placement="top" target={`viewtooltip-${product.id}`}>
+                                          View Product
                                         </UncontrolledTooltip>
                                       </DropdownItem>
                                     </DropdownMenu>
@@ -222,7 +239,7 @@ const BasicTable = () => {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="10">No products available</td>
+                              <td colSpan="11">No products available</td>
                             </tr>
                           )}
                         </tbody>
