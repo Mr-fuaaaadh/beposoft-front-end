@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import {
-    Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label, Form, FormFeedback
+    Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label, Form, FormFeedback, 
 } from "reactstrap";
+import { Dropdown } from 'react-bootstrap';
 import { Link } from "react-router-dom";
+
 
 // Import components
 import Breadcrumbs from '../../components/Common/Breadcrumb';
@@ -98,17 +100,31 @@ const DatatableTables = () => {
                 ),
             },
             {
-                header: 'Address',
-                accessorKey: 'address',
+                header: 'Actions',
+                accessorKey: 'actions',
                 enableColumnFilter: false,
                 enableSorting: false,
                 cell: ({ row }) => (
-                    <Link
-                        to={`/customer/address/${row.original.id}/add/`}
-                        className="btn btn-success"
-                    >
-                        Address
-                    </Link>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            Actions
+                        </Dropdown.Toggle>
+            
+                        <Dropdown.Menu>
+                            <Dropdown.Item as={Link} to={`/customer/address/${row.original.id}/add/`}>
+                                Address
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} to={`/customer/invoice/${row.original.id}/view/`}>
+                                Invoice
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} to={`/customer/orders/${row.original.id}/view/`}>
+                                Orders
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} to={`/customer/${row.original.id}/ledger/`}>
+                                Ledger
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 ),
             }
             

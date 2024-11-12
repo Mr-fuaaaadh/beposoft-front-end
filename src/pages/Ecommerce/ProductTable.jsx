@@ -190,7 +190,7 @@ const BasicTable = () => {
                                 <th scope="row">{index + 1}</th>
                                 <td>
                                   <img
-                                    src={`http://localhost:8000/${product.image}`}  // Combine API base URL with image path
+                                    src={`http://localhost:8000${product.image}`}  // Combine API base URL with image path
                                     alt={product.name}
                                     style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "5px" }}
                                   />

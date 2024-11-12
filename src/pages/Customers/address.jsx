@@ -57,7 +57,7 @@ const FormLayouts = () => {
         onSubmit: async (values, { resetForm }) => {
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}add/cutomer/address/${id}/`,
+                    `${import.meta.env.VITE_APP_APIKEY}add/customer/address/${id}/`,
                     values,
                     { headers: { 'Authorization': `Bearer ${token}` } }
                 );
@@ -87,7 +87,7 @@ const FormLayouts = () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this address?");
         if (confirmDelete) {
             try {
-                const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}update/cutomer/address/${id}/`, {
+                const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}update/customer/address/${id}/`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
     
@@ -113,7 +113,7 @@ const FormLayouts = () => {
             setLoading(true); // Set loading to true at the start of fetch
             try {
                 const responseState = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const responseAddress = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/cutomer/address/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const responseAddress = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
     
                 if (responseState.status === 200) {
                     setState(responseState.data.data);

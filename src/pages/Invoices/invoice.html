@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .invoice-box {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            line-height: 1.6;
+            color: #555;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .header .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .company-info {
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .invoice-info, .address-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .address-box, .invoice-info div {
+            width: 48%;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .summary-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 16px;
+        }
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .bank-details {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <!-- Header with Company Logo and Name -->
+        <div class="header">
+            <img src="https://via.placeholder.com/150" alt="Company Logo">
+            <div class="company-name">Michael Export and Import Private Limited</div>
+        </div>
+
+        <!-- Centered Company Information -->
+        <div class="company-info">
+            H.NO./X/153-B, Floor-Jubilee Nagar, Ernakulam, Kerala, 682003<br>
+            Contact: +91 95267 92642<br>
+            Email: Accounts@bepositiveracing.com<br>
+            GSTIN: 32AAJCM8151G2ZH
+        </div>
+
+        <!-- Invoice Information -->
+        <div class="invoice-info">
+            <div>
+                <strong>Invoice #:</strong> MIK/11/06086<br>
+                <strong>Date:</strong> 12-Nov-2024<br>
+            </div>
+        </div>
+
+        <!-- Address Section for Billing and Shipping -->
+        <div class="address-section">
+            <!-- Billing Address -->
+            <div class="address-box">
+                <strong>Billing Address</strong>
+                Rajesh Kumar<br>
+                C/o Raj Computers, Railway Road, Opposite Union Bank of India<br>
+                NARWANA (District Jind) Haryana, Pin: 126116<br>
+                Phone: 9812161299
+            </div>
+
+            <!-- Shipping Address (if different) -->
+            <div class="address-box">
+                <strong>Shipping Address</strong>
+                Rajesh Kumar<br>
+                C/o Raj Computers, Railway Road, Opposite Union Bank of India<br>
+                NARWANA (District Jind) Haryana, Pin: 126116<br>
+                Phone: 9812161299
+            </div>
+        </div>
+
+        <!-- Product Details Table -->
+        <div class="product-details">
+            <table>
+                <tr>
+                    <th>Description</th>
+                    <th>HSN Code</th>
+                    <th>Rate</th>
+                    <th>Tax Rate</th>
+                    <th>Tax Amount</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+                <tr>
+                    <td>SLIDE BOARD - Green, M</td>
+                    <td>39269099</td>
+                    <td>2542.37</td>
+                    <td>18%</td>
+                    <td>457.63</td>
+                    <td>1</td>
+                    <td>3000.00</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-item"><span>Net Amount Before Tax:</span> <span>2542.37</span></div>
+            <div class="summary-item"><span>Total Tax Amount:</span> <span>457.63</span></div>
+            <div class="summary-item"><span>Discounted Amount:</span> <span>0.00</span></div>
+            <div class="summary-item"><span>Shipping Charge:</span> <span>0.00</span></div>
+            <div class="summary-item"><span>Advance Paid:</span> <span>0.00</span></div>
+            <div class="summary-item total"><span>Total Payable Amount:</span> <span>3000.00</span></div>
+        </div>
+
+        <!-- Bank Details Section -->
+        <div class="bank-details">
+            <strong>Bank Details</strong>
+            A/C Name: Michael Export & Import Pvt Ltd.<br>
+            Bank A/C: 850120110000168<br>
+            Bank Name: Bank of India<br>
+            IFSC: BKID0008501<br>
+            Branch: MG Road branch, Cochin
+        </div>
+
+        <!-- Footer Note -->
+        <div class="footer">
+            Thank you! This invoice was created on a computer and is valid without a signature and seal.
+        </div>
+    </div>
+</body>
+</html>

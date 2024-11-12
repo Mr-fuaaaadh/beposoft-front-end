@@ -174,6 +174,8 @@ import StaffEdit from "../pages/Staff/StaffUpdate";
 import CustomerTable from "../pages/Customers/customerTable";
 import CustomerForm from "../pages/Customers/add-customers";
 import Address from "../pages/Customers/address";
+import Ledger from "../pages/Customers/Ledger";
+
 
 // supervisor
 
@@ -182,6 +184,18 @@ import SupervisorForm from "../pages/Supervisor/supervisor";
 
 
 import CreateOrder from "../pages/Order/OrderCreate";
+import OrderTable from "../pages/Order/OrderList";
+import OrderItems from "../pages/Order/OrderProducts";
+
+
+
+
+//perfoma Invoice
+
+import InvoiceTable from "../pages/PerfomaInvoive/CreatePerfomaInvoice";
+import InvoiceList from "../pages/PerfomaInvoive/PerfomaInvoiceList"
+import Invoice from "../pages/PerfomaInvoive/PerfoamInvoiceProducts";
+import GenerateInvoice from "../pages/PerfomaInvoive/Invoice"
 
 import States from "../pages/State/stateTable";
 import Departments from "../pages/Department/departments";
@@ -195,6 +209,7 @@ import ProductUpdate from "../pages/Ecommerce/ProductUpdateForm";
 
 
 import Bank from "../../src/pages/Bank/index";
+
 
 
 
@@ -256,6 +271,8 @@ const authProtectedRoutes = [
   {path: "/all-customers/",component:<CustomerTable />},
   {path: "/add-customers/",component:<CustomerForm />},
   {path: "customer/address/:id/add/",component:<Address />},
+  {path: "customer/:id/ledger/",component:<Ledger />},
+
 
 
   //all supervisors
@@ -264,6 +281,19 @@ const authProtectedRoutes = [
   { path: "/add-supervisors", component: <SupervisorForm /> },
 
   { path: "/New/Order/", component: <CreateOrder /> },
+  { path: "/Orders/", component: <OrderTable /> },
+  { path: "/order/:id/items/", component: <OrderItems /> },
+
+
+  { path: "/create/perfoma/invoice/", component: <InvoiceTable /> },
+  {path: "/perfoma/invoices/", component: <InvoiceList/>},
+  {path: "/perfoma/invoice/:invoice/view/", component: <Invoice/>},
+  {path: "/generate/perfoma/invoice/:invoice/", component: <GenerateInvoice/>},
+
+
+
+
+
 
 
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios
+import { useParams } from "react-router-dom";
+
 import {
     Modal,
     ModalHeader,
@@ -24,6 +26,10 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
     const [selectedSize, setSelectedSize] = useState({});
     const [quantity, setQuantity] = useState({});
     const token = localStorage.getItem("token");
+    const { id } = useParams();
+
+
+    console.log("order ID   :",id)
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -136,7 +142,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
 
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}cart/product/`,
+                `${import.meta.env.VITE_APP_APIKEY}add/order/${id}/product/`,
                 cartItem,
                 {
                     headers: {
@@ -328,7 +334,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                                 </Button>
                                                                             </td>
 
-                                                                            <td>
+                                                                            {/* <td>
                                                                                 {variant.is_variant && (
                                                                                     <Button
                                                                                         color="success"
@@ -339,7 +345,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                                         Add
                                                                                     </Button>
                                                                                 )}
-                                                                            </td>
+                                                                            </td> */}
 
                                                                         </tr>
                                                                     ))}

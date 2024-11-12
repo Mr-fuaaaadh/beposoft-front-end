@@ -301,10 +301,26 @@ const SidebarContent = (props) => {
                   <Link to="/New/Order/">{props.t("new order")}</Link>
                 </li>
                 <li>
-                  <Link to="/attribute-values/">{props.t("order list")}</Link>
+                  <Link to="/Orders/">{props.t("order list")}</Link>
                 </li>
               </ul>
             </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Perfoma Invoice")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/create/perfoma/invoice/">{props.t("new Perfoma invoice")}</Link>
+                </li>
+                <li>
+                  <Link to="/perfoma/invoices/">{props.t("Perfoma invoices")}</Link>
+                </li>
+              </ul>
+            </li>
+
 
 
             <li>

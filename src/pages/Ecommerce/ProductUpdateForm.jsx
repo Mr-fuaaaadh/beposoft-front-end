@@ -119,7 +119,7 @@ const EcommerenceAddProduct = () => {
                 const productData = await response.json();
                 console.log("Fetched product data:", productData);
 
-                if (response.ok && productData.data.data) {
+                if (response.ok && productData) {
                     formik.setValues({
                         name: productData.data.name || '',
                         hsn_code: productData.data.hsn_code || '',

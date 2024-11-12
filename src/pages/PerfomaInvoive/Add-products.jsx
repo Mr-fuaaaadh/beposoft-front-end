@@ -119,7 +119,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
         // If the product is a variant, add the variant ID
         if (variant) {
             cartItem.variant = variant.id;
-             // Include the variant ID
+            // Include the variant ID
 
             // Log the variant ID
             console.log("Variant ID:", variant.id);

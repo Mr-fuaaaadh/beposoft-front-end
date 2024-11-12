@@ -4,7 +4,7 @@ import { Card, Col, Container, Table, Button, Row, CardBody, CardTitle, Label, F
 import * as Yup from 'yup';
 import { useFormik } from "formik";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-import AddProduct from "./Add-product";
+import AddProduct from "./Add-products";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ const FormLayouts = () => {
     const [states, setStates] = useState([]); // All states
     const [staffs, setStaffs] = useState([]);
     const [customers, setCustomers] = useState([]);
-    const [allocatedStates, setAllocatedStates] = useState([]);
+    // const [states, setstates] = useState([]);
     const [loggedUser, setLoggedUser] = useState(null);
     const [familys, setFamilys] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,7 +72,7 @@ const FormLayouts = () => {
 
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}order/create/`, // Replace 'your-endpoint/' with the actual API endpoint
+                    `${import.meta.env.VITE_APP_APIKEY}perfoma/invoice/create/`, // Replace 'your-endpoint/' with the actual API endpoint
                     values,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -137,9 +137,9 @@ const FormLayouts = () => {
                         formik.setFieldValue("family", user.family || "");
 
                         if (states.length > 0) {
-                            const allocatedStates = user.allocated_states || [];
-                            const filteredStates = states.filter(state => allocatedStates.includes(state.id));
-                            setAllocatedStates(filteredStates);
+                            const states = user.allocated_states || [];
+                            const filteredStates = states.filter(state => states.includes(state.id));
+                            setstates(filteredStates);
                         }
                     }
 
@@ -453,7 +453,7 @@ const FormLayouts = () => {
                                                         invalid={formik.touched.state && formik.errors.state ? true : false}
                                                     >
                                                         <option value="">Select a State...</option>
-                                                        {allocatedStates.map((stat) => (
+                                                        {states.map((stat) => (
                                                             <option key={stat.id} value={stat.id}>
                                                                 {stat.name}
                                                             </option>
