@@ -6,8 +6,8 @@ import * as Yup from 'yup';
 import { useFormik } from "formik";
 import axios from 'axios';
 import AddProduct from "./AddCreatedOrderProducts";
-import Receipt from "./Reciept";
 import Information from "./information"
+import Paymentrecipent from "./PaymentRecipt"
 
 // Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
@@ -822,7 +822,7 @@ const FormLayouts = () => {
                                                                 <td className="image-cell">
                                                                     {item.images ? (
                                                                         <img
-                                                                            src={`http://localhost:8000${item.images[0]}`}
+                                                                            src={`${item.images[0]}`}
                                                                             alt={item.name}
                                                                             style={{
                                                                                 width: '50px',
@@ -1047,173 +1047,7 @@ const FormLayouts = () => {
 
 
                         <Col xl={12}>
-                            <Card>
-                                <CardBody>
-                                    <CardTitle className="mb-4 p-2 text-uppercase border-bottom border-primary">
-                                        <i className="bi bi-info-circle me-2"></i> INFORMATION
-                                    </CardTitle>
-
-                                    <Row>
-                                        <Col md={4} className="d-flex flex-column p-3" style={{ borderRight: "1px solid black" }}>
-                                            <h5>INVOICE PAYMENT STATUS</h5>
-                                            <p style={{ color: "green", fontWeight: "bold" }}>No reciept against Invoice</p>
-                                        </Col>
-
-                                        <Col md={4} className="d-flex flex-column p-3" style={{ borderRight: "1px solid black" }}>
-                                            <h5>CUSTOMER LEDGER</h5>
-                                            <div style={{ backgroundColor: "#f8f9fa", padding: "10px", borderRadius: "5px", fontWeight: "bold" }}>
-                                                Ledger debited: <span style={{ color: "#dc3545" }}>{totalAmount.toFixed(2)}</span>
-                                            </div>
-                                        </Col>
-
-                                        <Col md={4} className="d-flex flex-column p-3" style={{ borderRight: "1px solid black" }}>
-                                            <h5>ACTION</h5>
-                                            <button className="btn btn-primary btn-sm mt-2" onClick={toggleReciptModal}>Add</button>
-                                        </Col>
-                                    </Row>
-
-                                    <Modal isOpen={isOpen} toggle={toggleReciptModal} size="lg">
-                                        <ModalHeader toggle={toggleReciptModal}>Receipt Against Invoice Generate</ModalHeader>
-                                        <ModalBody>
-                                            <Receipt toggleReciptModal={toggleReciptModal} />
-                                        </ModalBody>
-                                    </Modal>
-
-
-
-                                    <Row>
-                                        <Col xl={12}>
-                                            <Card>
-                                                <CardBody>
-                                                    <CardTitle className="h4">RECEIPT DETAILS</CardTitle>
-                                                    <div className="table-responsive">
-                                                        <Table className="table table-bordered mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>#</th>
-                                                                    <th>RECEIEPT NO</th>
-                                                                    <th>DATE</th>
-                                                                    <th>BANK</th>
-                                                                    <th>AMOUNT</th>
-                                                                    <th>CREATED BY</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {Array.isArray(paymentReceipts) && paymentReceipts.length > 0 ? (
-                                                                    paymentReceipts.map((receiptItem, index) => (
-                                                                        <tr key={receiptItem.id || index}>
-                                                                            <th scope="row">{index + 1}</th>
-                                                                            <td>{receiptItem.payment_receipt || 'N/A'}</td>
-                                                                            <td>{receiptItem.received_at || 'N/A'}</td>
-                                                                            <td>{receiptItem.bank ? 'Federal Bank' : 'N/A'}</td> {/* Replace with actual bank name if needed */}
-                                                                            <td>{receiptItem.amount || 'N/A'}</td>
-                                                                            <td>{receiptItem.created_by || 'N/A'}</td>
-
-                                                                        </tr>
-                                                                    ))
-                                                                ) : (
-                                                                    <tr>
-                                                                        <td colSpan="7" style={{ textAlign: 'center', color: 'gray' }}>No receipts available</td>
-                                                                    </tr>
-                                                                )}
-                                                            </tbody>
-
-
-                                                        </Table>
-                                                    </div>
-                                                </CardBody>
-                                                <Row>
-                                                    <Col xl={6}>
-                                                        <Card>
-                                                            <CardBody>
-                                                                <h4 className="card-title">PACKING INFORMATION</h4>
-                                                                <p className="card-title-desc">Add <code>.table-bordered</code> & <code>.border-*</code>
-                                                                    for colored borders on all sides of the table and cells.</p>
-                                                                <div className="table-responsive">
-                                                                    <Table className="table table-bordered border-primary mb-0">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>#</th>
-                                                                                <th>BOX</th>
-                                                                                <th>A.WT</th>
-                                                                                <th>V.WT</th>
-                                                                                <th>IMAGE</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th scope="row">1</th>
-                                                                                <td>Mark</td>
-                                                                                <td>Otto</td>
-                                                                                <td>@mdo</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th scope="row">2</th>
-                                                                                <td>Jacob</td>
-                                                                                <td>Thornton</td>
-                                                                                <td>@fat</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th scope="row">3</th>
-                                                                                <td>Larry</td>
-                                                                                <td>the Bird</td>
-                                                                                <td>@twitter</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </Table>
-                                                                </div>
-                                                            </CardBody>
-                                                        </Card>
-                                                    </Col>
-
-                                                    <Col xl={6}>
-                                                        <Card>
-                                                            <CardBody>
-                                                                <h4 className="card-title">TRACKING INFORMATION</h4>
-                                                                <p className="card-title-desc">Add <code>.table-bordered</code> & <code>.border-*</code> for colored borders on all sides of the table and cells.</p>
-
-                                                                <div className="table-responsive">
-                                                                    <Table className="table table-bordered border-success mb-0">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>#</th>
-                                                                                <th>BOX</th>
-                                                                                <th>PARCEL SERVICE	</th>
-                                                                                <th>TRACKING ID	</th>
-                                                                                <th>DELIVERY CHARGE</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th scope="row">1</th>
-                                                                                <td>Mark</td>
-                                                                                <td>Otto</td>
-                                                                                <td>@mdo</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th scope="row">2</th>
-                                                                                <td>Jacob</td>
-                                                                                <td>Thornton</td>
-                                                                                <td>@fat</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th scope="row">3</th>
-                                                                                <td>Larry</td>
-                                                                                <td>the Bird</td>
-                                                                                <td>@twitter</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </Table>
-                                                                </div>
-                                                            </CardBody>
-                                                        </Card>
-                                                    </Col>
-                                                </Row>
-                                            </Card>
-                                        </Col>
-                                    </Row>
-                                </CardBody>
-                            </Card>
+                            <Paymentrecipent/>
 
                             <Information/>
 

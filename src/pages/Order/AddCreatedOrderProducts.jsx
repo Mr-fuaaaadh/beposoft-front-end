@@ -208,7 +208,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                 <td>{index + 1}</td>
                                                 <td>
                                                     <img
-                                                        src={`http://localhost:8000${product.image}`}
+                                                        src={`${product.image}`}
                                                         alt={product.name}
                                                         style={{ width: "50px", height: "50px", objectFit: "cover" }}
                                                     />
@@ -273,7 +273,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                             <td>
                                                                                 <img
                                                                                     src={variant.variant_images && variant.variant_images.length > 0
-                                                                                        ? `http://localhost:8000${variant.variant_images[0].image}`
+                                                                                        ? `${variant.variant_images[0].image}`
                                                                                         : "https://via.placeholder.com/50"
                                                                                     }
                                                                                     alt={variant.name}

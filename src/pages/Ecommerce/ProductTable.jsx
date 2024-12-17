@@ -94,7 +94,7 @@ const BasicTable = () => {
     navigate(`/ecommerce-product-variant/${productId}/${productType}/`);
   };
 
-  const handleViewProduct = (productId,productType) => {
+  const handleViewProduct = (productId, productType) => {
     navigate(`/ecommerce-product-detail/${productId}/${productType}/`); // Adjust this path as per your view product route
   };
 
@@ -190,7 +190,7 @@ const BasicTable = () => {
                                 <th scope="row">{index + 1}</th>
                                 <td>
                                   <img
-                                    src={`http://localhost:8000${product.image}`}  // Combine API base URL with image path
+                                    src={product.image}
                                     alt={product.name}
                                     style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "5px" }}
                                   />
@@ -225,7 +225,7 @@ const BasicTable = () => {
                                           Delete
                                         </UncontrolledTooltip>
                                       </DropdownItem>
-                                      <DropdownItem onClick={() => handleViewProduct(product.id,product.type)}>
+                                      <DropdownItem onClick={() => handleViewProduct(product.id, product.type)}>
                                         <i className="mdi mdi-eye font-size-16 text-info me-1" id={`viewtooltip-${product.id}`}></i>
                                         View
                                         <UncontrolledTooltip placement="top" target={`viewtooltip-${product.id}`}>

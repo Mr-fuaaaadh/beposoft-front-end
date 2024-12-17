@@ -67,8 +67,6 @@ const FormLayouts = () => {
         gst: "",
         address: "",
         zipcode: "",
-        phone: "",
-        email: "",
     })
 
 

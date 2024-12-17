@@ -15,7 +15,7 @@ import {
     DropdownItem
 } from "reactstrap";
 
-const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
+const AddProduct = ({ isOpen, toggle, }) => {
     const [products, setProducts] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
@@ -69,10 +69,11 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
     const handleSizeSelect = (variantId, sizeId) => {
         // Find the selected size object based on the provided sizeId
         const variant = products.find(product =>
-            product.variant_products.some(variant => variant.id === variantId)
-        )?.variant_products.find(variant => variant.id === variantId);
+            product.variant_products && product.variant_products.some(variant => variant.id === variantId) // Check if variant_products is defined
+        )?.variant_products?.find(variant => variant.id === variantId); // Safely access variant_products
+    
         const selectedSizeObject = variant?.sizes.find((size) => size.id === sizeId);
-
+    
         if (selectedSizeObject) {
             // Update the state with the selected size for the specific variant
             setSelectedSize((prevState) => ({
@@ -84,6 +85,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
             }));
         }
     };
+    
 
     // Function to toggle the dropdown
     const toggleDropdown = (variantId) => {
@@ -202,7 +204,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                 <td>{index + 1}</td>
                                                 <td>
                                                     <img
-                                                        src={`http://localhost:8000${product.image}`}
+                                                        src={product.image}
                                                         alt={product.name}
                                                         style={{ width: "50px", height: "50px", objectFit: "cover" }}
                                                     />
@@ -267,7 +269,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                             <td>
                                                                                 <img
                                                                                     src={variant.variant_images && variant.variant_images.length > 0
-                                                                                        ? `http://localhost:8000${variant.variant_images[0].image}`
+                                                                                        ? `${variant.variant_images[0].image}`
                                                                                         : "https://via.placeholder.com/50"
                                                                                     }
                                                                                     alt={variant.name}
@@ -318,7 +320,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                                     placeholder="Quantity"
                                                                                 />
                                                                             </td>
-                                                                            <td>
+                                                                            {/* <td>
                                                                                 <Button
                                                                                     color="success"
                                                                                     size="sm"
@@ -326,7 +328,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
                                                                                 >
                                                                                     Add
                                                                                 </Button>
-                                                                            </td>
+                                                                            </td> */}
 
                                                                             <td>
                                                                                 {variant.is_variant && (

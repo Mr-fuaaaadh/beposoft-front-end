@@ -1,11 +1,10 @@
 import axios from 'axios';
 import {
-    Card, Col, Container, Row, CardBody, CardTitle, Label, Form, Input, InputGroup, FormFeedback, Button
+    Card, Col, Container, Row, CardBody, CardTitle, Label, Form, Input, FormFeedback,
 } from "reactstrap";
 import * as Yup from 'yup';
 import { useFormik } from "formik";
 import React, { useState, useEffect } from "react";
-import Select from 'react-select';
 
 // Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";

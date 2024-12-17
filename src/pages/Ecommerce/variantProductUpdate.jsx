@@ -526,7 +526,7 @@ const VariantProductData = () => {
                                                         <td>{index + 1}</td>
                                                         <td>
                                                             <img
-                                                                src={`http://localhost:8000${image.image}`}
+                                                                src={image.image}
                                                                 alt={`Image ${index + 1}`}
                                                                 style={{ width: "50px", height: "50px", marginRight: "10px" }}
                                                             />

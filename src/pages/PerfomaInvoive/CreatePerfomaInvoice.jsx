@@ -30,6 +30,8 @@ const FormLayouts = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [banks, setBank] = useState([]);
+    const [companys, setCompany] = useState([]);
+
 
 
 
@@ -108,13 +110,15 @@ const FormLayouts = () => {
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse] = await Promise.all([
+                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse,companyResponse] = await Promise.all([
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/customers/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_APIKEY}company/getadd/`, { headers: { Authorization: `Bearer ${token}` } }),
+
 
                     ]);
 
@@ -145,6 +149,9 @@ const FormLayouts = () => {
 
                     if (bankResponse.status === 200) {
                         setBank(bankResponse.data.data);
+                    }
+                    if (companyResponse.status === 200) {
+                        setCompany(companyResponse.data);
                     }
 
                 } catch (error) {
@@ -341,8 +348,12 @@ const FormLayouts = () => {
                                                         onBlur={formik.handleBlur}
                                                         invalid={formik.touched.company && formik.errors.company ? true : false}
                                                     >
-                                                        <option value="BEPOSITIVERACING PVT LTD">BEPOSITIVERACING PVT LTD</option>
-                                                        <option value="MICHEAL IMPORT EXPORT PVT LTD">MICHEAL IMPORT EXPORT PVT LTD</option>
+                                                        <option value="" disabled>Select a company</option>
+                                                        {companys.map((company, index) => (
+                                                            <option key={index} value={company.id}>
+                                                                {company.name}
+                                                            </option>
+                                                        ))}
                                                     </Input>
                                                     {formik.errors.company && formik.touched.company ? (
                                                         <FormFeedback type="invalid">{formik.errors.company}</FormFeedback>

@@ -543,7 +543,7 @@ const VariantProductCreateForm = () => {
                                                                     <th scope="row">{index + 1}</th>
                                                                     <td>{item.name}</td>
                                                                     <td>
-                                                                        <img src={`http://127.0.0.1:8000/${item.variant_images[0]?.image}`} alt={item.name} style={{ width: '50px', height: '50px' }} />
+                                                                        <img src={item.variant_images[0]?.image} alt={item.name} style={{ width: '50px', height: '50px' }} />
                                                                     </td>
                                                                     <td>{item.stock}</td>
                                                                     <td>{item.created_user}</td>
@@ -571,7 +571,7 @@ const VariantProductCreateForm = () => {
                                                                 <tr key={item.id}>
                                                                     <td>{index + 1}</td>
                                                                     <td>
-                                                                        <img src={`http://127.0.0.1:8000/${item.image}`} alt={item.name} style={{ width: '100px', height: '100px' }} />
+                                                                        <img src={item.image}alt={item.name} style={{ width: '100px', height: '100px' }} />
                                                                     </td>
                                                                     <td>
                                                                         <button type="button"

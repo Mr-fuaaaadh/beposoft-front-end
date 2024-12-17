@@ -1,216 +1,45 @@
-import React, { useEffect, useMemo, useState } from "react";
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from "react";
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 import {
-    Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label, Form, FormFeedback, 
+    Table,
+    Row,
+    Col,
+    Card,
+    CardBody,
+    CardTitle,
+    CardSubtitle,
+    Button,
+    Input,
+    FormGroup,
+    Label
 } from "reactstrap";
-import { Dropdown } from 'react-bootstrap';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-
-// Import components
-import Breadcrumbs from '../../components/Common/Breadcrumb';
-import TableContainer from '../../components/Common/TableContainer';
-
-const DatatableTables = () => {
-    const [data, setData] = useState([]); // State to store customer data
-    const [states, setState] = useState([]); // State to store customer data
-    const [managers, setManager] = useState([]); // State to store customer data
-    const [loading, setLoading] = useState(true); // State for loading status
-    const [error, setError] = useState(null); // State for error handling
-    const [selectedCustomer, setSelectedCustomer] = useState(null); // To store selected customer data
-    const [modal, setModal] = useState(false); // State for modal visibility
-    const [validationErrors, setValidationErrors] = useState({}); // Validation errors state
+const BasicTable = () => {
+    const [data, setData] = useState([]);
+    const [states, setStates] = useState([]); // Store all states
+    const [managers, setManager] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedState, setSelectedState] = useState(""); // State for state filter
     const token = localStorage.getItem('token');
-
-    const toggleModal = () => setModal(!modal); // Toggle modal
-
-    const columns = useMemo(
-        () => [
-            {
-                header: 'ID',
-                accessorKey: 'id',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-            {
-                header: 'GST',
-                accessorKey: 'gst',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-            {
-                header: 'NAME',
-                accessorKey: 'name',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-            {
-                header: 'MANAGER',
-                accessorKey: 'manager',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-            {
-                header: 'PHONE',
-                accessorKey: 'phone',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-            {
-                header: 'EMAIL',
-                accessorKey: 'email',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-
-            {
-                header: 'CITY',
-                accessorKey: 'city',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-
-            {
-                header: 'STATE',
-                accessorKey: 'state',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-
-            {
-                header: 'ZIP CODE',
-                accessorKey: 'zip_code',
-                enableColumnFilter: false,
-                enableSorting: true,
-            },
-
-            {
-                header: 'Actions',
-                accessorKey: 'actions',
-                enableColumnFilter: false,
-                enableSorting: false,
-                cell: ({ row }) => (
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => handleUpdateClick(row.original)}
-                    >
-                        Update
-                    </button>
-                ),
-            },
-            {
-                header: 'Actions',
-                accessorKey: 'actions',
-                enableColumnFilter: false,
-                enableSorting: false,
-                cell: ({ row }) => (
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic">
-                            Actions
-                        </Dropdown.Toggle>
-            
-                        <Dropdown.Menu>
-                            <Dropdown.Item as={Link} to={`/customer/address/${row.original.id}/add/`}>
-                                Address
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} to={`/customer/invoice/${row.original.id}/view/`}>
-                                Invoice
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} to={`/customer/orders/${row.original.id}/view/`}>
-                                Orders
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} to={`/customer/${row.original.id}/ledger/`}>
-                                Ledger
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                ),
-            }
-            
-        ],
-        []
-    );
-
-    // Handle click on the Update button
-    const handleUpdateClick = (customerData) => {
-        setSelectedCustomer(customerData); // Set the selected customer data
-        toggleModal(); // Open the modal
-    };
-
-    // Handle the form submission to update the customer
-    const handleUpdateSubmit = async (event) => {
-        event.preventDefault();
-        
-        // Validate form
-        const errors = {};
-        if (!selectedCustomer.state) {
-            errors.state = "State is required";
-        }
-        if (!selectedCustomer.manager) {
-            errors.manager = "Manager is required";
-        }
-
-        // If validation errors exist, stop form submission
-        if (Object.keys(errors).length > 0) {
-            setValidationErrors(errors);
-            return;
-        }
-
-        try {
-            const response = await axios.put(`${import.meta.env.VITE_APP_APIKEY}customer/update/${selectedCustomer.id}/`, selectedCustomer, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-    
-            if (response.status === 200) {
-                // Update the local data array
-                const updatedData = data.map((item) =>
-                    item.id === selectedCustomer.id ? response.data : item
-                );
-                setData(updatedData); // This will cause a re-render with updated data
-    
-                toggleModal(); // Close the modal
-                alert("Customer updated successfully!");
-            } else {
-                throw new Error("Failed to update customer.");
-            }
-        } catch (error) {
-            setError(error.message || "Failed to update customer.");
-        }
-    };
-
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setSelectedCustomer((prev) => ({ ...prev, [name]: value }));
-
-        // Clear validation error if a valid value is selected
-        setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, {headers: {'Authorization': `Bearer ${token}`}});
-                const responseState = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, {headers: {'Authorization': `Bearer ${token}`}});
-                const responseManager = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {headers: {'Authorization': `Bearer ${token}`}});
+                const [response, responseState, responseManager] = await Promise.all([
+                    axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                ]);
 
-                if (response.status === 200) {
-                    setData(response.data.data); 
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                if (responseState.status === 200) {
-                    setState(responseState.data.data); 
-                } else {
-                    throw new Error(`HTTP error! Status: ${responseState.status}`);
-                }
-                if (responseManager.status === 200) {
-                    setManager(responseManager.data.data);
-                } else {
-                    throw new Error(`HTTP error! Status: ${responseManager.status}`);
-                }
+                if (response.status === 200) setData(response.data.data);
+                if (responseState.status === 200) setStates(responseState.data.data); // Fetch and set states
+                if (responseManager.status === 200) setManager(responseManager.data.data);
             } catch (error) {
                 setError(error.message || "Failed to fetch data");
             } finally {
@@ -221,171 +50,177 @@ const DatatableTables = () => {
         fetchData();
     }, [token]);
 
-    document.title = "Staff | Beposoft";
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleStateFilter = (e) => {
+        setSelectedState(e.target.value);
+    };
+
+    // Filter data based on both search term and selected state
+    const filteredData = data.filter((customer) =>
+        (customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.phone.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedState === "" || customer.state === selectedState)
+    );
+
+    const handleUpdate = (customerId) => {
+        navigate(`/customer/${customerId}/edit/`);
+    };
+
+    const handleAddress = (customerId) => {
+        navigate(`/customer/address/${customerId}/add/`);
+    };
+
+    const handleLedger = (customerId) => {
+        navigate(`/customer/${customerId}/ledger/`);
+    };
+
+    const exportToExcel = () => {
+        const formattedData = filteredData.map((customer, index) => ({
+            "#": index + 1,
+            "Name": customer.name,
+            "Manager": customer.manager,
+            "GST": customer.gst || 'N/A',
+            "Email": customer.email || 'N/A',
+            "Phone": customer.phone || 'N/A',
+            "Alt Phone": customer.alt_phone || 'N/A',
+            "City": customer.city || 'N/A',
+            "State": customer.state || 'N/A',
+            "Zip": customer.zip_code || 'N/A',
+            "Address": customer.address || 'N/A',
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+
+        XLSX.writeFile(workbook, "Customer_List.xlsx");
+    };
+
+    document.title = "Customer List | Dashboard Template";
 
     return (
-        <div className="page-content">
-            <div className="container-fluid">
-                <Breadcrumbs title="Tables" breadcrumbItem="Customers Information" />
-                {loading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p className="text-danger">Error: {error}</p>
-                ) : (
-                    <TableContainer
-                        columns={columns}
-                        data={data || []}
-                        isGlobalFilter={true}
-                        isPagination={true}
-                        SearchPlaceholder="Search by Name, Department, or Designation..."
-                        pagination="pagination"
-                        paginationWrapper='dataTables_paginate paging_simple_numbers'
-                        tableClass="table-bordered table-nowrap dt-responsive nowrap w-100 dataTable no-footer dtr-inline"
-                    />
-                )}
+        <React.Fragment>
+            <div className="page-content">
+                <div className="container-fluid">
+                    <Row>
+                        <Col xl={12}>
+                            <Card>
+                                <CardBody>
+                                    <CardTitle className="h4">Customer List</CardTitle>
+                                    <CardSubtitle className="card-title-desc">
+                                        Filter and view customer data.
+                                    </CardSubtitle>
 
-                {/* Modal for Update */}
-                {selectedCustomer && (
-                    <Modal isOpen={modal} toggle={toggleModal}>
-                        <ModalHeader toggle={toggleModal}>Update Customer</ModalHeader>
-                        <Form onSubmit={handleUpdateSubmit}>
-                            <ModalBody>
-                                <div className="mb-3">
-                                    <Label for="name">Name</Label>
-                                    <Input
-                                        type="text"
-                                        name="name"
-                                        value={selectedCustomer.name}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
+                                    <Row className="align-items-center mb-3">
+                                        <Col md={5}>
+                                            <FormGroup className="mb-0">
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Search by name, email, or phone"
+                                                    value={searchTerm}
+                                                    onChange={handleSearch}
+                                                    className="w-100"
+                                                />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col md={5}>
+                                            <FormGroup className="mb-0">
+                                                <Label for="stateFilter" className="mb-1">Filter by State</Label>
+                                                <Input
+                                                    type="select"
+                                                    id="stateFilter"
+                                                    value={selectedState}
+                                                    onChange={handleStateFilter}
+                                                    className="w-100"
+                                                >
+                                                    <option value="">All States</option>
+                                                    {states.map((state) => (
+                                                        <option key={state.id} value={state.name}>
+                                                            {state.name}
+                                                        </option>
+                                                    ))}
+                                                </Input>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col md={2} className="d-flex justify-content-end">
+                                            <Button color="success" onClick={exportToExcel} className="w-100">
+                                                Export to Excel
+                                            </Button>
+                                        </Col>
+                                    </Row>
 
-                                <div className="mb-3">
-                                    <Label for="manager">Managed User</Label>
-                                    <select
-                                        className={`form-control ${validationErrors.manager ? 'is-invalid' : ''}`}
-                                        name="manager"
-                                        value={selectedCustomer.manager}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="">Select Manager</option>
-                                        {managers.map((manager) => (
-                                            <option key={manager.id} value={manager.id}>
-                                                {manager.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {validationErrors.manager && (
-                                        <FormFeedback>{validationErrors.manager}</FormFeedback>
+
+                                    {loading ? (
+                                        <p>Loading...</p>
+                                    ) : error ? (
+                                        <p className="text-danger">{error}</p>
+                                    ) : (
+                                        <div className="table-responsive">
+                                            <Table bordered striped hover className="mb-0">
+                                                <caption>List of Customers</caption>
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Name</th>
+                                                        <th>Manager</th>
+                                                        <th>GST</th>
+                                                        <th>Email</th>
+                                                        <th>Phone</th>
+                                                        <th>City</th>
+                                                        <th>State</th>
+                                                        <th>Zip</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {filteredData.map((customer, index) => (
+                                                        <tr key={customer.id}>
+                                                            <th scope="row">{index + 1}</th>
+                                                            <td>{customer.name}</td>
+                                                            <td>{customer.manager}</td>
+                                                            <td>{customer.gst || 'N/A'}</td>
+                                                            <td>{customer.email || 'N/A'}</td>
+                                                            <td>{customer.phone || 'N/A'}</td>
+                                                            <td>{customer.city || 'N/A'}</td>
+                                                            <td>{customer.state || 'N/A'}</td>
+                                                            <td>{customer.zip_code || 'N/A'}</td>
+                                                            <td>
+                                                                <DropdownButton
+                                                                    id={`dropdown-${customer.id}`}
+                                                                    title="Actions"
+                                                                    size="sm"
+                                                                    variant="secondary"
+                                                                    className="d-inline-block"
+                                                                >
+                                                                    <Dropdown.Item onClick={() => handleUpdate(customer.id)}>
+                                                                        Update
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item onClick={() => handleAddress(customer.id)}>
+                                                                        Address
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item onClick={() => handleLedger(customer.id)}>
+                                                                        Ledger
+                                                                    </Dropdown.Item>
+                                                                </DropdownButton>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </div>
                                     )}
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="gst">GST</Label>
-                                    <Input
-                                        type="text"
-                                        name="gst"
-                                        value={selectedCustomer.gst}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="email">Email</Label>
-                                    <Input
-                                        type="email"
-                                        name="email"
-                                        value={selectedCustomer.email}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="phone">Phone</Label>
-                                    <Input
-                                        type="text"
-                                        name="phone"
-                                        value={selectedCustomer.phone}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="alt_phone">ALT Phone</Label>
-                                    <Input
-                                        type="text"
-                                        name="alt_phone"
-                                        value={selectedCustomer.alt_phone}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="address">ADDRESS</Label>
-                                    <Input
-                                        type="text"
-                                        name="address"
-                                        value={selectedCustomer.address}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="zip_code">ZIP CODE </Label>
-                                    <Input
-                                        type="text"
-                                        name="zip_code"
-                                        value={selectedCustomer.zip_code}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="city">CITY</Label>
-                                    <Input
-                                        type="text"
-                                        name="city"
-                                        value={selectedCustomer.city}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="mb-3">
-                                    <Label for="state">STATE</Label>
-                                    <select
-                                        className={`form-control ${validationErrors.state ? 'is-invalid' : ''}`}
-                                        name="state"
-                                        value={selectedCustomer.state}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="">Select State</option>
-                                        {states.map((state) => (
-                                            <option key={state.id} value={state.id}>
-                                                {state.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {validationErrors.state && (
-                                        <FormFeedback>{validationErrors.state}</FormFeedback>
-                                    )}
-                                </div>
-
-                            </ModalBody>
-
-                            <ModalFooter>
-                                <Button type="submit" color="primary">Update</Button>
-                                <Button color="secondary" onClick={toggleModal}>Cancel</Button>
-                            </ModalFooter>
-                        </Form>
-                    </Modal>
-                )}
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 
-DatatableTables.propTypes = {
-    preGlobalFilteredRows: PropTypes.any,
-};
-
-export default DatatableTables;
+export default BasicTable;

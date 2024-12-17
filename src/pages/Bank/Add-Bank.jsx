@@ -1,94 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Col, Container, Row, CardBody, CardTitle, Label, Form, Input, FormFeedback } from "reactstrap";
 import * as Yup from 'yup';
 import { useFormik } from "formik";
-// Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-
+import axios from "axios";
 
 const FormLayouts = () => {
-    // Meta title
     document.title = "Form Layouts | Skote - Vite React Admin & Dashboard Template";
 
-    // Retrieve the created_user value from local storage
-    const created_user = localStorage.getItem('name') || '';
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [message, setMessage] = useState(null); // For success or error message
+    const [messageType, setMessageType] = useState(null); // For determining success or error message type
 
-    // Formik setup
+    const user = localStorage.getItem('name');
+    console.log("User    :",user)
+
     const formik = useFormik({
         initialValues: {
             name: "",
             account_number: "",
             ifsc_code: "",
             branch: "",
-            state: "",
             open_balance: "",
-            check: false,
-            created_user: created_user,
+            check: "",
         },
         validationSchema: Yup.object({
             name: Yup.string().required("This field is required"),
             account_number: Yup.string().required("This field is required"),
             ifsc_code: Yup.string().required("This field is required"),
-            state: Yup.string().required("This field is required"),
+            branch: Yup.string().required("This field is required"),
             open_balance: Yup.string().required("This field is required"),
-            check: Yup.boolean().oneOf([true], "You must accept the terms"),
+            check: Yup.string().required("This field is required"),
         }),
         onSubmit: async (values) => {
-            console.log("Form values:", values);
-
-            setSuccessMessage("");
-            setErrorMessage("");
-
-            const token = localStorage.getItem('token');
-            console.log("token data...:", token);
-            if (!token) {
-                setErrorMessage("Authorization token is missing. Please log in.");
-                return;
-            }
-
-
-            console.log("token",token);
-
-            const apiBaseUrl = import.meta.env.VITE_APP_APIKEY;
-
-            console.log('dnsddjbsdjbd',apiBaseUrl);
-    
-            if (!apiBaseUrl) {
-                setErrorMessage("API base URL is not configured.");
-                return;
-            }
-
             try {
-                const response = await fetch(`${apiBaseUrl}add/bank/`,{
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
-                });
+                // Retrieve token from localStorage
+                const token = localStorage.getItem('token');
 
-                console.log("response info", response);
+                const response = await axios.post(
+                    `${import.meta.env.VITE_APP_APIKEY}add/bank/`,
+                    values,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    }
+                );
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setSuccessMessage("Form submitted successfully!");
-                    console.log("Form submission response:", data);
+                if (response.status === 201) {
+                    // Handle successful response
+                    setMessage("Bank account added successfully!");
+                    setMessageType("success");
                 } else {
-                    const errorData = await response.json();
-                    setErrorMessage(errorData.message || "Server responded with an error.");
-                    console.error("Server error:", errorData);
+                    console.error("Error: " + response.data.message);
+                    setMessage(response.data.message || "Something went wrong. Please try again.");
+                    setMessageType("error");
                 }
             } catch (error) {
-                console.error("Fetch error:", error);
-                setErrorMessage("An unexpected error occurred. Please try again.");
+                console.error("Error posting data:", error);
+                setMessage("Something went wrong. Please try again.");
+                setMessageType("error");
             }
-        },
-        
+        }
     });
-
 
     return (
         <React.Fragment>
@@ -101,73 +75,69 @@ const FormLayouts = () => {
                                 <CardBody>
                                     <CardTitle className="mb-4">Form Grid Layout</CardTitle>
 
-                                    {/* Success and Error Messages */}
-                                    {successMessage && (
-                                        <div className="alert alert-success" role="alert">
-                                            {successMessage}
-                                        </div>
-                                    )}
-                                    {errorMessage && (
-                                        <div className="alert alert-danger" role="alert">
-                                            {errorMessage}
+                                    {/* Display success or error message */}
+                                    {message && (
+                                        <div className={`alert alert-${messageType === 'success' ? 'success' : 'danger'}`} role="alert">
+                                            {message}
                                         </div>
                                     )}
 
                                     <Form onSubmit={formik.handleSubmit}>
                                         <div className="mb-3">
-                                            <Label htmlFor="formrow-name-Input">Name</Label>
+                                            <Label htmlFor="formrow-firstname-Input">Bank Name</Label>
                                             <Input
                                                 type="text"
                                                 name="name"
                                                 className="form-control"
-                                                id="formrow-name-Input"
-                                                placeholder="Enter Your First Name"
+                                                id="formrow-firstname-Input"
+                                                placeholder="Enter Bank Name"
                                                 value={formik.values.name}
                                                 onChange={formik.handleChange}
                                                 onBlur={formik.handleBlur}
-                                                invalid={formik.touched.name && formik.errors.name ? true : false}
+                                                invalid={formik.touched.name && formik.errors.name}
                                             />
-                                            {formik.touched.name && formik.errors.name && (
-                                                <FormFeedback>{formik.errors.name}</FormFeedback>
+                                            {formik.errors.name && formik.touched.name && (
+                                                <FormFeedback type="invalid">{formik.errors.name}</FormFeedback>
                                             )}
                                         </div>
 
                                         <Row>
                                             <Col md={6}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-account-Input">Account Number</Label>
+                                                    <Label htmlFor="formrow-email-Input">A/C Number</Label>
                                                     <Input
                                                         type="text"
                                                         name="account_number"
                                                         className="form-control"
-                                                        id="formrow-account-Input"
-                                                        placeholder="Enter Your Account Number"
+                                                        id="formrow-email-Input"
+                                                        placeholder="Enter Your A/C Number"
                                                         value={formik.values.account_number}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.account_number && formik.errors.account_number ? true : false}
+                                                        invalid={formik.touched.account_number && formik.errors.account_number}
                                                     />
-                                                    {formik.touched.account_number && formik.errors.account_number && (
-                                                        <FormFeedback>{formik.errors.account_number}</FormFeedback>
+                                                    {formik.errors.account_number && formik.touched.account_number && (
+                                                        <FormFeedback type="invalid">{formik.errors.account_number}</FormFeedback>
                                                     )}
                                                 </div>
                                             </Col>
                                             <Col md={6}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-ifsc-Input">IFSC Code</Label>
+                                                    <Label htmlFor="formrow-password-Input">IFSC Code</Label>
                                                     <Input
                                                         type="text"
                                                         name="ifsc_code"
                                                         className="form-control"
-                                                        id="formrow-ifsc-Input"
+                                                        id="formrow-password-Input"
                                                         placeholder="Enter Your IFSC Code"
+                                                        autoComplete="off"
                                                         value={formik.values.ifsc_code}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.ifsc_code && formik.errors.ifsc_code ? true : false}
+                                                        invalid={formik.touched.ifsc_code && formik.errors.ifsc_code}
                                                     />
-                                                    {formik.touched.ifsc_code && formik.errors.ifsc_code && (
-                                                        <FormFeedback>{formik.errors.ifsc_code}</FormFeedback>
+                                                    {formik.errors.ifsc_code && formik.touched.ifsc_code && (
+                                                        <FormFeedback type="invalid">{formik.errors.ifsc_code}</FormFeedback>
                                                     )}
                                                 </div>
                                             </Col>
@@ -176,77 +146,85 @@ const FormLayouts = () => {
                                         <Row>
                                             <Col lg={4}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-branch-Input">Branch</Label>
+                                                    <Label htmlFor="formrow-InputCity">Branch</Label>
                                                     <Input
                                                         type="text"
                                                         name="branch"
                                                         className="form-control"
-                                                        id="formrow-branch-Input"
+                                                        id="formrow-InputCity"
                                                         placeholder="Enter Your Branch"
                                                         value={formik.values.branch}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.branch && formik.errors.branch ? true : false}
+                                                        invalid={formik.touched.branch && formik.errors.branch}
                                                     />
-                                                    {formik.touched.branch && formik.errors.branch && (
-                                                        <FormFeedback>{formik.errors.branch}</FormFeedback>
+                                                    {formik.errors.branch && formik.touched.branch && (
+                                                        <FormFeedback type="invalid">{formik.errors.branch}</FormFeedback>
                                                     )}
                                                 </div>
                                             </Col>
-
                                             <Col lg={4}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-open_balance-Input">Opening Balance</Label>
+                                                    <Label htmlFor="formrow-InputZip">Opening balance</Label>
                                                     <Input
                                                         type="text"
                                                         name="open_balance"
                                                         className="form-control"
-                                                        id="formrow-open_balance-Input"
-                                                        placeholder="Enter Your Opening Balance"
+                                                        id="formrow-Inputopen_balance"
+                                                        placeholder="Enter Your open balance"
                                                         value={formik.values.open_balance}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.open_balance && formik.errors.open_balance ? true : false}
+                                                        invalid={formik.touched.open_balance && formik.errors.open_balance}
                                                     />
-                                                    {formik.touched.open_balance && formik.errors.open_balance && (
-                                                        <FormFeedback>{formik.errors.open_balance}</FormFeedback>
+                                                    {formik.errors.open_balance && formik.touched.open_balance && (
+                                                        <FormFeedback type="invalid">{formik.errors.open_balance}</FormFeedback>
                                                     )}
                                                 </div>
                                             </Col>
 
-                                            <Col lg={4}>
+                                            <Col md={4}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-created_user-Input">Created User</Label>
+                                                    <Label htmlFor="formrow-email-Input">Created User</Label>
                                                     <Input
                                                         type="text"
                                                         name="created_user"
                                                         className="form-control"
-                                                        id="formrow-created_user-Input"
-                                                        value={formik.values.created_user}
-                                                        readOnly
+                                                        id="formrow-email-Input"
+                                                        placeholder="Enter Your A/C Number"
+                                                        value={user}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.created_user && formik.errors.created_user}
                                                     />
+                                                    {formik.errors.created_user && formik.touched.created_user && (
+                                                        <FormFeedback type="invalid">{formik.errors.created_user}</FormFeedback>
+                                                    )}
                                                 </div>
                                             </Col>
                                         </Row>
 
-                                        <div className="mb-3 form-check">
-                                            <Input
-                                                type="checkbox"
-                                                className="form-check-input"
-                                                id="formrow-check"
-                                                name="check"
-                                                checked={formik.values.check}
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                invalid={formik.touched.check && formik.errors.check ? true : false}
-                                            />
-                                            <Label className="form-check-label" htmlFor="formrow-check">
-                                                Check me out
-                                            </Label>
-                                            {formik.touched.check && formik.errors.check && (
-                                                <FormFeedback>{formik.errors.check}</FormFeedback>
+                                        <div className="mb-3">
+                                            <div className="form-check">
+                                                <Input
+                                                    type="checkbox"
+                                                    className="form-check-Input"
+                                                    id="formrow-customCheck"
+                                                    name="check"
+                                                    value={formik.values.check}
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    invalid={formik.touched.check && formik.errors.check}
+                                                />
+                                                <Label className="form-check-Label" htmlFor="formrow-customCheck">
+                                                    Check me out
+                                                </Label>
+                                            </div>
+                                            {formik.errors.check && formik.touched.check && (
+                                                <FormFeedback type="invalid">{formik.errors.check}</FormFeedback>
                                             )}
                                         </div>
+
                                         <div>
                                             <button type="submit" className="btn btn-primary w-md">
                                                 Submit

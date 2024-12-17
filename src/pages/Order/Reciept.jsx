@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { Row, Col, FormGroup, Label, Input, Button } from 'reactstrap';
 import { FaUniversity, FaIdBadge, FaUserPlus } from 'react-icons/fa';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object({
     received_at: Yup.date().required('Date is required'),
@@ -15,7 +15,6 @@ const validationSchema = Yup.object({
     remark: Yup.string().max(500, 'Remark should be 500 characters or less')
 });
 
-// Utility function to get today's date in YYYY-MM-DD format
 const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -26,52 +25,86 @@ const getCurrentDate = () => {
 
 const ReceiptFormPage = ({ toggleReciptModal }) => {
     const { id } = useParams();
+    const navigate = useNavigate();  // Hook to navigate
     const [creatorName, setCreatorName] = useState('');
     const [banks, setBanks] = useState([]);
+    const [orderItems, setOrderItems] = useState([]); // Store order items
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        const Creatername = localStorage.getItem('name');
-        console.log("Creator Name:", Creatername);
-        setCreatorName(Creatername || '');
+        const creatorName = localStorage.getItem('name') || '';
+        setCreatorName(creatorName);
 
-        // Fetch the list of banks from an API and set them in state
-        const fetchBanks = async () => {
+        // Fetch banks and order items
+        const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
                 const headers = { Authorization: `Bearer ${token}` };
 
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers });
-                setBanks(response.data.data);
+                const bankResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers });
+                setBanks(bankResponse.data.data);
+
+                const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, { headers });
+                setOrderItems(orderItemsResponse.data.items);  // Fetch order items here
             } catch (error) {
-                console.error('Error fetching banks', error);
+                console.error('Error fetching data', error);
             }
         };
 
-        fetchBanks();
-    }, []);
+        fetchData();
+    }, [id]);
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, { resetForm }) => {
+        setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
-            // Ensure date has a value, and set it to today's date if it's empty
             const formattedDate = values.received_at || getCurrentDate();
-
             const selectedBank = banks.find(bank => bank.id === values.bank);
             localStorage.setItem('selectedBank', selectedBank ? selectedBank.name : '');
 
-            // Submit the form data including formatted date
+            // Optionally, modify orderItems here if needed
+            const updatedOrderItems = orderItems.map(item => ({
+                ...item,
+                status: 'processed', // Example: mark items as processed after receipt is submitted
+            }));
+
+            // Submit the receipt data along with order items
             const response = await axios.post(
                 `${import.meta.env.VITE_APP_APIKEY}payment/${id}/reciept/`,
-                { ...values, received_at: formattedDate, id },
+                { ...values, received_at: formattedDate, id, orderItems: updatedOrderItems },
                 { headers }
             );
 
-            console.log('Form submitted successfully', response.data);
-            toggleReciptModal(); // Close modal on success
+            if (response.status === 200 || response.status === 201) {
+                alert('Receipt and order items updated successfully');
+                resetForm();
+                toggleReciptModal();  // Close the modal on success
+
+                // Navigate to another page (e.g., order details page)
+                navigate(`/order/${id}/details`, {
+                    state: {
+                        updatedOrderItems,  // Pass the updated order items as state
+                        receiptDetails: response.data // Pass the receipt details if needed
+                    }
+                });
+            } else {
+                throw new Error('Unexpected response status');
+            }
         } catch (error) {
-            console.error('Error submitting form', error);
+            if (error.response) {
+                console.error('Server responded with an error:', error.response);
+                alert(`Failed to submit form: ${error.response.data.message || 'Please try again later.'}`);
+            } else if (error.request) {
+                console.error('Network error:', error.request);
+                alert('Network error: Please check your internet connection and try again.');
+            } else {
+                console.error('Error:', error.message);
+                alert('Failed to submit form. Please try again.');
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -86,12 +119,12 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                     createdBy: creatorName || '',
                     remark: ''
                 }}
-                enableReinitialize // Allows form to reinitialize with new initial values
+                enableReinitialize
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
-                {(Recieptformik) => (
-                    <Form onSubmit={Recieptformik.handleSubmit}>
+                {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                    <Form onSubmit={handleSubmit}>
                         <Row>
                             <Col md={6}>
                                 <FormGroup>
@@ -99,13 +132,13 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                     <Input
                                         type="date"
                                         name="received_at"
-                                        value={Recieptformik.values.received_at}
-                                        onChange={Recieptformik.handleChange}
-                                        onBlur={Recieptformik.handleBlur}
-                                        className={`border-primary ${Recieptformik.errors.received_at && Recieptformik.touched.received_at ? 'is-invalid' : ''}`}
+                                        value={values.received_at}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`border-primary ${errors.received_at && touched.received_at ? 'is-invalid' : ''}`}
                                     />
-                                    {Recieptformik.errors.received_at && Recieptformik.touched.received_at && (
-                                        <div className="invalid-feedback">{Recieptformik.errors.received_at}</div>
+                                    {errors.received_at && touched.received_at && (
+                                        <div className="invalid-feedback">{errors.received_at}</div>
                                     )}
                                 </FormGroup>
                             </Col>
@@ -115,14 +148,14 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                     <Input
                                         type="number"
                                         name="amount"
-                                        value={Recieptformik.values.amount}
-                                        onChange={Recieptformik.handleChange}
-                                        onBlur={Recieptformik.handleBlur}
-                                        className={`border-success ${Recieptformik.errors.amount && Recieptformik.touched.amount ? 'is-invalid' : ''}`}
+                                        value={values.amount}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`border-success ${errors.amount && touched.amount ? 'is-invalid' : ''}`}
                                         placeholder="Enter amount"
                                     />
-                                    {Recieptformik.errors.amount && Recieptformik.touched.amount && (
-                                        <div className="invalid-feedback">{Recieptformik.errors.amount}</div>
+                                    {errors.amount && touched.amount && (
+                                        <div className="invalid-feedback">{errors.amount}</div>
                                     )}
                                 </FormGroup>
                             </Col>
@@ -134,18 +167,18 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                         <Input
                                             type="select"
                                             name="bank"
-                                            value={Recieptformik.values.bank}
-                                            onChange={Recieptformik.handleChange}
-                                            onBlur={Recieptformik.handleBlur}
-                                            className={Recieptformik.errors.bank && Recieptformik.touched.bank ? 'is-invalid' : ''}
+                                            value={values.bank}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={errors.bank && touched.bank ? 'is-invalid' : ''}
                                         >
                                             <option value="">Select bank</option>
                                             {banks.map(bank => (
                                                 <option key={bank.id} value={bank.id}>{bank.name}</option>
                                             ))}
                                         </Input>
-                                        {Recieptformik.errors.bank && Recieptformik.touched.bank && (
-                                            <div className="invalid-feedback">{Recieptformik.errors.bank}</div>
+                                        {errors.bank && touched.bank && (
+                                            <div className="invalid-feedback">{errors.bank}</div>
                                         )}
                                     </div>
                                 </FormGroup>
@@ -158,14 +191,14 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                         <Input
                                             type="text"
                                             name="transactionID"
-                                            value={Recieptformik.values.transactionID}
-                                            onChange={Recieptformik.handleChange}
-                                            onBlur={Recieptformik.handleBlur}
-                                            className={`border-warning shadow-sm ${Recieptformik.errors.transactionID && Recieptformik.touched.transactionID ? 'is-invalid' : ''}`}
+                                            value={values.transactionID}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={`border-warning shadow-sm ${errors.transactionID && touched.transactionID ? 'is-invalid' : ''}`}
                                             placeholder="Enter transaction ID"
                                         />
-                                        {Recieptformik.errors.transactionID && Recieptformik.touched.transactionID && (
-                                            <div className="invalid-feedback">{Recieptformik.errors.transactionID}</div>
+                                        {errors.transactionID && touched.transactionID && (
+                                            <div className="invalid-feedback">{errors.transactionID}</div>
                                         )}
                                     </div>
                                 </FormGroup>
@@ -178,7 +211,7 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                         <Input
                                             type="text"
                                             name="createdBy"
-                                            value={Recieptformik.values.createdBy}
+                                            value={values.createdBy}
                                             readOnly
                                             className="border-info shadow-sm"
                                             placeholder="Creator's name"
@@ -193,20 +226,22 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                                     <Input
                                         type="textarea"
                                         name="remark"
-                                        value={Recieptformik.values.remark}
-                                        onChange={Recieptformik.handleChange}
-                                        onBlur={Recieptformik.handleBlur}
-                                        className={`border-secondary ${Recieptformik.errors.remark && Recieptformik.touched.remark ? 'is-invalid' : ''}`}
+                                        value={values.remark}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`border-secondary ${errors.remark && touched.remark ? 'is-invalid' : ''}`}
                                         placeholder="Enter any additional remarks here"
                                     />
-                                    {Recieptformik.errors.remark && Recieptformik.touched.remark && (
-                                        <div className="invalid-feedback">{Recieptformik.errors.remark}</div>
+                                    {errors.remark && touched.remark && (
+                                        <div className="invalid-feedback">{errors.remark}</div>
                                     )}
                                 </FormGroup>
                             </Col>
                         </Row>
                         <div className="modal-footer d-flex justify-content-end" style={{ padding: "1.5rem" }}>
-                            <Button color="success" type="submit" className="px-4">Save</Button>
+                            <Button color="success" type="submit" className="px-4" disabled={isSubmitting}>
+                                {isSubmitting ? 'Saving...' : 'Save'}
+                            </Button>
                             <Button color="danger" onClick={toggleReciptModal} className="ml-2 px-4">Cancel</Button>
                         </div>
                     </Form>

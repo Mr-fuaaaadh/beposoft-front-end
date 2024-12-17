@@ -7,14 +7,14 @@ Contact: themesbrand@gmail.com
 File: Custom Bootstrap Css File
 */
 
+// Core files
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "variables";          // Ensure this file exists and is in the correct directory
+@import "variables-dark";     // Ensure this file exists and is in the correct directory
+@import "bootstrap/scss/bootstrap";
 
-//Core files
-@import "./node_modules/bootstrap/scss/functions";
-@import "./node_modules/bootstrap/scss/variables";
-@import "variables";
-@import "variables-dark";
-@import "./node_modules/bootstrap/scss/bootstrap";
-
+// Custom components
 @import "custom/components/root";
 @import "custom/components/reboot";
 @import "custom/components/badge";

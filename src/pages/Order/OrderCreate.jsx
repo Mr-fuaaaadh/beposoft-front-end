@@ -30,6 +30,7 @@ const FormLayouts = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [banks, setBank] = useState([]);
+    const [companys, setCompany] = useState([]);
 
 
 
@@ -108,18 +109,19 @@ const FormLayouts = () => {
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse] = await Promise.all([
+                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse, companyResponse] = await Promise.all([
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/customers/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
-
+                        axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
 
                     if (statesResponse.status === 200) {
                         setStates(statesResponse.data.data);
+                        console.log(statesResponse.data.data)
                     }
                     if (familyResponse.status === 200) {
                         setFamilys(familyResponse.data.data);
@@ -141,6 +143,10 @@ const FormLayouts = () => {
                             const filteredStates = states.filter(state => allocatedStates.includes(state.id));
                             setAllocatedStates(filteredStates);
                         }
+                    }
+                    if (companyResponse.status === 200) {
+                        setCompany(companyResponse.data.data);
+                        console.log(companyResponse.data.data)
                     }
 
                     if (bankResponse.status === 200) {
@@ -170,7 +176,7 @@ const FormLayouts = () => {
         formik.setFieldValue("customer", selectedCustomerId);
 
         try {
-            const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${selectedCustomerId}`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${selectedCustomerId}/`, { headers: { Authorization: `Bearer ${token}` } });
             if (response.status === 200) {
                 setCustomerAddresses(response.data.data);
             } else {
@@ -341,8 +347,12 @@ const FormLayouts = () => {
                                                         onBlur={formik.handleBlur}
                                                         invalid={formik.touched.company && formik.errors.company ? true : false}
                                                     >
-                                                        <option value="BEPOSITIVERACING PVT LTD">BEPOSITIVERACING PVT LTD</option>
-                                                        <option value="MICHEAL IMPORT EXPORT PVT LTD">MICHEAL IMPORT EXPORT PVT LTD</option>
+                                                        <option value="" disabled>Select a company</option>
+                                                        {companys.map((company, index) => (
+                                                            <option key={index} value={company.id}>
+                                                                {company.name}
+                                                            </option>
+                                                        ))}
                                                     </Input>
                                                     {formik.errors.company && formik.touched.company ? (
                                                         <FormFeedback type="invalid">{formik.errors.company}</FormFeedback>
@@ -453,7 +463,7 @@ const FormLayouts = () => {
                                                         invalid={formik.touched.state && formik.errors.state ? true : false}
                                                     >
                                                         <option value="">Select a State...</option>
-                                                        {allocatedStates.map((stat) => (
+                                                        {states.map((stat) => (
                                                             <option key={stat.id} value={stat.id}>
                                                                 {stat.name}
                                                             </option>
@@ -567,7 +577,7 @@ const FormLayouts = () => {
                                                                                     <td>{index + 1}</td>
                                                                                     <td>
                                                                                         <img
-                                                                                            src={`http://localhost:8000${product.images[0]}`}
+                                                                                            src={product.images[0]}
                                                                                             alt={product.name}
                                                                                             style={{ width: "50px", height: "50px" }}
                                                                                         />

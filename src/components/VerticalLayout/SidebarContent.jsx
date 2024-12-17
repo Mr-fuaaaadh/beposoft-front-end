@@ -13,7 +13,7 @@ import withRouter from "../Common/withRouter";
 import { withTranslation } from "react-i18next";
 import { useCallback } from "react";
 
-import { FaUsers } from 'react-icons/fa'; 
+import { FaUsers } from 'react-icons/fa';
 import { FaUserTie } from "react-icons/fa";
 
 const SidebarContent = (props) => {
@@ -332,8 +332,106 @@ const SidebarContent = (props) => {
                 <li>
                   <Link to="/add/bank/">{props.t("Add Bank")}</Link>
                 </li>
+                <li>
+                  <Link to="/bank/datas/">{props.t("Bank List")}</Link>
+                </li>
               </ul>
             </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Company")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/add/beposoft/company/details/">{props.t("Add company")}</Link>
+                </li>
+                <li>
+                  <Link to="/beposoft/companies/">{props.t("Companies")}</Link>
+                </li>
+              </ul>
+            </li>
+
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("GRV")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/beposoft/new/grv/">{props.t("new grv")}</Link>
+                </li>
+                <li>
+                  <Link to="/beposoft/grv/view/">{props.t("grv list")}</Link>
+                </li>
+              </ul>
+            </li>
+
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("DELIVERY NOTES")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/delivery/notes/">{props.t("delivery-notes")}</Link>
+                </li>
+                <li>
+                  <Link to="/daily/good/movment/">{props.t("Daily Good Movment")}</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Expense")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/add/expense/">{props.t("add expense")}</Link>
+                </li>
+                <li>
+                  <Link to="/expense/list/">{props.t("Expenses")}</Link>
+                </li>
+              </ul>
+            </li>
+
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUsers size={20} style={{ marginRight: '8px' }} />
+                <span>{props.t("Reports")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/sales/reports/">{props.t("Sales Report")}</Link>
+                </li>
+                <li>
+                  <Link to="/credit/sale/">{props.t("Credit Sales")}</Link>
+                </li>
+                <li>
+                  <Link to="/COD/sales/resport/">{props.t("COD Sales Report")}</Link>
+                </li>
+
+                <li>
+                  <Link to="/states/sales/resport/">{props.t("States Sales Report")}</Link>
+                </li>
+                <li>
+                  <Link to="/expense/report/">{props.t("Expense Report")}</Link>
+                </li>
+                <li>
+                  <Link to="/Delivery/report/">{props.t("Delivery Report")}</Link>
+                </li>
+                <li>
+                  <Link to="/product/sold/report/">{props.t("Product Sold Report")}</Link>
+                </li>
+              </ul>
+            </li>
+
 
 
             <li>

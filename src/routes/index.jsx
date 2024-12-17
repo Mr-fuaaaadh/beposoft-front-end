@@ -174,6 +174,7 @@ import StaffEdit from "../pages/Staff/StaffUpdate";
 import CustomerTable from "../pages/Customers/customerTable";
 import CustomerForm from "../pages/Customers/add-customers";
 import Address from "../pages/Customers/address";
+import CustomerEdit from "../pages/Customers/CustomerUpdate"; 
 import Ledger from "../pages/Customers/Ledger";
 
 
@@ -208,8 +209,63 @@ import AttributeValues from "../pages/Attributes/attribute-values";
 import ProductUpdate from "../pages/Ecommerce/ProductUpdateForm";
 
 
-import Bank from "../../src/pages/Bank/index";
+import Bank from "../pages/Bank/Add-Bank";
+import BankList from "../pages/Bank/Banks";
 
+
+
+
+
+//expense 
+
+import AddExpense from "../pages/Expense/AddExpense";
+import ExpenseList from "../pages/Expense/ListExpenses"
+
+// Repots
+
+import Salesreport from "../pages/Resports/SaleReposts";
+import InvoiceDatas from "../pages/Resports/FilderdOrders";
+import StaffOrders from "../pages/Resports/Bills";
+import CreditSales from "../pages/Resports/CreditSale";
+import CreditOrders from "../pages/Resports/Creditorders";
+// company  
+
+import Company from "../pages/Company/Company";
+import Companies from "../pages/Company/Companies";
+
+// GRV 
+
+import GrvTable from "../pages/GRV/GRC-table";
+import GrvForm from "../pages/GRV/GRV-creating";
+
+
+//DJM
+
+import DGmTable from "../pages/DGM/Delivery-notes";
+import ParcelDetails from "../pages/DGM/Packing";
+import Dailygoodmovment from "../pages/DGM/Daily-Goods-Movments";
+
+
+
+// COD ORDERS
+
+import CodOrders from "../pages/Resports/Cod";
+import CodOrdersDetails from "../pages/Resports/Codfilterdorders";
+
+
+// STATE
+
+import StatewaiseReport from "../pages/Resports/States";
+import Statewisestaffsale from "../pages/Resports/StatesReport";
+
+
+import ExpensReport from "../pages/Resports/ExpenseReport";
+
+import DeliveryReports from "../pages/Resports/DeliveryReposrts";
+import DeliveryReportsDeliverdOrdes from "../pages/Resports/DeliveryReportsFilter";
+
+
+import ProductSalesReport from "../pages/Resports/ProductSalesReport";
 
 
 
@@ -271,7 +327,36 @@ const authProtectedRoutes = [
   {path: "/all-customers/",component:<CustomerTable />},
   {path: "/add-customers/",component:<CustomerForm />},
   {path: "customer/address/:id/add/",component:<Address />},
-  {path: "customer/:id/ledger/",component:<Ledger />},
+  {path: "/customer/:id/ledger/",component:<Ledger />},
+  {path: "customer/:id/edit/",component:<CustomerEdit />},
+
+
+
+
+  // company 
+
+  {path: "/add/beposoft/company/details/",component:<Company />},
+  {path: "/beposoft/companies/",component:<Companies />},
+
+
+  //GRV 
+
+  {path: "/beposoft/new/grv/",component:<GrvForm />},
+  {path: "/beposoft/grv/view/",component:<GrvTable />},
+
+  //DGM
+  {path: "/delivery/notes/",component:< DGmTable/>},
+  {path: "/order/packing/:id/progress/",component:< ParcelDetails/>},
+  {path: "/daily/good/movment/",component:< Dailygoodmovment/>},
+
+ 
+
+
+
+
+
+
+
 
 
 
@@ -353,6 +438,44 @@ const authProtectedRoutes = [
   //Bank
 
   { path: "/add/bank/", component: <Bank /> },
+  { path: "/bank/datas/", component: <BankList /> },
+  { path: "/add/expense/", component: <AddExpense />},
+  { path: "/expense/list/", component: <ExpenseList />},
+
+
+  {path: "/sales/reports/",component: <Salesreport />},
+  {path: "/sales/view/:date/data/",component :<InvoiceDatas />},
+  {path: "/sales/resport/:id/staff/:date/:name/", component :<StaffOrders />},
+  {path: "/credit/sale/", component :<CreditSales />},
+  {path: "/credit/sales/resport/:date/", component :<CreditOrders />},
+
+
+  {path: "/COD/sales/resport/", component :<CodOrders />},
+  {path: "/COD/sales/resport/:date/", component :<CodOrdersDetails />},
+
+
+  {path: "/states/sales/resport/", component :<StatewaiseReport />},
+  {path: "/state/sales/view/:id/data/", component :<Statewisestaffsale />},
+
+
+  {path: "/expense/report/", component :<ExpensReport />},
+  {path: "/Delivery/report/", component :<DeliveryReports />},
+  {path: "/delivery/:date/reports/", component :<DeliveryReportsDeliverdOrdes />},
+  {path: "/product/sold/report/", component :<ProductSalesReport />},
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
 
 
   //   //Blog

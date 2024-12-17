@@ -1,13 +1,16 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
-const Authmiddleware = (props) => {
+const Authmiddleware = ({ children }) => {
+  const location = useLocation();  // Get the current location using useLocation hook
+
   if (!localStorage.getItem("token")) {
-    return (
-      <Navigate to={{ pathname: "/login", state: { from: props.location } }} />
-    );
+    // Redirect to login page if no token is found, passing the current location in state
+    return <Navigate to="/login" state={{ from: location }} />;
   }
-  return <React.Fragment>{props.children}</React.Fragment>;
+
+  // Render the children if the token exists
+  return <>{children}</>;
 };
 
 export default Authmiddleware;

@@ -1,137 +1,46 @@
-import React, { useEffect, useMemo, useState } from "react";
-import PropTypes from 'prop-types';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
-    Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Label, Form
+    Table,
+    Row,
+    Col,
+    Card,
+    CardBody,
+    CardTitle,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    Input
 } from "reactstrap";
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons for edit and delete
 
-// Import components
-import Breadcrumbs from '../../components/Common/Breadcrumb';
-import TableContainer from '../../components/Common/TableContainer';
+// Import Breadcrumb
+import Breadcrumbs from "../../components/Common/Breadcrumb";
 
-const DatatableTables = () => {
-    const [data, setData] = useState([]); 
-    const [departments, setDepartments] = useState([]); // New state for departments
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null); 
-    const [selectedCustomer, setSelectedCustomer] = useState(null); 
-    const [modal, setModal] = useState(false); 
-    const token = localStorage.getItem('token');
+const BasicTable = () => {
+    // State for data
+    const [data, setData] = useState([]);
+    const [departments, setDepartments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedSupervisor, setSelectedSupervisor] = useState(null);
+    const [supervisorName, setSupervisorName] = useState("");
+    const [supervisorDepartment, setSupervisorDepartment] = useState("");
 
-    const toggleModal = () => setModal(!modal); 
-
-    const columns = useMemo(
-        () => [
-            {
-                header: () => <div style={{ textAlign: 'center' }}>ID</div>,  // Center alignment for header
-                accessorKey: 'id',
-                enableColumnFilter: false,
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div style={{ textAlign: 'center' }}>{row.original.id}</div> // Center alignment for ID value
-                ),
-            },
-            
-            {
-                header: () => <div style={{ textAlign: 'center' }}>NAME</div>,
-                accessorKey: 'name',
-                enableColumnFilter: false,
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div style={{ textAlign: 'center' }}>{row.original.name}</div> // Center alignment for Name
-                ),
-            },
-            {
-                header: () => <div style={{ textAlign: 'center' }}>DEPARTMENT</div>,
-                accessorKey: 'department',
-                enableColumnFilter: false,
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div style={{ textAlign: 'center' }}>{row.original.department}</div> // Center alignment for Department
-                ),
-            },
-            {
-                header: () => <div style={{ textAlign: 'center' }}>EDIT</div>,
-                accessorKey: 'editActions',
-                enableColumnFilter: false,
-                enableSorting: false,
-                cell: ({ row }) => (
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <button
-                            className="btn btn-primary d-flex align-items-center"
-                            style={{ height: '30px', padding: '0 10px' }}
-                            onClick={() => handleEdit(row.original)}
-                        >
-                            <FaEdit style={{ marginRight: '5px' }} />
-                            Edit
-                        </button>
-                    </div>
-                ),
-            },
-            {
-                header: () => <div style={{ textAlign: 'center' }}>DELETE</div>,
-                accessorKey: 'deleteActions',
-                enableColumnFilter: false,
-                enableSorting: false,
-                cell: ({ row }) => (
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <button
-                            className="btn btn-danger d-flex align-items-center"
-                            style={{ height: '30px', padding: '0 10px' }}
-                            onClick={() => handleDelete(row.original.id)}
-                        >
-                            <FaTrash style={{ marginRight: '5px' }} />
-                            Delete
-                        </button>
-                    </div>
-                ),
-            },
-        ],
-        []
-    );
-
-    const handleEdit = (customer) => {
-        setSelectedCustomer(customer);
-        toggleModal(); 
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await axios.delete(`${import.meta.env.VITE_APP_APIKEY}supervisor/update/${id}/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            setData(data.filter(customer => customer.id !== id)); 
-        } catch (error) {
-            console.error("Delete failed:", error);
-            setError(error.message || "Failed to delete customer");
-        }
-    };
-
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setSelectedCustomer((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async () => {
-        try {
-            await axios.put(`${import.meta.env.VITE_APP_APIKEY}supervisor/update/${selectedCustomer.id}/`, selectedCustomer, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            setData(data.map(customer => customer.id === selectedCustomer.id ? selectedCustomer : customer)); 
-            toggleModal(); 
-        } catch (error) {
-            console.error("Update failed:", error);
-            setError(error.message || "Failed to update customer");
-        }
-    };
+    // Meta title
+    document.title = "Basic Tables | Skote - Vite React Admin & Dashboard Template";
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, {headers: {'Authorization': `Bearer ${token}`}}); 
+                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
                 if (response.status === 200) {
-                    setData(response.data.data); 
+                    setData(response.data.data);
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -144,7 +53,9 @@ const DatatableTables = () => {
 
         const fetchDepartments = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
                 if (response.status === 200) {
                     setDepartments(response.data.data); // Set the department data
                 } else {
@@ -157,70 +68,141 @@ const DatatableTables = () => {
 
         fetchData();
         fetchDepartments();
-    }, [token]);
+    }, []); // Empty dependency array to run only on mount
 
-    document.title = "Supervisors | Beposoft";
+    const handleEditClick = (supervisor) => {
+        setSelectedSupervisor(supervisor);
+        setSupervisorName(supervisor.name);
+        setSupervisorDepartment(supervisor.department || '');
+        setIsModalOpen(true);
+    };
+
+    const handleSaveChanges = async () => {
+        try {
+            const response = await axios.put(
+                `${import.meta.env.VITE_APP_APIKEY}supervisor/update/${selectedSupervisor.id}/`,
+                {
+                    name: supervisorName,
+                    department: supervisorDepartment,
+                },
+                {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                }
+            );
+            if (response.status === 200) {
+                // Re-fetch data after saving changes
+                const updatedResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                if (updatedResponse.status === 200) {
+                    setData(updatedResponse.data.data); // Update state with the latest data
+                } else {
+                    throw new Error(`HTTP error! Status: ${updatedResponse.status}`);
+                }
+                setIsModalOpen(false); // Close modal
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            setError(error.message || "Failed to update supervisor");
+        }
+    };
+    
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
-        <div className="page-content">
-            <div className="container-fluid">
-                <Breadcrumbs title="Tables" breadcrumbItem="Customers Information" />
-                {loading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p className="text-danger">Error: {error}</p>
-                ) : (
-                    <TableContainer
-                        columns={columns}
-                        data={data || []}
-                        isGlobalFilter={true}
-                        isPagination={true}
-                        SearchPlaceholder="Search by Name, Department, or Designation..."
-                        pagination="pagination"
-                        paginationWrapper='dataTables_paginate paging_simple_numbers'
-                        tableClass="table-bordered table-nowrap dt-responsive nowrap w-100 dataTable no-footer dtr-inline"
-                    />
-                )}
+        <React.Fragment>
+            <div className="page-content">
+                <div className="container-fluid">
+                    <Breadcrumbs title="Tables" breadcrumbItem="Basic Tables" />
 
-                {/* Modal for editing */}
-                <Modal isOpen={modal} toggle={toggleModal}>
-                    <ModalHeader toggle={toggleModal}>Edit Customer</ModalHeader>
-                    <ModalBody>
-                        <Form>
-                            <Label for="name">Name</Label>
-                            <Input 
-                                id="name" 
-                                name="name" 
-                                value={selectedCustomer?.name || ''} 
-                                onChange={handleInputChange}
-                            />
-                            <Label for="department">Department</Label>
-                            <Input 
-                                id="department" 
-                                name="department" 
-                                type="select" // Change to select type for dropdown
-                                value={selectedCustomer?.department || ''} 
-                                onChange={handleInputChange}
-                            >
-                                <option value="">Select Department</option> {/* Placeholder option */}
-                                {departments.map(department => (
-                                    <option key={department.id} value={department.id}>{department.name}</option>
-                                ))}
-                            </Input>
-                        </Form>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="secondary" onClick={toggleModal}>Cancel</Button>
-                        <Button color="primary" onClick={handleSubmit}>Save</Button>
-                    </ModalFooter>
-                </Modal>
+                    <Row>
+                        <Col xl={12}>
+                            <Card>
+                                <CardBody>
+                                    <CardTitle className="h4">SUPERVISORS</CardTitle>
+                                    <div className="table-responsive">
+                                        <Table className="table table-bordered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>NAME</th>
+                                                    <th>DEPARTMENT</th>
+                                                    <th>ACTION</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {data.map((supervisor, index) => (
+                                                    <tr key={supervisor.id}>
+                                                        <th scope="row">{index + 1}</th>
+                                                        <td>{supervisor.name}</td>
+                                                        <td>{supervisor.department || 'N/A'}</td>
+                                                        <td>
+                                                            <Button
+                                                                color="primary"
+                                                                onClick={() => handleEditClick(supervisor)}
+                                                            >
+                                                                Edit
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* Modal for editing supervisor */}
+                    <Modal isOpen={isModalOpen} toggle={() => setIsModalOpen(!isModalOpen)}>
+                        <ModalHeader toggle={() => setIsModalOpen(!isModalOpen)}>Edit Supervisor</ModalHeader>
+                        <ModalBody>
+                            <div>
+                                <label>Name</label>
+                                <Input
+                                    type="text"
+                                    value={supervisorName}
+                                    onChange={(e) => setSupervisorName(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label>Department</label>
+                                <Input
+                                    type="select"
+                                    value={supervisorDepartment}
+                                    onChange={(e) => setSupervisorDepartment(e.target.value)}
+                                >
+                                    <option value="">Select Department</option>
+                                    {departments.map((department) => (
+                                        <option key={department.id} value={department.id}>
+                                            {department.name}
+                                        </option>
+                                    ))}
+                                </Input>
+                            </div>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="secondary" onClick={() => setIsModalOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button color="primary" onClick={handleSaveChanges}>
+                                Save Changes
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 
-DatatableTables.propTypes = {
-    preGlobalFilteredRows: PropTypes.any,
-};
-
-export default DatatableTables;
+export default BasicTable;
