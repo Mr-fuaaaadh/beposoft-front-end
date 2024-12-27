@@ -141,8 +141,11 @@ const FormLayouts = () => {
         
                 if (response.status === 201) {
                     setSuccess("Form submitted successfully");
+                    resetForm(); // Clear the form
+                    setTimeout(() => setSuccess(null), 3000);
                 } else {
                     setError("Failed to submit the form");
+                    setTimeout(() => setError(null), 3000); 
                 }
         
             } catch (err) {
@@ -151,6 +154,9 @@ const FormLayouts = () => {
                     // Display specific backend validation errors
                     if (backendErrors.email) {
                         formik.setFieldError('email', backendErrors.email[0]);
+                    }
+                    if (backendErrors.phone) {
+                        formik.setFieldError('phone', backendErrors.phone[0]);
                     }
                     if (backendErrors.username) {
                         formik.setFieldError('username', backendErrors.username[0]);

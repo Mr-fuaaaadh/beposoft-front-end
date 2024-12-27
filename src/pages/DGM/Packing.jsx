@@ -170,7 +170,7 @@ const FormLayouts = () => {
                                                         <td>{index + 1}</td>
                                                         <td>
                                                             <img
-                                                                src={item.images[0]}
+                                                                src={item.images?.[0] || 'No images'}
                                                                 alt={item.name}
                                                                 style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                                             />

@@ -210,6 +210,22 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
+
+            <li>
+              <Link to="/#" className="has-arrow">
+                <FaUserTie size={17} style={{ marginRight: '6px' }} />
+                <span>{props.t("Product")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/add/products/">{props.t("add Product")}</Link>
+                </li>
+                <li>
+                  <Link to="/product/list/">{props.t("Product List")}</Link>
+                </li>
+              </ul>
+            </li>
+
             <li>
               <Link to="/#" className="has-arrow">
                 <FaUsers size={20} style={{ marginRight: '8px' }} />

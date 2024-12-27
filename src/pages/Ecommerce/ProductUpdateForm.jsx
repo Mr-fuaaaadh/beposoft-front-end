@@ -10,17 +10,17 @@ import { useParams } from 'react-router-dom';
 const EcommerenceAddProduct = () => {
     document.title = "Add Product | Skote - Vite React Admin & Dashboard Template";
 
-    const { id } = useParams(); // Get the id from the URL params
+    const { id } = useParams();
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [productFamilies, setProductFamilies] = useState([]);
-    const [imagePreview, setImagePreview] = useState(""); // State for image preview
+    const [imagePreview, setImagePreview] = useState("");
     const token = localStorage.getItem('token');
 
     console.log(`getd id ${id}`);
 
     const types = [
-        { value: 'single', label: 'single' },
-        { value: 'variant', label: 'variant' },
+        { value: 'single', label: 'Single' },
+        { value: 'variant', label: 'Variant' },
     ];
 
     const formik = useFormik({
@@ -33,17 +33,23 @@ const EcommerenceAddProduct = () => {
             tax: '',
             unit: "",
             selling_price: '',
-            image: null // Add image field
+            stock: '',
+            color: '',
+            size: '',
+            image: null
         },
         validationSchema: yup.object().shape({
             name: yup.string().required('Please Enter Your Product Name'),
-            hsn_code: yup.string().required('Please Enter Your Manufacturer Name'),
+            hsn_code: yup.string().required('Please Enter HSN Code'),
             family: yup.array().min(1, 'Please select at least one Feature'),
-            purchase_rate: yup.number().required('Please Enter Your purchase_rate'),
-            type: yup.string().required('Please Enter Your type'),
-            tax: yup.string().required('Please Enter Your Product Tax'),
-            unit: yup.string().required('Please Enter Your Product unit'),
-            selling_price: yup.string().required('Please Enter Your selling_price'),
+            purchase_rate: yup.number().required('Please Enter Purchase Rate'),
+            type: yup.string().required('Please Enter Product Type'),
+            tax: yup.string().required('Please Enter Tax'),
+            unit: yup.string().required('Please Enter Unit'),
+            selling_price: yup.number().required('Please Enter Selling Price'),
+            stock: yup.number().required('Please Enter Stock Quantity'),
+            color: yup.string().required('Please Enter Color'),
+            size: yup.string().required('Please Enter Size')
         }),
         onSubmit: async (values) => {
             const formData = new FormData();
@@ -56,7 +62,7 @@ const EcommerenceAddProduct = () => {
 
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`, // Include the id in the URL
+                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
                     {
                         method: 'PUT',
                         headers: {
@@ -72,7 +78,7 @@ const EcommerenceAddProduct = () => {
                 }
                 console.log('Product updated successfully:', data);
                 formik.resetForm();
-                setImagePreview(""); // Reset image preview
+                setImagePreview("");
             } catch (error) {
                 console.error('Error updating product:', error);
             }
@@ -117,7 +123,6 @@ const EcommerenceAddProduct = () => {
                     },
                 });
                 const productData = await response.json();
-                console.log("Fetched product data:", productData);
 
                 if (response.ok && productData) {
                     formik.setValues({
@@ -129,9 +134,12 @@ const EcommerenceAddProduct = () => {
                         tax: productData.data.tax || '',
                         unit: productData.data.unit || '',
                         selling_price: productData.data.selling_price || '',
+                        stock: productData.data.stock || '',
+                        color: productData.data.color || '',
+                        size: productData.data.size || ''
                     });
                     if (productData.data.image) {
-                        setImagePreview(productData.data.image); // Set initial image preview if available
+                        setImagePreview(productData.data.image);
                     }
                 } else {
                     console.error('Error fetching product data:', productData.message);
@@ -142,13 +150,13 @@ const EcommerenceAddProduct = () => {
         };
 
         fetchProductFamilies();
-        fetchProductData(); // Fetch product data when the component mounts
-    }, [token, id]); // Include token and id in the dependency array
+        fetchProductData();
+    }, [token, id]);
 
     const handleAcceptedFiles = (files) => {
         const file = files[0];
         setSelectedFiles(files);
-        setImagePreview(URL.createObjectURL(file)); // Set image preview
+        setImagePreview(URL.createObjectURL(file));
     };
 
     return (
@@ -216,34 +224,52 @@ const EcommerenceAddProduct = () => {
                                                 </div>
 
                                                 <div className="mb-3">
-                                                    <Label htmlFor="tax">Tax</Label>
+                                                    <Label htmlFor="stock">Stock</Label>
                                                     <Input
-                                                        id="tax"
-                                                        name="tax"
+                                                        id="stock"
+                                                        name="stock"
                                                         type="number"
-                                                        placeholder="Tax"
-                                                        value={formik.values.tax}
+                                                        placeholder="Stock Quantity"
+                                                        value={formik.values.stock}
                                                         onChange={formik.handleChange}
-                                                        invalid={formik.touched.tax && formik.errors.tax ? true : false}
+                                                        invalid={formik.touched.stock && formik.errors.stock ? true : false}
                                                     />
-                                                    {formik.errors.tax && formik.touched.tax ? (
-                                                        <FormFeedback type="invalid">{formik.errors.tax}</FormFeedback>
+                                                    {formik.errors.stock && formik.touched.stock ? (
+                                                        <FormFeedback type="invalid">{formik.errors.stock}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="color">Color</Label>
+                                                    <Input
+                                                        id="color"
+                                                        name="color"
+                                                        type="text"
+                                                        placeholder="Color"
+                                                        value={formik.values.color}
+                                                        onChange={formik.handleChange}
+                                                        invalid={formik.touched.color && formik.errors.color ? true : false}
+                                                    />
+                                                    {formik.errors.color && formik.touched.color ? (
+                                                        <FormFeedback type="invalid">{formik.errors.color}</FormFeedback>
                                                     ) : null}
                                                 </div>
                                             </Col>
 
                                             <Col sm="6">
                                                 <div className="mb-3">
-                                                    <div className="control-label" style={{ marginBottom: "0.5rem" }}>Unit Type</div>
-                                                    <Select
-                                                        name="unit"
-                                                        options={UNIT_TYPES}
-                                                        className="select2"
-                                                        value={UNIT_TYPES.find((option) => option.value === formik.values.unit)}
-                                                        onChange={(selectedOption) => formik.setFieldValue("unit", selectedOption.value)}
+                                                    <Label htmlFor="size">Size</Label>
+                                                    <Input
+                                                        id="size"
+                                                        name="size"
+                                                        type="text"
+                                                        placeholder="Size"
+                                                        value={formik.values.size}
+                                                        onChange={formik.handleChange}
+                                                        invalid={formik.touched.size && formik.errors.size ? true : false}
                                                     />
-                                                    {formik.errors.unit && formik.touched.unit ? (
-                                                        <span className="text-danger">{formik.errors.unit}</span>
+                                                    {formik.errors.size && formik.touched.size ? (
+                                                        <FormFeedback type="invalid">{formik.errors.size}</FormFeedback>
                                                     ) : null}
                                                 </div>
 
@@ -306,7 +332,6 @@ const EcommerenceAddProduct = () => {
                                                     ) : null}
                                                 </div>
 
-                                                {/* Image Upload and Preview */}
                                                 <div className="mb-3">
                                                     <Label htmlFor="image">Product Image</Label>
                                                     <Dropzone onDrop={acceptedFiles => handleAcceptedFiles(acceptedFiles)}>

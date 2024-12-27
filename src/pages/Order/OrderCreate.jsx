@@ -573,20 +573,18 @@ const FormLayouts = () => {
                                                                     <tbody>
                                                                         {cartProducts.length > 0 ? (
                                                                             cartProducts.map((product, index) => (
-                                                                                <tr key={product.id}>
+                                                                                <tr key={product.id || index}>
                                                                                     <td>{index + 1}</td>
                                                                                     <td>
                                                                                         <img
-                                                                                            src={product.images[0]}
-                                                                                            alt={product.name}
+                                                                                            src={product.images && product.images[0] ? product.images[0] : "/path/to/placeholder-image.jpg"}
+                                                                                            alt={product.name || "Product image"}
                                                                                             style={{ width: "50px", height: "50px" }}
                                                                                         />
                                                                                     </td>
-                                                                                    <td>{product.name}</td>
-                                                                                    <td> ₹  {product.exclude_price}</td>
-
-                                                                                    <td>{product.tax} %</td>
-
+                                                                                    <td>{product.name || "Unknown Product"}</td>
+                                                                                    <td>₹ {product.exclude_price || 0}</td>
+                                                                                    <td>{product.tax || 0} %</td>
                                                                                     <td>
                                                                                         <Input
                                                                                             type="text"
@@ -604,9 +602,8 @@ const FormLayouts = () => {
                                                                                             onChange={(e) => handleDiscountChange(index, e.target.value)}
                                                                                             className="input-sm"
                                                                                         />
-
                                                                                     </td>
-                                                                                    <td>₹{product.price.toFixed(2) - product.discount}</td>
+                                                                                    <td>₹{(product.price || 0) - (product.discount || 0)}</td>
                                                                                     <td>
                                                                                         <Input
                                                                                             type="number"
@@ -615,8 +612,7 @@ const FormLayouts = () => {
                                                                                             className="input-sm"
                                                                                         />
                                                                                     </td>
-                                                                                    <td>₹{((product.price * product.quantity) - (product.discount * product.quantity)).toFixed(2)}</td>
-
+                                                                                    <td>₹{(((product.price || 0) * (product.quantity || 1)) - ((product.discount || 0) * (product.quantity || 1))).toFixed(2)}</td>
                                                                                     <td>
                                                                                         <Button
                                                                                             className="btn-remove"
@@ -635,6 +631,7 @@ const FormLayouts = () => {
                                                                             </tr>
                                                                         )}
                                                                     </tbody>
+
                                                                 </Table>
                                                             </div>
 

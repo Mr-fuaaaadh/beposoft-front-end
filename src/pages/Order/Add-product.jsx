@@ -9,42 +9,50 @@ import {
     Table,
     Spinner,
     Collapse,
-    Dropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem
 } from "reactstrap";
 
-const AddProduct = ({ isOpen, toggle, }) => {
-    const [products, setProducts] = useState([]);
+const AddProduct = ({ isOpen, toggle }) => {
+    const [products, setProducts] = useState([]); // Initialize products state with an empty array
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [expandedProductId, setExpandedProductId] = useState(null);
-    const [selectedSize, setSelectedSize] = useState({});
     const [quantity, setQuantity] = useState({});
     const token = localStorage.getItem("token");
 
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
+        const token = localStorage.getItem("token");
+
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}all/products/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
-                }
+                },
             });
+
+            console.log("API response:", response); // Log the response to check status
 
             if (!response.ok) {
                 throw new Error("Failed to fetch products");
             }
 
             const data = await response.json();
-            setProducts(data.data);
+            console.log("API data:", data); // Log the data to verify
+
+            // Ensure the data is an array and properly set it
+            if (data && Array.isArray(data.data)) {
+                setProducts(data.data);
+            } else {
+                setError('Data structure is not as expected');
+            }
+            
         } catch (error) {
-            setError("An error occurred while fetching products.");
+            console.error("Error fetching products:", error); // Log error to console
+            setError(error.message || "An error occurred while fetching products.");
         } finally {
             setLoading(false);
         }
@@ -64,42 +72,6 @@ const AddProduct = ({ isOpen, toggle, }) => {
         setExpandedProductId(expandedProductId === productId ? null : productId);
     };
 
-    // Function to handle size selection
-    // Function to handle size selection
-    const handleSizeSelect = (variantId, sizeId) => {
-        // Find the selected size object based on the provided sizeId
-        const variant = products.find(product =>
-            product.variant_products && product.variant_products.some(variant => variant.id === variantId) // Check if variant_products is defined
-        )?.variant_products?.find(variant => variant.id === variantId); // Safely access variant_products
-    
-        const selectedSizeObject = variant?.sizes.find((size) => size.id === sizeId);
-    
-        if (selectedSizeObject) {
-            // Update the state with the selected size for the specific variant
-            setSelectedSize((prevState) => ({
-                ...prevState,
-                [variantId]: {
-                    ...selectedSizeObject,
-                    isOpen: false, // Close the dropdown after selection
-                },
-            }));
-        }
-    };
-    
-
-    // Function to toggle the dropdown
-    const toggleDropdown = (variantId) => {
-        setSelectedSize((prevState) => ({
-            ...prevState,
-            [variantId]: {
-                ...prevState[variantId],
-                isOpen: !prevState[variantId]?.isOpen, // Toggle the dropdown open/close state
-            },
-        }));
-    };
-
-
-
     const handleQuantityChange = (productId, value) => {
         setQuantity((prev) => ({
             ...prev,
@@ -108,33 +80,10 @@ const AddProduct = ({ isOpen, toggle, }) => {
     };
 
     const addToCart = async (product, variant = null) => {
-        // Prepare the cart item data based on the product type
         const cartItem = {
             product: product.id,
             quantity: variant ? quantity[variant.id] || 1 : quantity[product.id] || 1,
         };
-
-        // Log the product ID and quantity
-        console.log("Product ID:", product.id);
-        console.log("Quantity:", quantity[product.id] || 1);
-
-        // If the product is a variant, add the variant ID
-        if (variant) {
-            cartItem.variant = variant.id;
-             // Include the variant ID
-
-            // Log the variant ID
-            console.log("Variant ID:", variant.id);
-
-            // If the product has a size variant selected, include the size ID
-            const selectedSizeForVariant = selectedSize[variant.id];
-            if (selectedSizeForVariant) {
-                cartItem.size = selectedSizeForVariant.id; // Include the size ID if selected
-
-                // Log the selected size ID
-                console.log("Selected Size ID:", selectedSizeForVariant.id);
-            }
-        }
 
         try {
             const response = await axios.post(
@@ -150,17 +99,14 @@ const AddProduct = ({ isOpen, toggle, }) => {
 
             if (response.status === 201) {
                 alert("Product added to cart successfully!");
-                onCartUpdate();
             }
         } catch (error) {
             console.error("Failed to add product to cart", error);
         }
     };
 
-
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter products based on the search query
+    const filteredProducts = Array.isArray(products) ? products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
     return (
         <Modal isOpen={isOpen} toggle={toggle} size="lg" style={{ maxWidth: "90%", width: "90%" }}>
@@ -192,12 +138,12 @@ const AddProduct = ({ isOpen, toggle, }) => {
                                     <th>Name</th>
                                     <th>Price</th>
                                     <th>Stock</th>
-                                    {filteredProducts.some(product => product.type === "single") && <th>Quantity</th>}
+                                    <th>Quantity</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredProducts.length > 0 ? (
+                                {filteredProducts.length >= 0 ? (
                                     filteredProducts.map((product, index) => (
                                         <React.Fragment key={product.id}>
                                             <tr>
@@ -210,147 +156,31 @@ const AddProduct = ({ isOpen, toggle, }) => {
                                                     />
                                                 </td>
                                                 <td>{product.name}</td>
-                                                <td>${product.selling_price.toFixed(2)}</td>
-                                                <td>{product.stock}</td>
-                                                {product.type === "single" && (
-                                                    <td>
-                                                        <Input
-                                                            type="number"
-                                                            min="1"
-                                                            value={quantity[product.id] || 1}
-                                                            onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                                                            className="form-control"
-                                                            placeholder="Quantity"
-                                                        />
-                                                    </td>
-                                                )}
+                                                <td>${product.selling_price ? product.selling_price.toFixed(2) : "N/A"}</td>
+                                                <td>{product.stock || 0}</td>
                                                 <td>
-                                                    {product.type === "single" ? (
-                                                        <Button
-                                                            color="success"
-                                                            size="sm"
-                                                            onClick={() => addToCart(product)}
-                                                            disabled={product.stock === 0} // Disable if stock is 0
-                                                        >
-                                                            Add
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            color="info"
-                                                            size="sm"
-                                                            onClick={() => toggleExpand(product.id)}
-                                                        >
-                                                            {expandedProductId === product.id ? "Hide Variants" : "Show Variants"}
-                                                        </Button>
-                                                    )}
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        value={quantity[product.id] || 1}
+                                                        onChange={(e) =>
+                                                            handleQuantityChange(product.id, e.target.value)
+                                                        }
+                                                        className="form-control"
+                                                        placeholder="Quantity"
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <Button
+                                                        color="success"
+                                                        size="sm"
+                                                        onClick={() => addToCart(product)}
+                                                        disabled={product.stock === 0}
+                                                    >
+                                                        Add
+                                                    </Button>
                                                 </td>
                                             </tr>
-                                            {product.type === "variant" && (
-                                                <tr>
-                                                    <td colSpan={7} className="p-0">
-                                                        <Collapse isOpen={expandedProductId === product.id}>
-                                                            <Table size="sm" className="mb-0" bordered>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>#</th>
-                                                                        <th>Image</th>
-                                                                        <th>Variant Name</th>
-                                                                        <th>Color</th>
-                                                                        <th>Size</th>
-                                                                        <th>Stock</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {product.variant_products.map((variant, variantIndex) => (
-                                                                        <tr key={variant.id}>
-                                                                            <td>{variantIndex + 1}</td>
-                                                                            <td>
-                                                                                <img
-                                                                                    src={variant.variant_images && variant.variant_images.length > 0
-                                                                                        ? `${variant.variant_images[0].image}`
-                                                                                        : "https://via.placeholder.com/50"
-                                                                                    }
-                                                                                    alt={variant.name}
-                                                                                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                                                                />
-                                                                            </td>
-                                                                            <td>{variant.name}</td>
-                                                                            <td>{variant.color}</td>
-                                                                            <td>
-                                                                                {variant.is_variant ? (
-                                                                                    <Dropdown
-                                                                                        isOpen={selectedSize[variant.id]?.isOpen || false}
-                                                                                        toggle={() => toggleDropdown(variant.id)} // Use toggleDropdown here
-                                                                                    >
-                                                                                        <DropdownToggle caret>
-                                                                                            {selectedSize[variant.id]?.attribute || "Select Size"}
-                                                                                        </DropdownToggle>
-                                                                                        <DropdownMenu>
-                                                                                            {variant.sizes.map((size) => (
-                                                                                                <DropdownItem
-                                                                                                    key={size.id}
-                                                                                                    onClick={() => handleSizeSelect(variant.id, size.id)} // Select size on click
-                                                                                                >
-                                                                                                    {size.attribute} - Stock: {size.stock}
-                                                                                                </DropdownItem>
-                                                                                            ))}
-                                                                                        </DropdownMenu>
-                                                                                    </Dropdown>
-
-                                                                                ) : (
-                                                                                    <span>{variant.color}</span>
-                                                                                )}
-                                                                            </td>
-                                                                            <td>
-                                                                                {variant.is_variant && selectedSize[variant.id]
-                                                                                    ? selectedSize[variant.id].stock
-                                                                                    : !variant.is_variant
-                                                                                        ? variant.stock
-                                                                                        : "N/A"}
-                                                                            </td>
-                                                                            <td>
-                                                                                <Input
-                                                                                    type="number"
-                                                                                    min="1"
-                                                                                    value={quantity[variant.id] || 1}
-                                                                                    onChange={(e) => handleQuantityChange(variant.id, e.target.value)}
-                                                                                    className="form-control"
-                                                                                    placeholder="Quantity"
-                                                                                />
-                                                                            </td>
-                                                                            {/* <td>
-                                                                                <Button
-                                                                                    color="success"
-                                                                                    size="sm"
-                                                                                    onClick={() => addToCart(product, variant)}
-                                                                                >
-                                                                                    Add
-                                                                                </Button>
-                                                                            </td> */}
-
-                                                                            <td>
-                                                                                {variant.is_variant && (
-                                                                                    <Button
-                                                                                        color="success"
-                                                                                        size="sm"
-                                                                                        onClick={() => addToCart(product, variant)}
-                                                                                        disabled={!selectedSize[variant.id] || selectedSize[variant.id].stock === 0}
-                                                                                    >
-                                                                                        Add
-                                                                                    </Button>
-                                                                                )}
-                                                                            </td>
-
-                                                                        </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </Table>
-                                                        </Collapse>
-                                                    </td>
-                                                </tr>
-                                            )}
                                         </React.Fragment>
                                     ))
                                 ) : (

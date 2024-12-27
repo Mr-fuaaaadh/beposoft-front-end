@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
     Card,
     Col,
@@ -10,605 +9,503 @@ import {
     Label,
     Form,
     Input,
-    FormFeedback,
-    Button,
-    Table,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter
+    FormFeedback
 } from "reactstrap";
-import * as Yup from "yup";
+import * as Yup from 'yup';
+import axios from "axios";
 import { useFormik } from "formik";
+import { useParams } from "react-router-dom";
 
-const VariantProductData = () => {
-    const [selectedImages, setSelectedImages] = useState([]);
-    const [fetchedImages, setFetchedImages] = useState([]);
-    const [attributes, setAttributes] = useState([]);
-    const [attributeValues, setAttributeValues] = useState([]);
-    const [sizes, setSizes] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [currentSize, setCurrentSize] = useState({ id: '', attribute: '', stock: '' });
-    const [error, setError] = useState(null);
+//Import Breadcrumb
+import Breadcrumbs from "../../components/Common/Breadcrumb";
 
+const FormLayouts = () => {
+
+    //meta title
+    document.title = "Form Layouts | Skote - Vite React Admin & Dashboard Template";
     const { id } = useParams();
-    const navigate = useNavigate();
-    const create_user = localStorage.getItem("name");
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
+    const created_user = localStorage.getItem('name');
+    const [familys, setFamily] = useState([]);
 
-    useEffect(() => {
-        if (id) {
-            fetchData(); // Fetch product data
-            fetchAttributes(); // Fetch attributes data
-            fetchSizes(); // Fetch initial sizes data
-        }
-    }, [id]);
+    const UNIT_TYPES = [
+        { value: 'NOS', label: 'NOS' },
+        { value: 'PRS', label: 'PRS' },
+        { value: 'BOX', label: 'BOX' },
+        { value: 'SET', label: 'SET' },
+        { value: 'SET OF 12', label: 'SET OF 12' },
+        { value: 'SET OF 16', label: 'SET OF 16' },
+        { value: 'SET OF 6', label: 'SET OF 6' },
+        { value: 'SET OF 8', label: 'SET OF 8' },
+    ];
+    const types = [
+        { value: 'single', label: 'Single' },
+        { value: 'variant', label: 'Variant' },
+    ];
 
-    // Formik form initialization
+
     const formik = useFormik({
         initialValues: {
             name: "",
+            hsn_code: "",
+            family: [],
+            type: "",
+            unit: "",
+            tax: "",
+            purchase_rate: "",
+            selling_price: "",
             stock: "",
             color: "",
-            is_variant: false,
-            attribute: "",
-            size: [],
+            size: "",
+            groupID: "",
+            check: ""
         },
-        validationSchema: Yup.object().shape({
+        validationSchema: Yup.object({
             name: Yup.string().required("This field is required"),
+            hsn_code: Yup.string().required("This field is required"),
+            family: Yup.array().min(1, "At least one value is required").required("This field is required"),
+            type: Yup.string().required("This field is required"),
+            unit: Yup.string().required("This field is required"),
+            purchase_rate: Yup.string().required("This field is required"),
+            tax: Yup.string().required("This field is required"),
+            selling_price: Yup.string().required("This field is required"),
+            stock: Yup.string().required("This field is required"),
             color: Yup.string().required("This field is required"),
-            is_variant: Yup.boolean(),
-            attribute: Yup.string().when("is_variant", {
-                is: true,
-                then: (schema) => schema.required("This field is required"),
-                otherwise: (schema) => schema.notRequired(),
-            }),
-            size: Yup.array().when("is_variant", {
-                is: true,
-                then: (schema) => schema.min(1, "Please select at least one size").required("This field is required"),
-                otherwise: (schema) => schema.notRequired(),
-            }),
+            groupID: Yup.string().required("This field is required"),
+            check: Yup.string().required("This field is required"),
         }),
+
+        
+
         onSubmit: async (values) => {
+            console.log("Calling API with values:", values);
             try {
-                const apiUrl = `${import.meta.env.VITE_APP_APIKEY}product/${id}/variant/data/`;
-                const formData = new FormData();
-                formData.append("name", values.name);
-                formData.append("stock", values.stock);
-                formData.append("color", values.color);
-                formData.append("is_variant", values.is_variant ? "true" : "false");
-                formData.append("attribute", values.attribute);
-                values.size.forEach((size) => formData.append("size", size));
-                selectedImages.forEach((image) => formData.append("images", image));
-
-                const response = await fetch(apiUrl, {
-                    method: "PUT",
-                    headers: { Authorization: `Bearer ${token}` },
-                    body: formData,
-                });
-
-                if (response.ok) {
-                    const newSizes = values.size.map((size) => ({
-                        attribute: size,
-                        stock: values.stock,
-                        id: Math.random().toString(36).substr(2, 9), // Assign a temporary ID for local state
-                    }));
-
-                    // Optimistically update sizes
-                    setSizes((prevSizes) => [...prevSizes, ...newSizes]);
-                    await fetchSizes();
-
-                    formik.resetForm();
-                    setSelectedImages([]);
+                const response = await fetch(
+                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(values), // Convert the form data to JSON
+                    }
+                );
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const responseData = await response.json(); // Parse the JSON response
+                console.log("API response:", responseData);
+        
+                if (response.status === 200) {
+                    alert("Product updated successfully!");
                 } else {
-                    const errorData = await response.json();
-                    alert(`Failed to update product variant: ${errorData.message || "Unknown error"}`);
+                    alert("Failed to update product.");
                 }
             } catch (error) {
-                alert("An error occurred while updating the product variant.");
+                console.error("Error updating product:", error);
+                alert("An error occurred while updating the product.");
             }
-        }
-
+        }         
     });
 
-    // Fetch product data
-    const fetchData = async () => {
-        try {
-            const apiUrl = `${import.meta.env.VITE_APP_APIKEY}product/${id}/variant/data/`;
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
-            });
 
-            if (!response.ok) throw new Error("Network response was not ok");
+    const [productData, setProductData] = useState(null); // State to store product data
 
-            const result = await response.json();
-            const productData = result.data;
+    useEffect(() => {
+        const fetchProductData = async () => {
+            try {
+                const response = await fetch(
+                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-            // Update form values directly
-            formik.setValues({
-                name: productData?.name || "",
-                stock: productData?.stock || "",
-                color: productData?.color || "",
-                is_variant: productData?.is_variant || false,
-                attribute: productData?.attribute || "",
-                size: productData?.size || [],
-            });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            const imagesResponse = await fetch(`${import.meta.env.VITE_APP_APIKEY}variant/${id}/images/`, {
-                method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
-            });
+                const data = await response.json();
+                const fetchedProductData = data.data;
 
-            if (!imagesResponse.ok) throw new Error("Network response was not ok");
+                setProductData(fetchedProductData); // Store the fetched product data
 
-            const resultImages = await imagesResponse.json();
-            setFetchedImages(resultImages.images);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
-
-    // Fetch attributes
-    const fetchAttributes = async () => {
-        try {
-            const attributesUrl = `${import.meta.env.VITE_APP_APIKEY}product/attributes/`;
-            const response = await fetch(attributesUrl, {
-                method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                navigate("/login");
-                return;
+                // Set initial form values
+                formik.setValues({
+                    name: fetchedProductData.name || "",
+                    hsn_code: fetchedProductData.hsn_code || "",
+                    family: fetchedProductData.family || [],
+                    type: fetchedProductData.type || "",
+                    unit: fetchedProductData.unit || "",
+                    tax: fetchedProductData.tax || "",
+                    purchase_rate: fetchedProductData.purchase_rate || "",
+                    selling_price: fetchedProductData.selling_price || "",
+                    stock: fetchedProductData.stock || "",
+                    color: fetchedProductData.color || "",
+                    size: fetchedProductData.size || "",
+                    groupID: fetchedProductData.groupID || "",
+                    check: fetchedProductData.check || "",
+                });
+            } catch (error) {
+                console.error("Error fetching product data:", error);
             }
+        };
 
-            if (!response.ok) throw new Error("Failed to fetch attributes");
+        fetchProductData();
+    }, [id, token]);
 
-            const attributesData = await response.json();
-            setAttributes(attributesData);
-        } catch (error) {
-            console.error("Error fetching attributes:", error);
-            setError(error.message);
-        }
-    };
+    useEffect(() => {
+        const fetchFamilyData = async () => {
+            try {
+                const response = await axios.get(
+                    `${import.meta.env.VITE_APP_APIKEY}familys/`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-    const fetchSizes = async () => {
-        try {
-            const sizeUrl = `${import.meta.env.VITE_APP_APIKEY}variant/product/${id}/size/view/`;
-            const response = await fetch(sizeUrl, {
-                method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
-            });
+                const familyData = response.data.data; // Assuming this contains the list of families with id and name
+                setFamily(familyData);
 
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                navigate("/login");
-                return;
+                // Pre-select family values if product data is already fetched
+                if (productData?.family) {
+                    formik.setFieldValue(
+                        'family',
+                        productData.family.map(familyId =>
+                            familyData.find(family => family.id === familyId)?.id
+                        )
+                    );
+                }
+            } catch (error) {
+                console.error("Error fetching family data:", error);
             }
+        };
 
-            if (!response.ok) throw new Error("Failed to fetch sizes");
 
-            const sizeData = await response.json();
-            setSizes(sizeData.data); // Update the sizes state with new data
-        } catch (error) {
-            console.error("Error fetching sizes:", error);
-            setError(error.message);
-        }
-    };
+        fetchFamilyData();
+    }, [id, token, productData]); // Add productData as a dependency
 
-    // Fetch attribute values
-    const fetchAttributeValues = useCallback(async (attributeId) => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attribute/${attributeId}/values/`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
 
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                navigate("/login");
-                return;
-            }
 
-            if (!response.ok) throw new Error("Failed to fetch attribute values");
-
-            const data = await response.json();
-            setAttributeValues(data);
-        } catch (error) {
-            console.error("Error fetching attribute values:", error);
-            setError(error.message);
-        }
-    }, [navigate, token]);
-
-    // Image selection handler
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        setSelectedImages((prevImages) => [...prevImages, ...files]);
-    };
-
-    // Remove selected image from preview
-    const removeImage = (indexToRemove) => {
-        setSelectedImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove));
-    };
-
-    // Remove images from backend
-    const removeImages = async (index, imageId) => {
-        const apiUrl = `${import.meta.env.VITE_APP_APIKEY}variant/${imageId}/delete/`;
-        try {
-            const response = await fetch(apiUrl, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!response.ok) throw new Error("Error deleting image");
-
-            setFetchedImages((prevImages) => prevImages.filter((_, i) => i !== index));
-        } catch (error) {
-            console.error("Error deleting image:", error);
-        }
-    };
-
-    const removesize = async (index, sizeId) => {
-        const apiUrl = `${import.meta.env.VITE_APP_APIKEY}variant/product/${sizeId}/size/edit/`;
-        try {
-            const response = await fetch(apiUrl, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData || "Error deleting size");
-            }
-
-            setSizes((prevSizes) => prevSizes.filter((_, i) => i !== index)); // Optimistically update UI
-        } catch (error) {
-            console.error("Error deleting size:", error);
-            alert(`An error occurred while deleting the size: ${error.message}`);
-        }
-    };
+    
 
 
 
 
-
-    const toggleModal = () => {
-        setModalOpen(!modalOpen);
-    };
-
-    const handleEditClick = (size) => {
-        setCurrentSize(size);
-        toggleModal();
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentSize((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleUpdate = async () => {
-        const apiUrl = `${import.meta.env.VITE_APP_APIKEY}variant/product/${currentSize.id}/size/edit/`;
-        try {
-            const response = await fetch(apiUrl, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(currentSize),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData || "Error updating size");
-            }
-
-            const updatedSizes = sizes.map((size) =>
-                size.id === currentSize.id ? { ...size, ...currentSize } : size
-            );
-            setSizes(updatedSizes);
-            toggleModal();
-        } catch (error) {
-            console.error("Error updating size:", error);
-            alert(`An error occurred while updating the size: ${error.message}`);
-        }
-    };
 
     return (
         <React.Fragment>
             <div className="page-content">
                 <Container fluid={true}>
+                    <Breadcrumbs title="Forms" breadcrumbItem="Form Layouts" />
                     <Row>
                         <Col xl={12}>
                             <Card>
                                 <CardBody>
-                                    <CardTitle className="mb-4">Update Product Variant</CardTitle>
-                                    <Form onSubmit={formik.handleSubmit}>
-                                        <div className="mb-3">
-                                            <Label htmlFor="formrow-created-user">Created User</Label>
-                                            <Input
-                                                type="text"
-                                                name="created_user"
-                                                className="form-control"
-                                                value={create_user || ""}
-                                                disabled
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <Label htmlFor="formrow-name-Input">Name</Label>
-                                            <Input
-                                                type="text"
-                                                name="name"
-                                                className="form-control"
-                                                placeholder="Enter Product Name"
-                                                value={formik.values.name}
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                invalid={formik.touched.name && !!formik.errors.name}
-                                            />
-                                            {formik.touched.name && formik.errors.name && (
-                                                <FormFeedback>{formik.errors.name}</FormFeedback>
-                                            )}
-                                        </div>
+                                    <CardTitle className="mb-4">Form Grid Layout</CardTitle>
 
+                                    <Form onSubmit={formik.handleSubmit}>
                                         <Row>
                                             <Col md={6}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-name-Input">Product Name :</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="name"
+                                                        className="form-control"
+                                                        id="formrow-name-Input"
+                                                        placeholder="Enter Product Name"
+                                                        value={formik.values.name}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={
+                                                            formik.touched.name && formik.errors.name ? true : false
+                                                        }
+                                                    />
+                                                    {formik.errors.name && formik.touched.name ? (
+                                                        <FormFeedback type="invalid">{formik.errors.name}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={6}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-hsn_code-Input">HSN CODE</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="hsn_code"
+                                                        className="form-control"
+                                                        id="formrow-hsn_code-Input"
+                                                        placeholder="Enter Product HSN Code"
+                                                        value={formik.values.hsn_code}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={
+                                                            formik.touched.hsn_code && formik.errors.hsn_code ? true : false
+                                                        }
+                                                    />
+                                                    {formik.errors.hsn_code && formik.touched.hsn_code ? (
+                                                        <FormFeedback type="invalid">{formik.errors.hsn_code}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md={4}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-tax-Input">created user</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="created_user"
+                                                        className="form-control"
+                                                        id="formrow-tax-Input"
+                                                        placeholder=""
+                                                        value={created_user}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.tax && formik.errors.tax ? true : false}
+                                                    />
+
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-type-Input">Product Type</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="type"
+                                                        className="form-control"
+                                                        id="formrow-type-Input"
+                                                        value={formik.values.type}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.type && formik.errors.type ? true : false}
+                                                    >
+                                                        <option value="">Select Product Type</option>
+                                                        {types.map((type) => (
+                                                            <option key={type.value} value={type.value}>
+                                                                {type.label}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+                                                    {formik.errors.type && formik.touched.type ? (
+                                                        <FormFeedback type="invalid">{formik.errors.type}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-unit-Input">Unit</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="unit"
+                                                        className="form-control"
+                                                        id="formrow-unit-Input"
+                                                        value={formik.values.unit}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.unit && formik.errors.unit ? true : false}
+                                                    >
+                                                        <option value="">Select Unit</option>
+                                                        {UNIT_TYPES.map((unit) => (
+                                                            <option key={unit.value} value={unit.value}>
+                                                                {unit.label}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+                                                    {formik.errors.unit && formik.touched.unit ? (
+                                                        <FormFeedback type="invalid">{formik.errors.unit}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                        </Row>
+
+
+                                        <Row>
+
+                                            <Col md={4}>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-purchase-rate-Input">Purchase Rate</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="purchase_rate"
+                                                        className="form-control"
+                                                        id="formrow-purchase-rate-Input"
+                                                        placeholder="Enter Purchase Rate"
+                                                        value={formik.values.purchase_rate}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={
+                                                            formik.touched.purchase_rate && formik.errors.purchase_rate ? true : false
+                                                        }
+                                                    />
+                                                    {formik.errors.purchase_rate && formik.touched.purchase_rate ? (
+                                                        <FormFeedback type="invalid">{formik.errors.purchase_rate}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-selling-price-Input">Selling Price</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="selling_price"
+                                                        className="form-control"
+                                                        id="formrow-selling-price-Input"
+                                                        placeholder="Enter Selling Price"
+                                                        value={formik.values.selling_price}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={
+                                                            formik.touched.selling_price && formik.errors.selling_price ? true : false
+                                                        }
+                                                    />
+                                                    {formik.errors.selling_price && formik.touched.selling_price ? (
+                                                        <FormFeedback type="invalid">{formik.errors.selling_price}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-stock-Input">Stock</Label>
+                                                    <Input
+                                                        type="number"
+                                                        name="stock"
+                                                        className="form-control"
+                                                        id="formrow-stock-Input"
+                                                        placeholder="Enter Stock Quantity"
+                                                        value={formik.values.stock}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.stock && formik.errors.stock ? true : false}
+                                                    />
+                                                    {formik.errors.stock && formik.touched.stock ? (
+                                                        <FormFeedback type="invalid">{formik.errors.stock}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-color-Input">Color</Label>
                                                     <Input
                                                         type="text"
                                                         name="color"
                                                         className="form-control"
+                                                        id="formrow-color-Input"
                                                         placeholder="Enter Color"
                                                         value={formik.values.color}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.color && !!formik.errors.color}
+                                                        invalid={formik.touched.color && formik.errors.color ? true : false}
                                                     />
-                                                    {formik.touched.color && formik.errors.color && (
-                                                        <FormFeedback>{formik.errors.color}</FormFeedback>
-                                                    )}
+                                                    {formik.errors.color && formik.touched.color ? (
+                                                        <FormFeedback type="invalid">{formik.errors.color}</FormFeedback>
+                                                    ) : null}
                                                 </div>
                                             </Col>
-                                            {!formik.values.is_variant && (
-                                                <Col md={6}>
-                                                    <div className="mb-3">
-                                                        <Label htmlFor="formrow-stock-Input">Stock</Label>
-                                                        <Input
-                                                            type="number"
-                                                            name="stock"
-                                                            className="form-control"
-                                                            placeholder="Enter Stock"
-                                                            value={formik.values.stock}
-                                                            onChange={formik.handleChange}
-                                                            onBlur={formik.handleBlur}
-                                                            invalid={formik.touched.stock && !!formik.errors.stock}
-                                                        />
-                                                        {formik.touched.stock && formik.errors.stock && (
-                                                            <FormFeedback>{formik.errors.stock}</FormFeedback>
-                                                        )}
-                                                    </div>
-                                                </Col>
-                                            )}
-                                        </Row>
-
-                                        <div className="mb-3">
-                                            <Label htmlFor="formrow-customis_variant">Is Variant</Label>
-                                            <Input
-                                                type="select"
-                                                name="is_variant"
-                                                value={formik.values.is_variant ? "true" : "false"}
-                                                onChange={(e) =>
-                                                    formik.setFieldValue("is_variant", e.target.value === "true")
-                                                }
-                                                onBlur={formik.handleBlur}
-                                                invalid={formik.touched.is_variant && !!formik.errors.is_variant}
-                                            >
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
-                                            </Input>
-                                            {formik.touched.is_variant && formik.errors.is_variant && (
-                                                <FormFeedback>{formik.errors.is_variant}</FormFeedback>
-                                            )}
-                                        </div>
-
-                                        {formik.values.is_variant && (
-                                            <>
+                                            <Col md={4}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-attribute-Input">Attribute</Label>
+                                                    <Label htmlFor="formrow-color-Input">Size</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="size"
+                                                        className="form-control"
+                                                        id="formrow-color-Input"
+                                                        placeholder="Enter Size"
+                                                        value={formik.values.size}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.size && formik.errors.size ? true : false}
+                                                    />
+                                                    {formik.errors.size && formik.touched.size ? (
+                                                        <FormFeedback type="invalid">{formik.errors.size}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-tax-Input">Tax (%)</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="tax"
+                                                        className="form-control"
+                                                        id="formrow-tax-Input"
+                                                        placeholder="Enter Tax Percentage"
+                                                        value={formik.values.tax}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.tax && formik.errors.tax ? true : false}
+                                                    />
+                                                    {formik.errors.tax && formik.touched.tax ? (
+                                                        <FormFeedback type="invalid">{formik.errors.tax}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-family-Input">Family</Label>
                                                     <Input
                                                         type="select"
-                                                        name="attribute"
+                                                        name="family"
                                                         className="form-control"
-                                                        value={formik.values.attribute}
+                                                        id="formrow-family-Input"
+                                                        multiple
+                                                        value={formik.values.family}
                                                         onChange={(e) => {
-                                                            formik.handleChange(e);
-                                                            fetchAttributeValues(e.target.value);
+                                                            // Capture multiple selected values
+                                                            const options = Array.from(e.target.selectedOptions, option => option.value);
+                                                            formik.setFieldValue("family", options);
                                                         }}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.attribute && !!formik.errors.attribute}
-                                                    >
-                                                        <option value="">Select an Attribute</option>
-                                                        {attributes.map((attr) => (
-                                                            <option key={attr.id} value={attr.id}>
-                                                                {attr.name}
-                                                            </option>
-                                                        ))}
-                                                    </Input>
-                                                    {formik.touched.attribute && formik.errors.attribute && (
-                                                        <FormFeedback>{formik.errors.attribute}</FormFeedback>
-                                                    )}
-                                                </div>
-                                                <div className="mb-3">
-                                                    <Label htmlFor="formrow-size-Input">Size</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="size"
-                                                        multiple
-                                                        className="form-control"
-                                                        value={formik.values.size}
-                                                        onChange={(e) =>
-                                                            formik.setFieldValue(
-                                                                "size",
-                                                                Array.from(e.target.selectedOptions, (option) => option.value)
-                                                            )
+                                                        invalid={
+                                                            formik.touched.family && formik.errors.family ? true : false
                                                         }
-                                                        onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.size && !!formik.errors.size}
                                                     >
-                                                        {attributeValues.map((size) => (
-                                                            <option key={size.id} value={size.value}>
-                                                                {size.value}
+                                                        <option value="">Select Family</option>
+                                                        {familys.map((family) => (
+                                                            <option key={family.id} value={family.id}>
+                                                                {family.name}
                                                             </option>
                                                         ))}
                                                     </Input>
-                                                    {formik.touched.size && formik.errors.size && (
-                                                        <FormFeedback>{formik.errors.size}</FormFeedback>
-                                                    )}
+                                                    {formik.errors.family && formik.touched.family ? (
+                                                        <FormFeedback type="invalid">{formik.errors.family}</FormFeedback>
+                                                    ) : null}
                                                 </div>
-                                            </>
-                                        )}
+                                            </Col>
 
-                                        <div className="mb-3">
-                                            <Label htmlFor="formrow-images-Input">Upload Images</Label>
-                                            <Input type="file" multiple className="form-control" onChange={handleImageChange} />
-                                        </div>
 
-                                        <Row>
-                                            {selectedImages.map((image, index) => (
-                                                <Col md={1} key={index} className="mb-3">
-                                                    <div className="image-preview">
-                                                        <img
-                                                            src={URL.createObjectURL(image)}
-                                                            alt={`preview-${index}`}
-                                                            className="img-fluid"
-                                                        />
-                                                        <Button
-                                                            color="danger"
-                                                            size="sm"
-                                                            className="mt-2"
-                                                            onClick={() => removeImage(index)}
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </div>
-                                                </Col>
-                                            ))}
                                         </Row>
 
-                                        <div className="mt-4">
-                                            <Button type="submit" color="primary">
+                                        <div>
+                                            <button type="submit" className="btn btn-primary w-md">
                                                 Submit
-                                            </Button>
+                                            </button>
                                         </div>
                                     </Form>
                                 </CardBody>
-
-                                {/* Fetched Images Table */}
-                                <Row>
-                                    <Col md={6}>
-                                        <Table className="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Image</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {fetchedImages.map((image, index) => (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td>
-                                                            <img
-                                                                src={image.image}
-                                                                alt={`Image ${index + 1}`}
-                                                                style={{ width: "50px", height: "50px", marginRight: "10px" }}
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            <Button color="danger" size="sm" onClick={() => removeImages(index, image.id)}>
-                                                                Remove
-                                                            </Button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </Col>
-                                    {formik.values.is_variant && (
-                                        <Col md={6}>
-                                            <Table className="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>SIZE</th>
-                                                        <th>STOCK</th>
-                                                        <th>DELETE</th>
-                                                        <th>UPDATE</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {sizes.map((size, index) => (
-                                                        <tr key={index}>
-                                                            <td>{index + 1}</td>
-                                                            <td>{size.attribute}</td>
-                                                            <td>{size.stock}</td>
-                                                            <td>
-                                                                <Button color="danger" size="sm" onClick={() => removesize(index, size.id)}>
-                                                                    Remove
-                                                                </Button>
-                                                            </td>
-                                                            <td>
-                                                                <Button color="warning" size="sm" onClick={() => handleEditClick(size)}>
-                                                                    Update
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-
-
-                                            <Modal isOpen={modalOpen} toggle={toggleModal}>
-                                                <ModalHeader toggle={toggleModal}>Edit Size</ModalHeader>
-                                                <ModalBody>
-                                                    <Input
-                                                        type="text"
-                                                        name="attribute"
-                                                        value={currentSize.attribute}
-                                                        onChange={handleInputChange}
-                                                        placeholder="Size"
-                                                    />
-                                                    <Input
-                                                        type="number"
-                                                        name="stock"
-                                                        value={currentSize.stock}
-                                                        onChange={handleInputChange}
-                                                        placeholder="Stock"
-                                                        className="mt-2"
-                                                    />
-                                                </ModalBody>
-                                                <ModalFooter>
-                                                    <Button color="primary" onClick={handleUpdate}>Update</Button>
-                                                    <Button color="secondary" onClick={toggleModal}>Cancel</Button>
-                                                </ModalFooter>
-                                            </Modal>
-                                        </Col>
-                                    )}
-                                </Row>
                             </Card>
                         </Col>
                     </Row>
                 </Container>
             </div>
-        </React.Fragment>
+        </React.Fragment >
     );
 };
 
-export default VariantProductData;
+export default FormLayouts;

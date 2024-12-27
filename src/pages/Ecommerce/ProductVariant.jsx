@@ -29,59 +29,9 @@ const VariantProductCreateForm = () => {
         is_variant: false
     });
 
-    const handleIsVariantChange = (e) => {
-        console.log('Checkbox value:', e.target.checked);  
-        setFormData({
-            ...formData,
-            is_variant: e.target.checked  
-        });
-    };
 
     const [error, setError] = useState(null);
     const userName = localStorage.getItem('name');
-
-
-    const handleDelete = async (itemId) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-        if (confirmDelete) {
-            try {
-                await fetch(`${import.meta.env.VITE_APP_APIKEY}product/${itemId}/variant/data/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                setStockData((prevData) => prevData.filter((item) => item.id !== itemId));
-                alert("Item deleted successfully.");
-            } catch (error) {
-                console.error("Error deleting item:", error);
-                setError("An error occurred while deleting the item.");
-            }
-        }
-    };
-
-    const handleImageDelete = async (itemId) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this image?");
-        if (confirmDelete) {
-            try {
-                await fetch(`${import.meta.env.VITE_APP_APIKEY}image/delete/${itemId}/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                setStockData((prevData) => prevData.filter((item) => item.id !== itemId));
-                alert("Item deleted successfully.");
-            } catch (error) {
-                console.error("Error deleting item:", error);
-                setError("An error occurred while deleting the item.");
-            }
-        }
-    };
 
 
     useEffect(() => {
@@ -157,6 +107,38 @@ const VariantProductCreateForm = () => {
         fetchAttributes();
     }, [navigate]);
 
+
+    const handleDelete = async (id) => {
+        try {
+            const confirmed = window.confirm("Are you sure you want to delete this item?");
+            if (!confirmed) return;
+
+            const url = `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`;
+
+            // Add token here
+            const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
+            if (!token) {
+                throw new Error("Authorization token is missing. Please log in.");
+            }
+
+            await axios.delete(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+                },
+            });
+
+            // Update the UI by filtering out the deleted item
+            setStockData((prevData) => prevData.filter((item) => item.id !== id));
+
+            alert("Item deleted successfully.");
+        } catch (err) {
+            setError("Failed to delete item. Please try again.");
+            console.error("Delete error:", err);
+        }
+    };
+
+
+
     const fetchAttributeValues = useCallback(async (attributeId, attributeName) => {
         try {
             const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attribute/${attributeId}/values/`, {
@@ -190,24 +172,6 @@ const VariantProductCreateForm = () => {
         }
     }, [navigate]);
 
-    const [selectedImages, setSelectedImages] = useState([]);
-
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-
-        setSelectedImages(prevImages => [...prevImages, ...files]);
-
-        const newPreviews = files.map(file => URL.createObjectURL(file));
-        setImagePreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
-    };
-
-    const removeImage = (index) => {
-        const updatedImages = selectedImages.filter((_, i) => i !== index);
-        const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
-
-        setSelectedImages(updatedImages);
-        setImagePreviews(updatedPreviews);
-    };
 
     const handleAttributeNameChange = async (index, selectedOption) => {
         const selectedAttributeName = selectedOption ? selectedOption.value : '';
@@ -260,24 +224,19 @@ const VariantProductCreateForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("formData:", formData);
-    
+
         const formDataToSend = new FormData();
         formDataToSend.append('product', formData.product);
         formDataToSend.append('managedUsers', formData.managedUsers);
         formDataToSend.append('attributes', JSON.stringify(formData.attributes));
-    
-        // Append the actual File objects for image uploads
-        selectedImages.forEach((file) => {
-            formDataToSend.append('images', file);  // Append each image with the same 'images' key
-        });
-    
+
         try {
             const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/product/variant/`, formDataToSend, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-    
+
             if (response.status === 201) {
                 setSuccessMessage("Product added successfully!");
                 // Fetch stock data after successful submission
@@ -290,7 +249,7 @@ const VariantProductCreateForm = () => {
             setErrorMessage("Failed to add product. Please try again.");
         }
     };
-    
+
     // Fetch stock data function
     const fetchStockData = async () => {
         try {
@@ -301,25 +260,27 @@ const VariantProductCreateForm = () => {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (response.status === 401) {
                 localStorage.removeItem('token');
                 navigate('/login');
                 return;
             }
-    
+
             const data = await response.json();
-            setStockData(data.products); // Update the stock data state
+            console.log(data); // Debug the response to check its structure
+            setStockData(data.products.variantIDs); // Ensure that variantIDs are being correctly set
         } catch (err) {
             setError(err.message || "An error occurred while fetching stock data");
         }
     };
-    
+
     // UseEffect to fetch stock data when component mounts or id changes
     useEffect(() => {
-        fetchStockData(); // Fetch stock data initially
+        fetchStockData();
     }, [id, navigate]);
-    
+
+
 
 
 
@@ -431,64 +392,8 @@ const VariantProductCreateForm = () => {
                                                     <FaPlus /> Add Attribute
                                                 </Button>
 
-
-
-                                                <FormGroup className="mb-3">
-                                                    <Row className="align-items-center">
-                                                        <Col md={12}>
-                                                            <Label check>
-                                                                <Input
-                                                                    type="checkbox"
-                                                                    checked={formData.is_variant}  // Controlled checkbox
-                                                                    onChange={handleIsVariantChange}  // Update state on change
-                                                                />
-                                                                Is Variant?
-                                                            </Label>
-                                                        </Col>
-                                                    </Row>
-                                                </FormGroup>
-
-
                                             </React.Fragment>
                                         )}
-
-                                        {type !== 'variant' && (
-                                            <>
-                                                <FormGroup className="mb-3">
-                                                    <Label for="images">
-                                                        <FaUser className="me-2" /> Upload Images
-                                                    </Label>
-                                                    <Input
-                                                        type="file"
-                                                        id="images"
-                                                        name="images"
-                                                        multiple
-                                                        accept="image/*"
-                                                        onChange={handleImageChange}
-                                                        placeholder="Select images"
-                                                    />
-                                                </FormGroup>
-
-                                                {selectedImages.length > 0 && (
-                                                    <div className="image-preview-container" style={styles.imagePreviewContainer}>
-                                                        {imagePreviews.map((previewUrl, index) => (
-                                                            <div key={index} className="image-preview" style={styles.imagePreview}>
-                                                                <img src={previewUrl} alt={`Preview ${index}`} style={styles.image} />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => removeImage(index)}
-                                                                    style={styles.removeButton}
-                                                                >
-                                                                    Remove
-                                                                </button>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </>
-                                        )}
-
-
 
                                         <div className="d-flex justify-content-start">
                                             <Button type="submit" color="success">Submit</Button>
@@ -509,88 +414,74 @@ const VariantProductCreateForm = () => {
                                     <CardBody>
                                         <div className="table-responsive">
                                             <h4 className="card-title">
-                                                {type === 'variant' ? 'VARIANT ITEMS' : 'PRODUCT IMAGES'}
+                                                VARIANT ITEMS
                                             </h4>
-
 
                                             {error && <p className="text-danger">{error}</p>}
                                             <Table className="align-middle mb-0">
                                                 <thead>
-                                                    {type === 'variant' ? (
-                                                        <tr>
-                                                            <th>ID</th>
-                                                            <th>NAME</th>
-                                                            <th>IMAGE</th>
-                                                            <th>STOCK</th>
-                                                            <th>CREATED USER</th>
-                                                            <th>DELETE</th>
-                                                            <th>EDIT</th>
-                                                        </tr>
-                                                    ) : (
-                                                        <tr>
-                                                            <th>ID</th>
-                                                            <th>IMAGE</th>
-                                                            <th>ACTION</th>
-                                                        </tr>
-                                                    )}
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>NAME</th>
+                                                        <th>IMAGE</th>
+                                                        <th>PRICE</th>
+                                                        <th>VARIATION</th>
+                                                        <th>STOCK</th>
+                                                        <th>CREATED USER</th>
+                                                        <th>DELETE</th>
+                                                        <th>EDIT</th>
+                                                    </tr>
                                                 </thead>
 
                                                 <tbody>
-                                                    {type === 'variant' ? (
-                                                        (stockData && stockData.length > 0) ? (  // Ensure stockData is defined and has length
-                                                            stockData.map((item, index) => (
-                                                                <tr key={item.id}>
-                                                                    <th scope="row">{index + 1}</th>
-                                                                    <td>{item.name}</td>
-                                                                    <td>
-                                                                        <img src={item.variant_images[0]?.image} alt={item.name} style={{ width: '50px', height: '50px' }} />
-                                                                    </td>
-                                                                    <td>{item.stock}</td>
-                                                                    <td>{item.created_user}</td>
-                                                                    <td>
-                                                                        <button type="button"
-                                                                            className="btn btn-light btn-sm"
-                                                                            onClick={() => handleDelete(item.id)}
-                                                                        >Delete</button>
-                                                                    </td>
-                                                                    <td>
-                                                                        <Link to={`/ecommerce/product/${item.id}/update/`}>
-                                                                            <button type="button" className="btn btn-light btn-sm">Edit</button>
-                                                                        </Link>
-                                                                    </td>
-                                                                </tr>
-                                                            ))
-                                                        ) : (
-                                                            <tr>
-                                                                <td colSpan="7" className="text-center">No variant items found</td>
+                                                    {stockData && stockData.length > 0 ? (
+                                                        stockData.map((item, index) => (
+                                                            <tr key={item.id}>
+                                                                <th scope="row">{index + 1}</th>
+                                                                <td>
+                                                                    <Link to={`/product/${item.id}/images`} style={{ textDecoration: "none", color: "inherit" }}>
+                                                                        {item.name}
+                                                                    </Link>
+                                                                </td>
+
+                                                                <td>
+                                                                    {/* Check if variant_images is defined and has at least one item */}
+                                                                    {item.image && item.image.length > 0 ? (
+                                                                        <img
+                                                                            src={item.image}
+                                                                            alt={item.name}
+                                                                            style={{ width: '50px', height: '50px' }}
+                                                                        />
+                                                                    ) : (
+                                                                        <span>No Image</span> // Fallback if no image is available
+                                                                    )}
+                                                                </td>
+                                                                <td>{item.price}</td>
+                                                                <td>{item.size || 'N/A'} - {item.color || 'N/A'}</td>
+                                                                <td>{item.stock}</td>
+                                                                <td>{item.created_user}</td>
+                                                                <td>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-light btn-sm"
+                                                                        onClick={() => handleDelete(item.id)}
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </td>
+                                                                <td>
+                                                                    <Link to={`/ecommerce/product/${item.id}/update/`}>
+                                                                        <button type="button" className="btn btn-light btn-sm">Edit</button>
+                                                                    </Link>
+                                                                </td>
                                                             </tr>
-                                                        )
+                                                        ))
                                                     ) : (
-                                                        (stockData && stockData.length > 0) ? (  
-                                                            stockData.map((item, index) => (
-                                                                <tr key={item.id}>
-                                                                    <td>{index + 1}</td>
-                                                                    <td>
-                                                                        <img src={item.image}alt={item.name} style={{ width: '100px', height: '100px' }} />
-                                                                    </td>
-                                                                    <td>
-                                                                        <button type="button"
-                                                                            className="btn btn-light btn-sm"
-                                                                            onClick={() => handleImageDelete(item.id)}
-                                                                        >Delete</button>
-                                                                    </td>
-                                                                </tr>
-                                                            ))
-                                                        ) : (
-                                                            <tr>
-                                                                <td colSpan="2" className="text-center">No images available</td>
-                                                            </tr>
-                                                        )
+                                                        <tr>
+                                                            <td colSpan="7" className="text-center">No variant items available</td>
+                                                        </tr>
                                                     )}
                                                 </tbody>
-
-
-
                                             </Table>
                                         </div>
                                     </CardBody>
@@ -611,7 +502,7 @@ const styles = {
         display: 'flex',
         flexWrap: 'wrap',
         gap: '10px',
-        justifyContent: 'flex-start', 
+        justifyContent: 'flex-start',
         padding: '10px'
     },
     imagePreview: {

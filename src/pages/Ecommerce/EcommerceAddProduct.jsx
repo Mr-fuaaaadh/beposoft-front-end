@@ -90,12 +90,6 @@ const EcommerenceAddProduct = () => {
         })
     }),
     onSubmit: async (values) => {
-      console.log('Submitting values:', values);
-
-      console.log('Submitting values:', values); // Log all values
-      console.log('Family values:', values.family); // Log family values
-
-      // Create FormData object
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("hsn_code", values.hsn_code);
@@ -172,7 +166,6 @@ const EcommerenceAddProduct = () => {
                   <Form onSubmit={formik.handleSubmit} autoComplete="off">
                     <Row>
                       <Col sm="6">
-                        {/* Product Name */}
                         <div className="mb-3">
                           <Label htmlFor="name">Product Name</Label>
                           <Input
@@ -189,7 +182,6 @@ const EcommerenceAddProduct = () => {
                           ) : null}
                         </div>
 
-                        {/* HSN Code */}
                         <div className="mb-3">
                           <Label htmlFor="hsn_code">HSN CODE</Label>
                           <Input

@@ -239,6 +239,13 @@ import GrvTable from "../pages/GRV/GRC-table";
 import GrvForm from "../pages/GRV/GRV-creating";
 
 
+//PRODUCT
+
+import Product from "../pages/Product/Add-product";
+import ProductList from "../pages/Product/Products";
+import Images from "../pages/Product/Images";
+
+
 //DJM
 
 import DGmTable from "../pages/DGM/Delivery-notes";
@@ -329,6 +336,14 @@ const authProtectedRoutes = [
   {path: "customer/address/:id/add/",component:<Address />},
   {path: "/customer/:id/ledger/",component:<Ledger />},
   {path: "customer/:id/edit/",component:<CustomerEdit />},
+
+
+  // {path: "/all-customers/",component:<CustomerTable />},
+  {path: "/add/products/",component:<Product />},
+  {path: "/product/list/",component:<ProductList />},
+  {path: "/product/:id/Images/",component:<Images />},
+
+
 
 
 
