@@ -221,6 +221,9 @@ const SidebarContent = (props) => {
                   <Link to="/add/products/">{props.t("add Product")}</Link>
                 </li>
                 <li>
+                  <Link to="/add/products/bulk/">{props.t("Bulk Product Upload")}</Link>
+                </li>
+                <li>
                   <Link to="/product/list/">{props.t("Product List")}</Link>
                 </li>
               </ul>

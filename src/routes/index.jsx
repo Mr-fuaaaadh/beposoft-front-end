@@ -244,6 +244,7 @@ import GrvForm from "../pages/GRV/GRV-creating";
 import Product from "../pages/Product/Add-product";
 import ProductList from "../pages/Product/Products";
 import Images from "../pages/Product/Images";
+import BulkProduct from  "../pages/Product/Bulk-product";
 
 
 //DJM
@@ -342,6 +343,8 @@ const authProtectedRoutes = [
   {path: "/add/products/",component:<Product />},
   {path: "/product/list/",component:<ProductList />},
   {path: "/product/:id/Images/",component:<Images />},
+  {path: "/add/products/bulk/",component:<BulkProduct />},
+
 
 
 
