@@ -93,7 +93,7 @@ const BasicTable = () => {
                 'DEBIT (₹)': order.total_amount.toFixed(2),
                 'CREDIT (₹)': "-"
             },
-            ...order.payment_receipts.map((receipt, index) => ({
+            ...order.recived_payment.map((receipt, index) => ({
                 '#': `${orderIndex + 1}.${index + 1}`,
                 'DATE': receipt.received_at,
                 'INVOICE': receipt.bank,
@@ -172,7 +172,7 @@ const BasicTable = () => {
     const totalDebit = filteredOrders.reduce((total, order) => total + order.total_amount, 0);
     const totalCredit = filteredOrders.reduce(
         (total, order) =>
-            total + order.payment_receipts.reduce((sum, receipt) => sum + parseFloat(receipt.amount || 0), 0),
+            total + order.recived_payment.reduce((sum, receipt) => sum + parseFloat(receipt.amount || 0), 0),
         0
     );
     const closingBalance = totalDebit - totalCredit;
@@ -272,7 +272,7 @@ const BasicTable = () => {
                                                             <td>{order.total_amount.toFixed(2)}</td>
                                                             <td>-</td>
                                                         </tr>
-                                                        {order.payment_receipts.map((receipt, index) => (
+                                                        {order.recived_payment.map((receipt, index) => (
                                                             <tr key={receipt.id}>
                                                                 <th scope="row">{`${orderIndex + 1}.${index + 1}`}</th>
                                                                 <td>{receipt.received_at}</td>

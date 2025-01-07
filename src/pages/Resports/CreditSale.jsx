@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
 import {
     Table,
     Row,
@@ -8,7 +9,8 @@ import {
     CardBody,
     CardTitle,
     Input,
-    FormGroup
+    FormGroup,
+    Button,
 } from "reactstrap";
 
 // Import Breadcrumb
@@ -32,83 +34,110 @@ const useDebounce = (value, delay) => {
 };
 
 const BasicTable = () => {
-    const [data, setData] = useState([]); // Holds the full data
+    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [staffFilter, setStaffFilter] = useState(""); // State for staff filter
-    const [familyFilter, setFamilyFilter] = useState(""); // State for family filter
-    const [allStaffs, setAllStaffs] = useState([]); // All staff data
-    const [allFamilies, setAllFamilies] = useState([]); // All families data
-    const [searchTerm, setSearchTerm] = useState(""); // State for search term
+    const [staffFilter, setStaffFilter] = useState("");
+    const [familyFilter, setFamilyFilter] = useState("");
+    const [allStaffs, setAllStaffs] = useState([]);
+    const [allFamilies, setAllFamilies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [startDate, setStartDate] = useState(""); // Start date filter
+    const [endDate, setEndDate] = useState(""); // End date filter
+    const token = localStorage.getItem("token");
 
-    // Debounced search term
-    const debouncedSearchTerm = useDebounce(searchTerm, 500); // Adjust debounce delay as needed
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    // Fetch data using Axios
     useEffect(() => {
-        const token = localStorage.getItem('token');  // Replace with actual method of fetching token
+        const apiKey = import.meta.env.VITE_APP_APIKEY;
 
-        // Fetch all staff data
-        axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then((response) => {
-                setAllStaffs(response.data.data);
-            })
-            .catch((error) => {
-                console.error("There was an error fetching staff data!", error);
-            });
+        if (!apiKey) {
+            console.error("API key is missing");
+            return;
+        }
 
-        // Fetch all family data
-        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then((response) => {
-                setAllFamilies(response.data.data);
-            })
-            .catch((error) => {
-                console.error("There was an error fetching family data!", error);
-            });
+        const fetchData = async () => {
+            try {
+                setLoading(true);
 
-        // Fetch the sales report data based on the current filters
-        const fetchData = () => {
-            setLoading(true);
-            axios.get(`${import.meta.env.VITE_APP_APIKEY}credit/sales/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                params: {
-                    staff: staffFilter,  // Add staff filter
-                    family: familyFilter,  // Add family filter
-                }
-            })
-                .then((response) => {
-                    setData(response.data); // Set the fetched data to state
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error("There was an error fetching the data!", error);
-                    setLoading(false);
+                const staffResponse = await axios.get(`${apiKey}staffs/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
+                setAllStaffs(staffResponse.data.data);
+
+                const familyResponse = await axios.get(`${apiKey}familys/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setAllFamilies(familyResponse.data.data);
+
+                const salesResponse = await axios.get(`${apiKey}credit/sales/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setData(salesResponse.data);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to fetch data. Please try again later.");
+                setLoading(false);
+            }
         };
 
-        fetchData(); // Fetch the data on mount or when filters change
-    }, [staffFilter, familyFilter]); // Dependencies: fetch data only when staffFilter or familyFilter change
+        fetchData();
+    }, []);
 
-    // Filter data based on staff, family, and search term
     const filteredData = data.filter((item) => {
-        return (
-            (staffFilter ? item.orders.some((order) => order.staff_name === staffFilter) : true) &&
-            (familyFilter ? item.orders.some((order) => order.family_name === familyFilter) : true) &&
-            (debouncedSearchTerm ? item.orders.some((order) =>
+        const withinDateRange =
+            (!startDate || new Date(item.date) >= new Date(startDate)) &&
+            (!endDate || new Date(item.date) <= new Date(endDate));
+
+        const matchesStaffFilter = !staffFilter || item.orders.some((order) => order.staff_name === staffFilter);
+        const matchesFamilyFilter = !familyFilter || item.orders.some((order) => order.family_name === familyFilter);
+
+        const matchesSearchTerm =
+            !debouncedSearchTerm ||
+            item.orders.some((order) =>
                 order.staff_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
                 order.family_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-            ) : true)
-        );
+            );
+
+        return withinDateRange && matchesStaffFilter && matchesFamilyFilter && matchesSearchTerm;
     });
+
+    const exportToExcel = () => {
+        const formattedData = filteredData.map((item, index) => {
+            const totalAmount = item.orders.reduce((sum, order) => sum + order.total_amount, 0);
+            const paidAmount = item.orders.reduce(
+                (sum, order) =>
+                    sum +
+                    order.recived_payment.reduce(
+                        (paymentSum, payment) => paymentSum + parseFloat(payment.amount),
+                        0
+                    ),
+                0
+            );
+            const pendingAmount = totalAmount - paidAmount;
+
+            return {
+                "#": index + 1,
+                Date: item.date,
+                "Total Orders": item.orders.length,
+                "Total Amount": totalAmount,
+                "Paid Amount": paidAmount,
+                "Pending Amount": pendingAmount,
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Credit Sales Report");
+
+        XLSX.writeFile(workbook, "Credit_Sales_Report.xlsx");
+    };
 
     return (
         <React.Fragment>
@@ -122,9 +151,28 @@ const BasicTable = () => {
                                 <CardBody>
                                     <CardTitle className="h4 text-center">CREDIT SALES REPORT</CardTitle>
 
-                                    {/* Search Fields */}
                                     <Row className="mb-4">
-                                        <Col md={4}>
+                                        <Col md={3}>
+                                            <FormGroup>
+                                                <label>Start Date</label>
+                                                <Input
+                                                    type="date"
+                                                    value={startDate}
+                                                    onChange={(e) => setStartDate(e.target.value)}
+                                                />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col md={3}>
+                                            <FormGroup>
+                                                <label>End Date</label>
+                                                <Input
+                                                    type="date"
+                                                    value={endDate}
+                                                    onChange={(e) => setEndDate(e.target.value)}
+                                                />
+                                            </FormGroup>
+                                        </Col>
+                                        <Col md={3}>
                                             <FormGroup>
                                                 <label>Staff</label>
                                                 <Input
@@ -141,7 +189,7 @@ const BasicTable = () => {
                                                 </Input>
                                             </FormGroup>
                                         </Col>
-                                        <Col md={4}>
+                                        <Col md={3}>
                                             <FormGroup>
                                                 <label>Family</label>
                                                 <Input
@@ -158,7 +206,10 @@ const BasicTable = () => {
                                                 </Input>
                                             </FormGroup>
                                         </Col>
-                                        <Col md={4}>
+                                    </Row>
+
+                                    <Row className="mb-4">
+                                        <Col>
                                             <FormGroup>
                                                 <label>Search</label>
                                                 <Input
@@ -168,6 +219,11 @@ const BasicTable = () => {
                                                     onChange={(e) => setSearchTerm(e.target.value)}
                                                 />
                                             </FormGroup>
+                                        </Col>
+                                        <Col className="text-right">
+                                            <Button color="success" onClick={exportToExcel}>
+                                                Export to Excel
+                                            </Button>
                                         </Col>
                                     </Row>
 
@@ -188,24 +244,54 @@ const BasicTable = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {filteredData.map((item, index) => (
-                                                        <tr key={index}>
-                                                            <th scope="row">{index + 1}</th>
-                                                            <td>{item.date}</td>
-                                                            <td>{item.orders.length}</td> 
-                                                            <td>{item.orders.reduce((acc, order) => acc + order.total_amount, 0)}</td> {/* Total amount for the entire date */}
-                                                            <td>
-                                                                {item.orders.reduce((acc, order) => acc + order.total_paid_amount, 0)}
-                                                            </td> 
-                                                            <td>
-                                                                {item.orders.reduce((acc, order) => acc + order.balance_amount, 0)}
-                                                            </td> 
-                                                            <td>
-                                                                <a href={`/credit/sales/resport/${item.date}/`} style={{ color: "#007bff", textDecoration: "none", fontWeight: "bold" }}>View</a>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    {filteredData.map((item, index) => {
+                                                        const filteredOrders = item.orders.filter((order) => {
+                                                            const matchesStaffFilter = !staffFilter || order.staff_name === staffFilter;
+                                                            const matchesFamilyFilter = !familyFilter || order.family_name === familyFilter;
+                                                            const matchesSearchTerm =
+                                                                !debouncedSearchTerm ||
+                                                                order.staff_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                                                                order.family_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+
+                                                            return matchesStaffFilter && matchesFamilyFilter && matchesSearchTerm;
+                                                        });
+
+                                                        const totalOrders = filteredOrders.length;
+                                                        const totalAmount = filteredOrders.reduce((sum, order) => sum + order.total_amount, 0);
+                                                        const paidAmount = filteredOrders.reduce(
+                                                            (sum, order) =>
+                                                                sum +
+                                                                order.recived_payment.reduce((paymentSum, payment) => paymentSum + parseFloat(payment.amount), 0),
+                                                            0
+                                                        );
+                                                        const pendingAmount = totalAmount - paidAmount;
+
+                                                        return (
+                                                            <tr key={index}>
+                                                                <th scope="row">{index + 1}</th>
+                                                                <td>{item.date}</td>
+                                                                <td>{totalOrders}</td>
+                                                                <td>{totalAmount.toFixed(2)}</td>
+                                                                <td>{paidAmount.toFixed(2)}</td>
+                                                                <td>{pendingAmount.toFixed(2)}</td>
+                                                                <td>
+                                                                    <a
+                                                                        href={`/credit/sales/report/${item.date}/`}
+                                                                        style={{
+                                                                            color: "#007bff",
+                                                                            textDecoration: "none",
+                                                                            fontWeight: "bold",
+                                                                        }}
+                                                                    >
+                                                                        View
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
                                                 </tbody>
+
+
                                             </Table>
                                         </div>
                                     )}
@@ -213,7 +299,6 @@ const BasicTable = () => {
                             </Card>
                         </Col>
                     </Row>
-
                 </div>
             </div>
         </React.Fragment>

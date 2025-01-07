@@ -10,8 +10,12 @@ const BasicTable = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedCompany, setSelectedCompany] = useState(""); // State for selected company
-    const [companies, setCompanies] = useState([]); // State for company list
+    const [selectedCompany, setSelectedCompany] = useState("");
+    const [selectedFamily, setSelectedFamily] = useState("");
+    const [selectedState, setSelectedState] = useState(""); // New state for selected state
+    const [companies, setCompanies] = useState([]);
+    const [families, setFamilies] = useState([]);
+    const [states, setStates] = useState([]); // New state for unique states
     const { date } = useParams();
     const token = localStorage.getItem("token");
 
@@ -33,11 +37,20 @@ const BasicTable = () => {
 
                 setOrders(filteredOrders);
 
-                // Assuming each order contains company info (adjust based on actual response structure)
                 const companyList = [
                     ...new Set(filteredOrders.map((order) => order.company.name)),
                 ];
                 setCompanies(companyList);
+
+                const familyList = [
+                    ...new Set(filteredOrders.map((order) => order.family)),
+                ];
+                setFamilies(familyList);
+
+                const stateList = [
+                    ...new Set(filteredOrders.map((order) => order.state)),
+                ];
+                setStates(stateList);
             } catch (error) {
                 setError("Error fetching orders data. Please try again later.");
                 console.error("Error fetching orders data:", error);
@@ -61,22 +74,33 @@ const BasicTable = () => {
         return { color: statusColors[status] || "black" };
     };
 
-    // Filter orders based on the search term and selected company
     const filteredOrders = orders.filter((order) => {
         const matchesSearchTerm =
             order.manage_staff.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.company.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCompanyFilter =
             selectedCompany === "" || order.company.name === selectedCompany;
-        return matchesSearchTerm && matchesCompanyFilter;
+        const matchesFamilyFilter =
+            selectedFamily === "" || order.family === selectedFamily;
+        const matchesStateFilter =
+            selectedState === "" || order.state === selectedState;
+        return matchesSearchTerm && matchesCompanyFilter && matchesFamilyFilter && matchesStateFilter;
     });
 
-    // Export to Excel
     const exportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(filteredOrders);
+        const exportData = filteredOrders.map((order) => ({
+            Invoice: order.invoice,
+            "Managed Staff": order.manage_staff,
+            Family: order.family,
+            Customer: order.customer.name,
+            "Total Amount": order.total_amount,
+            Status: order.status,
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Orders");
-        XLSX.writeFile(wb, "orders.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Filtered Orders");
+        XLSX.writeFile(wb, "filtered_orders.xlsx");
     };
 
     return (
@@ -91,8 +115,7 @@ const BasicTable = () => {
                                     <CardTitle className="h4">BEPOSOFT ORDERS</CardTitle>
 
                                     <Row className="mb-3">
-                                        <Col md={5}>
-                                            {/* Search Input */}
+                                        <Col md={3}>
                                             <Input
                                                 type="text"
                                                 placeholder="Search orders..."
@@ -101,8 +124,7 @@ const BasicTable = () => {
                                                 className="mb-3"
                                             />
                                         </Col>
-                                        <Col md={5}>
-                                            {/* Company Filter Dropdown */}
+                                        <Col md={3}>
                                             <Input
                                                 type="select"
                                                 value={selectedCompany}
@@ -117,19 +139,45 @@ const BasicTable = () => {
                                                 ))}
                                             </Input>
                                         </Col>
+                                        <Col md={3}>
+                                            <Input
+                                                type="select"
+                                                value={selectedFamily}
+                                                onChange={(e) => setSelectedFamily(e.target.value)}
+                                                className="mb-3"
+                                            >
+                                                <option value="">All Families</option>
+                                                {families.map((family) => (
+                                                    <option key={family} value={family}>
+                                                        {family}
+                                                    </option>
+                                                ))}
+                                            </Input>
+                                        </Col>
+                                        <Col md={3}>
+                                            <Input
+                                                type="select"
+                                                value={selectedState}
+                                                onChange={(e) => setSelectedState(e.target.value)}
+                                                className="mb-3"
+                                            >
+                                                <option value="">All States</option>
+                                                {states.map((state) => (
+                                                    <option key={state} value={state}>
+                                                        {state}
+                                                    </option>
+                                                ))}
+                                            </Input>
+                                        </Col>
+                                    </Row>
 
-                                        <Col md={2}>
+                                    <Row className="mb-3">
                                         <Col>
-                                            {/* Export to Excel Button */}
                                             <Button color="primary" onClick={exportToExcel} className="mb-3">
                                                 Export to Excel
                                             </Button>
                                         </Col>
-                                        </Col>
                                     </Row>
-
-                                    
-
 
                                     <div className="table-responsive">
                                         {loading ? (
@@ -167,26 +215,6 @@ const BasicTable = () => {
                                                                         className="position-relative"
                                                                     >
                                                                         {order.status}
-                                                                        <table className="nested-table table table-sm table-bordered mt-2">
-                                                                            <thead>
-                                                                                <tr className="bg-light">
-                                                                                    <th>#</th>
-                                                                                    <th>BOX</th>
-                                                                                    <th>PARCEL</th>
-                                                                                    <th>TRACKING</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {order.warehouse.map((parcel, i) => (
-                                                                                    <tr key={i}>
-                                                                                        <td>{i + 1}</td>
-                                                                                        <td>{parcel.box}</td>
-                                                                                        <td>{parcel.parcel_service}</td>
-                                                                                        <td>{parcel.tracking_id}</td>
-                                                                                    </tr>
-                                                                                ))}
-                                                                            </tbody>
-                                                                        </table>
                                                                     </td>
                                                                     <td>{order.total_amount}</td>
                                                                     <td>{order.order_date}</td>

@@ -33,7 +33,7 @@ const StatisticsApplications = () => {
 
     return (
         <React.Fragment>
-            <Col lg={8}>
+            <Col lg={12}>
                 <Card>
                     <CardBody>
                         <div className="d-sm-flex flex-wrap">

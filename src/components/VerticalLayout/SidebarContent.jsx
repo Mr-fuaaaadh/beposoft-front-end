@@ -16,9 +16,16 @@ import { useCallback } from "react";
 import { FaUsers } from 'react-icons/fa';
 import { FaUserTie } from "react-icons/fa";
 
+
+const role = localStorage.getItem('active')
+console.log(role)
+
 const SidebarContent = (props) => {
   const ref = useRef();
   const path = useLocation();
+
+
+
 
   const activateParentDropdown = useCallback((item) => {
     item.classList.add("active");
@@ -174,15 +181,15 @@ const SidebarContent = (props) => {
               </ul>
             </li>
 
-            <li className="menu-title">{props.t("Apps")}</li>
+            {/* <li className="menu-title">{props.t("Apps")}</li> */}
 
             <li>
-              <Link to="/calendar" className=" ">
+              <Link to="/dashboard/" className=" ">
                 <i className="bx bx-calendar"></i>
-                <span>{props.t("Calendar")}</span>
+                <span>{props.t("Dashboard")}</span>
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/chat" className="">
                 <i className="bx bx-chat"></i>
                 <span>{props.t("Chat")}</span>
@@ -193,122 +200,169 @@ const SidebarContent = (props) => {
                 <i className="bx bx-file"></i>
                 <span>{props.t("File Manager")}</span>
               </Link>
-            </li>
+            </li> */}
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUserTie size={17} style={{ marginRight: '6px' }} />
-                <span>{props.t("Staff")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-staffs">{props.t("Staffs")}</Link>
-                </li>
-                <li>
-                  <Link to="/add-staffs">{props.t("Add Staff")}</Link>
-                </li>
-              </ul>
-            </li>
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUserTie size={17} style={{ marginRight: '6px' }} />
+                  <span>{props.t("Staff")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-staffs">{props.t("Staffs")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/add-staffs">{props.t("Add Staff")}</Link>
+                  </li>
+                </ul>
+              </li>
+
+            ) : null}
 
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUserTie size={17} style={{ marginRight: '6px' }} />
-                <span>{props.t("Product")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/add/products/">{props.t("add Product")}</Link>
-                </li>
-                <li>
-                  <Link to="/add/products/bulk/">{props.t("Bulk Product Upload")}</Link>
-                </li>
-                <li>
-                  <Link to="/product/list/">{props.t("Product List")}</Link>
-                </li>
-              </ul>
-            </li>
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Customers")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-customers/">{props.t("Customers")}</Link>
-                </li>
-                <li>
-                  <Link to="/add-customers/">{props.t("Add Customers")}</Link>
-                </li>
-              </ul>
-            </li>
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Supervisor")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-supervisors/">{props.t("Supervisors")}</Link>
-                </li>
-                <li>
-                  <Link to="/add-supervisors/">{props.t("add Supervisors")}</Link>
-                </li>
-              </ul>
-            </li>
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("States")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-states/">{props.t("States")}</Link>
-                </li>
-              </ul>
-            </li>
+            {role === 'BDO' || role === 'BDM' ? (
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUserTie size={17} style={{ marginRight: '6px' }} />
+                  <span>{props.t("Customers")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all/staff/customers/">{props.t("Customers")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/add/staff/customer/">{props.t("Add Customers")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Department")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-departments/">{props.t("Departments")}</Link>
-                </li>
-              </ul>
-            </li>
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUserTie size={17} style={{ marginRight: '6px' }} />
+                  <span>{props.t("Product")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/add/products/">{props.t("add Product")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/add/products/bulk/">{props.t("Bulk Product Upload")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/product/list/">{props.t("Product List")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Family")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/all-families/">{props.t("Families")}</Link>
-                </li>
-              </ul>
-            </li>
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Attribute")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/attributes/">{props.t("attribute")}</Link>
-                </li>
-                <li>
-                  <Link to="/attribute-values/">{props.t("attribute-values")}</Link>
-                </li>
-              </ul>
-            </li>
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Customers")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-customers/">{props.t("Customers")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/add-customers/">{props.t("Add Customers")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Supervisor")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-supervisors/">{props.t("Supervisors")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/add-supervisors/">{props.t("add Supervisors")}</Link>
+                  </li>
+                </ul>
+              </li>
+
+            ) : null}
+
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("States")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-states/">{props.t("States")}</Link>
+                  </li>
+                </ul>
+              </li>
+
+            ) : null}
+
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Department")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-departments/">{props.t("Departments")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Family")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/all-families/">{props.t("Families")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Attribute")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/attributes/">{props.t("attribute")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/attribute-values/">{props.t("attribute-values")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
 
             <li>
               <Link to="/#" className="has-arrow">
@@ -341,119 +395,133 @@ const SidebarContent = (props) => {
             </li>
 
 
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Bank")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/add/bank/">{props.t("Add Bank")}</Link>
-                </li>
-                <li>
-                  <Link to="/bank/datas/">{props.t("Bank List")}</Link>
-                </li>
-              </ul>
-            </li>
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Bank")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/add/bank/">{props.t("Add Bank")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/bank/datas/">{props.t("Bank List")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Company")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/add/beposoft/company/details/">{props.t("Add company")}</Link>
-                </li>
-                <li>
-                  <Link to="/beposoft/companies/">{props.t("Companies")}</Link>
-                </li>
-              </ul>
-            </li>
-
-
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("GRV")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/beposoft/new/grv/">{props.t("new grv")}</Link>
-                </li>
-                <li>
-                  <Link to="/beposoft/grv/view/">{props.t("grv list")}</Link>
-                </li>
-              </ul>
-            </li>
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Company")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/add/beposoft/company/details/">{props.t("Add company")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/beposoft/companies/">{props.t("Companies")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("DELIVERY NOTES")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/delivery/notes/">{props.t("delivery-notes")}</Link>
-                </li>
-                <li>
-                  <Link to="/daily/good/movment/">{props.t("Daily Good Movment")}</Link>
-                </li>
-              </ul>
-            </li>
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("GRV")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/beposoft/new/grv/">{props.t("new grv")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/beposoft/grv/view/">{props.t("grv list")}</Link>
+                  </li>
+                </ul>
+              </li>
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Expense")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/add/expense/">{props.t("add expense")}</Link>
-                </li>
-                <li>
-                  <Link to="/expense/list/">{props.t("Expenses")}</Link>
-                </li>
-              </ul>
-            </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
 
-            <li>
-              <Link to="/#" className="has-arrow">
-                <FaUsers size={20} style={{ marginRight: '8px' }} />
-                <span>{props.t("Reports")}</span>
-              </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/sales/reports/">{props.t("Sales Report")}</Link>
-                </li>
-                <li>
-                  <Link to="/credit/sale/">{props.t("Credit Sales")}</Link>
-                </li>
-                <li>
-                  <Link to="/COD/sales/resport/">{props.t("COD Sales Report")}</Link>
-                </li>
-
-                <li>
-                  <Link to="/states/sales/resport/">{props.t("States Sales Report")}</Link>
-                </li>
-                <li>
-                  <Link to="/expense/report/">{props.t("Expense Report")}</Link>
-                </li>
-                <li>
-                  <Link to="/Delivery/report/">{props.t("Delivery Report")}</Link>
-                </li>
-                <li>
-                  <Link to="/product/sold/report/">{props.t("Product Sold Report")}</Link>
-                </li>
-              </ul>
-            </li>
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("DELIVERY NOTES")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/delivery/notes/">{props.t("delivery-notes")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/daily/good/movment/">{props.t("Daily Good Movment")}</Link>
+                  </li>
+                </ul>
+              </li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
 
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Expense")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/add/expense/">{props.t("add expense")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/expense/list/">{props.t("Expenses")}</Link>
+                  </li>
+                </ul>
+              </li>
 
-            <li>
+            ) : null}
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <FaUsers size={20} style={{ marginRight: '8px' }} />
+                  <span>{props.t("Reports")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/sales/reports/">{props.t("Sales Report")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/credit/sale/">{props.t("Credit Sales")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/COD/sales/resport/">{props.t("COD Sales Report")}</Link>
+                  </li>
+
+                  <li>
+                    <Link to="/states/sales/resport/">{props.t("States Sales Report")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/expense/report/">{props.t("Expense Report")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/Delivery/report/">{props.t("Delivery Report")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/product/sold/report/">{props.t("Product Sold Report")}</Link>
+                  </li>
+                </ul>
+              </li>
+
+            ) : null}
+
+
+            {/* <li>
               <Link to="/#" className="has-arrow">
                 <i className="bx bx-store"></i>
                 <span>{props.t("Ecommerce")}</span>
@@ -488,7 +556,7 @@ const SidebarContent = (props) => {
                   </Link>
                 </li>
               </ul>
-            </li>
+            </li> */}
 
             <li>
               <Link to="/#" className="has-arrow ">

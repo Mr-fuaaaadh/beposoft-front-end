@@ -820,20 +820,17 @@ const FormLayouts = () => {
                                                             <tr key={item.id} className="table-row">
                                                                 <td>{index + 1}</td>
                                                                 <td className="image-cell">
-                                                                    {item.images ? (
-                                                                        <img
-                                                                            src={`${item.images[0]}`}
-                                                                            alt={item.name}
-                                                                            style={{
-                                                                                width: '50px',
-                                                                                height: '50px',
-                                                                                objectFit: 'cover',
-                                                                                borderRadius: '5px'
-                                                                            }}
-                                                                        />
-                                                                    ) : (
-                                                                        <span>No Image</span>
-                                                                    )}
+                                                                    <img
+                                                                        src={`${item.image}`}
+                                                                        alt={item.name}
+                                                                        style={{
+                                                                            width: '50px',
+                                                                            height: '50px',
+                                                                            objectFit: 'cover',
+                                                                            borderRadius: '5px'
+                                                                        }}
+                                                                    />
+                                                                 
                                                                 </td>
                                                                 <td>{item.name}</td>
                                                                 <td>{item.rate}</td>

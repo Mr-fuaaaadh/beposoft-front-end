@@ -191,6 +191,12 @@ import OrderItems from "../pages/Order/OrderProducts";
 
 
 
+import StaffBasedCustomers from "../pages/Staff-Customers/Staff-based-customers"
+import AddStaffBasedCustomers from "../pages/Staff-Customers/Add-customers"
+
+
+
+
 //perfoma Invoice
 
 import InvoiceTable from "../pages/PerfomaInvoive/CreatePerfomaInvoice";
@@ -302,7 +308,7 @@ const authProtectedRoutes = [
   { path: "/dashboard-saas", component: <DashboardSaas /> },
   { path: "/dashboard-crypto", component: <DashboardCrypto /> },
   { path: "/blog", component: <Blog /> },
-  { path: "/dashboard-job", component: <DashboardJob /> },
+  { path: "/dashboard/", component: <DashboardJob /> },
 
   //   //Crypto
   { path: "/crypto-wallet", component: <CryptoWallet /> },
@@ -396,6 +402,14 @@ const authProtectedRoutes = [
 
 
 
+  { path: "/all/staff/customers/", component: <StaffBasedCustomers /> },
+  { path: "/add/staff/customer/", component: <AddStaffBasedCustomers /> },
+
+
+
+
+
+
 
 
 
@@ -465,7 +479,7 @@ const authProtectedRoutes = [
   {path: "/sales/view/:date/data/",component :<InvoiceDatas />},
   {path: "/sales/resport/:id/staff/:date/:name/", component :<StaffOrders />},
   {path: "/credit/sale/", component :<CreditSales />},
-  {path: "/credit/sales/resport/:date/", component :<CreditOrders />},
+  {path: "/credit/sales/report/:date/", component :<CreditOrders />},
 
 
   {path: "/COD/sales/resport/", component :<CodOrders />},

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
 import {
     Table,
     Row,
@@ -86,6 +87,30 @@ const BasicTable = () => {
     const approvedStatuses = ["Approved", "Invoice Approved", "Completed", "Shipped", "Waiting For Confirmation", "To Print", "Invoice Created"];
     const rejectedStatuses = ["Cancelled", "Refunded", "Invoice Rejected", "Return"];
 
+    const exportToExcel = () => {
+        const data = filteredSalesData.map((sale, index) => {
+            const approved = calculateTotals(sale.order_details, approvedStatuses);
+            const rejected = calculateTotals(sale.order_details, rejectedStatuses);
+
+            return {
+                "No": index + 1,
+                "Date": sale.date,
+                "Total Orders": sale.order_details.length,
+                "Total Amount": sale.order_details.reduce((sum, order) => sum + order.total_amount, 0).toFixed(2),
+                "Approved Orders": approved.count,
+                "Approved Amount": approved.amount.toFixed(2),
+                "Rejected Orders": rejected.count,
+                "Rejected Amount": rejected.amount.toFixed(2),
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Report");
+
+        XLSX.writeFile(workbook, "Sales_Report.xlsx");
+    };
+
     document.title = "Basic Tables | Skote - Vite React Admin & Dashboard Template";
 
     return (
@@ -150,8 +175,11 @@ const BasicTable = () => {
 
                                     <Row className="mb-3">
                                         <Col md={12} className="text-center">
-                                            <Button color="primary" onClick={handleFilter}>
+                                            <Button color="primary" onClick={handleFilter} className="mr-2">
                                                 Filter
+                                            </Button>
+                                            <Button color="success" onClick={exportToExcel}>
+                                                Export to Excel
                                             </Button>
                                         </Col>
                                     </Row>

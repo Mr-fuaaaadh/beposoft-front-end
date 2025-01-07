@@ -577,7 +577,7 @@ const FormLayouts = () => {
                                                                                     <td>{index + 1}</td>
                                                                                     <td>
                                                                                         <img
-                                                                                            src={product.images && product.images[0] ? product.images[0] : "/path/to/placeholder-image.jpg"}
+                                                                                            src={product.image}
                                                                                             alt={product.name || "Product image"}
                                                                                             style={{ width: "50px", height: "50px" }}
                                                                                         />

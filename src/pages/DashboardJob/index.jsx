@@ -8,7 +8,7 @@ import CandidateSection from "./CandidateSection";
 import ChartSection from "./ChartSection";
 import JobVacancy from "./JobVacancy";
 import ReceivedTime from "./ReceivedTime";
-import Section from "./Section";
+// import Section from "./Section";
 import StatisticsApplications from "./StatisticsApplications";
 
 const DashboardJob = () => {
@@ -17,14 +17,13 @@ const DashboardJob = () => {
 
   return (
     <React.Fragment>
+
+
       <div className="page-content">
         <Container fluid>
-          <Section />
-
-          <ChartSection />
+          <StatisticsApplications />
           <Row>
-            <StatisticsApplications />
-
+            <ChartSection />
             <CandidateSection />
           </Row>
 

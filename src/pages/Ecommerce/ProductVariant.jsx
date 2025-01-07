@@ -445,17 +445,14 @@ const VariantProductCreateForm = () => {
                                                                 </td>
 
                                                                 <td>
-                                                                    {/* Check if variant_images is defined and has at least one item */}
-                                                                    {item.image && item.image.length > 0 ? (
-                                                                        <img
-                                                                            src={item.image}
-                                                                            alt={item.name}
-                                                                            style={{ width: '50px', height: '50px' }}
-                                                                        />
-                                                                    ) : (
-                                                                        <span>No Image</span> // Fallback if no image is available
-                                                                    )}
+                                                                    <img
+                                                                        src={item.image}
+                                                                        alt={item.name || 'Image not available'}
+                                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                                        onError={(e) => { e.target.src = '/path/to/placeholder.png'; }}
+                                                                    />
                                                                 </td>
+
                                                                 <td>{item.price}</td>
                                                                 <td>{item.size || 'N/A'} - {item.color || 'N/A'}</td>
                                                                 <td>{item.stock}</td>
@@ -470,7 +467,7 @@ const VariantProductCreateForm = () => {
                                                                     </button>
                                                                 </td>
                                                                 <td>
-                                                                    <Link to={`/ecommerce/product/${item.id}/update/`}>
+                                                                    <Link to={`/ecommerce-product-edit/${item.id}/`}>
                                                                         <button type="button" className="btn btn-light btn-sm">Edit</button>
                                                                     </Link>
                                                                 </td>
