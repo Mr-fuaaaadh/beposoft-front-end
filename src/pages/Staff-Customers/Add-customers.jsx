@@ -46,9 +46,7 @@ const FormLayouts = () => {
             gst: Yup.string().required("Please enter GST number"),
             address: Yup.string().required("Please enter address"),
             zip_code: Yup.string().required("ZIP code required"),
-            manager: Yup.string().required("Please select a manager"),
-            alt_phone: Yup.string().required("This field is required"),
-            commend: Yup.string().required("This field is required"),
+            manager: Yup.string().required('Manager is required').nullable(),
             city: Yup.string().required("City is required"),
             state: Yup.string().required("State is required"),
             check: Yup.boolean().required("You must check this box"),
@@ -282,8 +280,8 @@ const FormLayouts = () => {
                                                     <Label htmlFor="state">State</Label>
                                                     <select
                                                         name="state"
-                                                        id="supervisor_id"
-                                                        className="form-control"
+                                                        id="state"
+                                                        className={`form-control ${formik.errors.state && formik.touched.state ? 'is-invalid' : ''}`}
                                                         value={formik.values.state}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
@@ -295,11 +293,12 @@ const FormLayouts = () => {
                                                             </option>
                                                         ))}
                                                     </select>
-                                                    {formik.errors.state && formik.touched.state ? (
+                                                    {formik.errors.state && formik.touched.state && (
                                                         <FormFeedback type="invalid">{formik.errors.state}</FormFeedback>
-                                                    ) : null}
+                                                    )}
                                                 </div>
                                             </Col>
+
 
                                             <Col lg={4}>
                                                 <div className="mb-3">
@@ -307,7 +306,7 @@ const FormLayouts = () => {
                                                     <select
                                                         name="manager"
                                                         id="supervisor_id"
-                                                        className="form-control"
+                                                        className={`form-control ${formik.errors.manager && formik.touched.manager ? 'is-invalid' : ''}`}
                                                         value={formik.values.manager}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
@@ -319,11 +318,12 @@ const FormLayouts = () => {
                                                             </option>
                                                         ))}
                                                     </select>
-                                                    {formik.errors.manager && formik.touched.manager ? (
+                                                    {formik.errors.manager && formik.touched.manager && (
                                                         <FormFeedback type="invalid">{formik.errors.manager}</FormFeedback>
-                                                    ) : null}
+                                                    )}
                                                 </div>
                                             </Col>
+
 
                                             <Col md={6}>
                                                 <div className="mb-3">

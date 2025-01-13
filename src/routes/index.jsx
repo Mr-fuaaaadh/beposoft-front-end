@@ -190,6 +190,11 @@ import OrderItems from "../pages/Order/OrderProducts";
 
 
 
+import StaffOrderCreate from "../pages/StaffOrders/OrderCreate";
+import StaffOrdersList from "../pages/StaffOrders/OrderList"
+
+
+
 
 import StaffBasedCustomers from "../pages/Staff-Customers/Staff-based-customers"
 import AddStaffBasedCustomers from "../pages/Staff-Customers/Add-customers"
@@ -234,6 +239,8 @@ import InvoiceDatas from "../pages/Resports/FilderdOrders";
 import StaffOrders from "../pages/Resports/Bills";
 import CreditSales from "../pages/Resports/CreditSale";
 import CreditOrders from "../pages/Resports/Creditorders";
+import StockReport from "../pages/Resports/StockReport";
+
 // company  
 
 import Company from "../pages/Company/Company";
@@ -258,6 +265,13 @@ import BulkProduct from  "../pages/Product/Bulk-product";
 import DGmTable from "../pages/DGM/Delivery-notes";
 import ParcelDetails from "../pages/DGM/Packing";
 import Dailygoodmovment from "../pages/DGM/Daily-Goods-Movments";
+
+
+// Super visor based customer 
+
+import ManagedStaffCustomers from "../pages/BDM/Customers";
+import FamilyBasedOrders from "../pages/BDM/Orders";
+
 
 
 
@@ -394,6 +408,12 @@ const authProtectedRoutes = [
   { path: "/order/:id/items/", component: <OrderItems /> },
 
 
+  { path: "/staff/new/order/", component: <StaffOrderCreate /> },
+  { path: "/staff/order/list/", component: <StaffOrdersList /> },
+
+
+
+
   { path: "/create/perfoma/invoice/", component: <InvoiceTable /> },
   {path: "/perfoma/invoices/", component: <InvoiceList/>},
   {path: "/perfoma/invoice/:invoice/view/", component: <Invoice/>},
@@ -404,6 +424,10 @@ const authProtectedRoutes = [
 
   { path: "/all/staff/customers/", component: <StaffBasedCustomers /> },
   { path: "/add/staff/customer/", component: <AddStaffBasedCustomers /> },
+  { path: "/managed/staff/customer/", component: <ManagedStaffCustomers /> },
+  { path: "/managed/family/order/", component: <FamilyBasedOrders /> },
+
+
 
 
 
@@ -480,6 +504,8 @@ const authProtectedRoutes = [
   {path: "/sales/resport/:id/staff/:date/:name/", component :<StaffOrders />},
   {path: "/credit/sale/", component :<CreditSales />},
   {path: "/credit/sales/report/:date/", component :<CreditOrders />},
+  {path: "/product/stock/report/", component :<StockReport />},
+
 
 
   {path: "/COD/sales/resport/", component :<CodOrders />},

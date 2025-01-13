@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { useFormik } from "formik";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const FormLayouts = () => {
     document.title = "Form Layouts | Skote - Vite React Admin & Dashboard Template";
@@ -12,9 +13,10 @@ const FormLayouts = () => {
     const [messageType, setMessageType] = useState(null); // For determining success or error message type
 
     const user = localStorage.getItem('name');
-    console.log("User    :",user)
+    const navigate = useNavigate();
 
     const formik = useFormik({
+        
         initialValues: {
             name: "",
             account_number: "",
@@ -57,9 +59,20 @@ const FormLayouts = () => {
                     setMessageType("error");
                 }
             } catch (error) {
-                console.error("Error posting data:", error);
-                setMessage("Something went wrong. Please try again.");
-                setMessageType("error");
+                if (error.response && error.response.status === 401) {
+                    // Clear invalid token
+                    localStorage.removeItem("token");
+                    
+                    // Show message (optional)
+                    alert("Your session has expired. Please log in again.");
+                    
+                    // Redirect to login page
+                    navigate("/login");
+                } else {
+                    console.error("Error posting data:", error);
+                    setMessage("Something went wrong. Please try again.");
+                    setMessageType("error");
+                }
             }
         }
     });

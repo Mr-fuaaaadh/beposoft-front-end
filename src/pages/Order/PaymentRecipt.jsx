@@ -7,6 +7,7 @@ import Receipt from "./Reciept";
 const ReceiptFormPage = () => {
     const { id } = useParams();
     const [packing, setPacking] = useState([]);
+    const [paymentRecipts, setPaymentRecipts] = useState([]); // Store order items
     const [orderItems, setOrderItems] = useState([]); // Store order items
     const [totalAmount, setTotalAmount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
@@ -22,22 +23,31 @@ const ReceiptFormPage = () => {
 
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
 
             // Fetch order items
-            const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, { headers });
-            setOrderItems(orderItemsResponse.data.order.payment_receipts);
-            setPacking(orderItemsResponse.data.order.warehouse);
+            const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, {
+                headers,
+            });
+
+            console.log("Order Items Response:", orderItemsResponse.data);
+
+            // Update state with fetched data
+            const { order } = orderItemsResponse.data;
+
+            setPaymentRecipts(order.recived_payment || []);
+            setTotalAmount(order.total_amount || 0);
+            setPacking(order.warehouse || {});
         } catch (error) {
-            console.error('Error fetching data', error);
+            console.error("Error fetching data:", error);
         }
     };
 
     const handleSubmit = async (values, { resetForm }) => {
         setIsSubmitting(true);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
             const formattedDate = values.received_at || getCurrentDate();
 
@@ -48,29 +58,40 @@ const ReceiptFormPage = () => {
             );
 
             if (response.status === 200 || response.status === 201) {
-                alert('Receipt added successfully');
+                alert("Receipt added successfully");
+
+                // Reset form and close modal
                 resetForm();
                 toggleModal();
 
-                fetchData();
+                // Fetch updated order items
+                console.log("Fetching updated order items...");
+                await fetchData();
             } else {
-                throw new Error('Unexpected response status');
+                throw new Error("Unexpected response status");
             }
         } catch (error) {
             if (error.response) {
-                console.error('Server responded with an error:', error.response);
-                alert(`Failed to submit form: ${error.response.data.message || 'Please try again later.'}`);
+                console.error("Server responded with an error:", error.response);
+                alert(`Failed to submit form: ${error.response.data.message || "Please try again later."}`);
             } else if (error.request) {
-                console.error('Network error:', error.request);
-                alert('Network error: Please check your internet connection and try again.');
+                console.error("Network error:", error.request);
+                alert("Network error: Please check your internet connection and try again.");
             } else {
-                console.error('Error:', error.message);
-                alert('Failed to submit form. Please try again.');
+                console.error("Error:", error.message);
+                alert("Failed to submit form. Please try again.");
             }
         } finally {
             setIsSubmitting(false);
         }
     };
+    const calculateReceiptTotal = (receipts) => {
+        return receipts.reduce((sum, receipt) => {
+            return sum + Number(receipt.amount || 0); // Safely parse amount to a number
+        }, 0);
+    };
+    
+
 
     return (
         <Card>
@@ -80,23 +101,57 @@ const ReceiptFormPage = () => {
                 </CardTitle>
 
                 <Row>
+                    {/* Invoice Payment Status */}
                     <Col md={4} className="d-flex flex-column p-3" style={{ borderRight: "1px solid black" }}>
                         <h5>INVOICE PAYMENT STATUS</h5>
-                        <p style={{ color: "green", fontWeight: "bold" }}>No receipt against Invoice</p>
+                        {paymentRecipts && paymentRecipts.length > 0 ? (
+                            <ul>
+                                {paymentRecipts.map((receipt, index) => (
+                                    <li key={index} style={{ fontWeight: "bold" }}>
+                                        Receipt #{index + 1}: $
+                                        {Number(receipt.amount || 0).toFixed(2)}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p style={{ color: "green", fontWeight: "bold" }}>
+                                No receipt against Invoice
+                            </p>
+                        )}
                     </Col>
 
+                    {/* Customer Ledger */}
                     <Col md={4} className="d-flex flex-column p-3" style={{ borderRight: "1px solid black" }}>
                         <h5>CUSTOMER LEDGER</h5>
-                        <div style={{ backgroundColor: "#f8f9fa", padding: "10px", borderRadius: "5px", fontWeight: "bold" }}>
-                            Ledger debited: <span style={{ color: "#dc3545" }}>{totalAmount.toFixed(2)}</span>
+                        <div
+                            style={{
+                                backgroundColor: "#f8f9fa",
+                                padding: "10px",
+                                borderRadius: "5px",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Ledger debited:{" "}
+                            <span style={{ color: "#dc3545" }}>
+                                ${Number(totalAmount - calculateReceiptTotal(paymentRecipts)).toFixed(2)}
+                            </span>
                         </div>
                     </Col>
 
+                    {/* Action Section */}
                     <Col md={4} className="d-flex flex-column p-3">
                         <h5>ACTION</h5>
-                        <button className="btn btn-primary btn-sm mt-2" onClick={toggleModal}>Add</button>
+                        <button
+                            className="btn btn-primary btn-sm mt-2"
+                            onClick={toggleModal}
+                            aria-label="Add new action"
+                        >
+                            Add
+                        </button>
                     </Col>
                 </Row>
+
+
 
                 <Modal isOpen={isOpen} toggle={toggleModal} size="lg">
                     <ModalHeader toggle={toggleModal}>Receipt Against Invoice Generate</ModalHeader>
@@ -123,8 +178,8 @@ const ReceiptFormPage = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {Array.isArray(orderItems) && orderItems.length > 0 ? (
-                                                orderItems.map((receiptItem, index) => (
+                                            {Array.isArray(paymentRecipts) && paymentRecipts.length > 0 ? (
+                                                paymentRecipts.map((receiptItem, index) => (
                                                     <tr key={receiptItem.id || index}>
                                                         <th scope="row">{index + 1}</th>
                                                         <td>{receiptItem.payment_receipt || 'N/A'}</td>

@@ -28,8 +28,8 @@ const UpdateInformationPage = () => {
         },
         validationSchema: Yup.object({
             status: Yup.string().required('Status is required'),
-            billing_address: Yup.string().required('Address is required'),
-            note: Yup.string().max(500, 'Note cannot exceed 500 characters'),
+            // billing_address: Yup.string().required('Address is required'),
+            // note: Yup.string().max(500, 'Note cannot exceed 500 characters'),
         }),
         onSubmit: async (values) => {
             console.log("Submitting values:", values); 

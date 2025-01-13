@@ -21,9 +21,10 @@ const DashboardJob = () => {
 
       <div className="page-content">
         <Container fluid>
-          <StatisticsApplications />
+          <ChartSection />
+
           <Row>
-            <ChartSection />
+            <StatisticsApplications />
             <CandidateSection />
           </Row>
 

@@ -53,7 +53,7 @@ const FormLayouts = () => {
             payment_status: "",
             payment_method: "",
             bank: "",
-            total_amount: 0,
+            total_amount: finalAmount,
             order_date: new Date().toISOString().substring(0, 10),
         },
         validationSchema: Yup.object({
@@ -69,23 +69,28 @@ const FormLayouts = () => {
             bank: Yup.string().required("Bank selection is required"),
         }),
         onSubmit: async (values) => {
-            console.log("Submitted values:", values); // Log form data to console
-
+            const payload = {
+                ...values,
+                total_amount: finalAmount, // Override with the current value
+            };
+        
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}order/create/`, // Replace 'your-endpoint/' with the actual API endpoint
-                    values,
+                    `${import.meta.env.VITE_APP_APIKEY}order/create/`,
+                    payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-
+        
                 if (response.status === 201) {
                     console.log("Data saved successfully:", response.data);
-                    // Optionally reset form and clear states
                     formik.resetForm();
                 }
             } catch (error) {
                 console.error("Error saving data:", error);
-                setError((prevError) => ({ ...prevError, submitError: "Failed to save data" }));
+                setError((prevError) => ({
+                    ...prevError,
+                    submitError: "Failed to save data",
+                }));
             }
         },
     });
@@ -222,12 +227,8 @@ const FormLayouts = () => {
                 setCartTotalAmount(totalAmount);
                 setCartTotalDiscount(totalDiscount);
                 setFinalAmount(finalAmountAfterDiscount);
-                formik.setFieldValue("total_amount", finalAmountAfterDiscount);
 
-                console.log("Cart Products:", data.data);
-                console.log("Total Amount:", totalAmount);
-                console.log("Total Discount:", totalDiscount);
-                console.log("Final Amount After Discount:", finalAmountAfterDiscount);
+                
             } else {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }

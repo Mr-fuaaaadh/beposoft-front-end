@@ -4,7 +4,7 @@ import { Card, Col, Container, Table, Button, Row, CardBody, CardTitle, Label, F
 import * as Yup from 'yup';
 import { useFormik } from "formik";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-import AddProduct from "./Add-products";
+import AddProduct from "./Add-product";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ const FormLayouts = () => {
     const [states, setStates] = useState([]); // All states
     const [staffs, setStaffs] = useState([]);
     const [customers, setCustomers] = useState([]);
-    // const [states, setstates] = useState([]);
+    const [allocatedStates, setAllocatedStates] = useState([]);
     const [loggedUser, setLoggedUser] = useState(null);
     const [familys, setFamilys] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,7 +31,6 @@ const FormLayouts = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [banks, setBank] = useState([]);
     const [companys, setCompany] = useState([]);
-
 
 
 
@@ -70,25 +69,31 @@ const FormLayouts = () => {
             bank: Yup.string().required("Bank selection is required"),
         }),
         onSubmit: async (values) => {
-            console.log("Submitted values:", values); // Log form data to console
-
+            const payload = {
+                ...values,
+                total_amount: finalAmount, // Override with the current value
+            };
+        
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}perfoma/invoice/create/`, // Replace 'your-endpoint/' with the actual API endpoint
-                    values,
+                    `${import.meta.env.VITE_APP_APIKEY}order/create/`,
+                    payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-
+        
                 if (response.status === 201) {
                     console.log("Data saved successfully:", response.data);
-                    // Optionally reset form and clear states
                     formik.resetForm();
                 }
             } catch (error) {
                 console.error("Error saving data:", error);
-                setError((prevError) => ({ ...prevError, submitError: "Failed to save data" }));
+                setError((prevError) => ({
+                    ...prevError,
+                    submitError: "Failed to save data",
+                }));
             }
         },
+        
     });
 
     const generateInvoice = async () => {
@@ -106,64 +111,65 @@ const FormLayouts = () => {
     };
 
     useEffect(() => {
-        if (token) {
-            const fetchData = async () => {
+        const fetchData = async () => {
+            if (token) {
                 setLoading(true);
                 try {
-                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse, companyResponse] = await Promise.all([
+                    const [
+                        statesResponse,
+                        ManagedResponse,
+                        familyResponse,
+                        StaffResponse,
+                        staffcustomersResponse,
+                        bankResponse,
+                        companyResponse
+                    ] = await Promise.all([
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/customers/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
-
-                    if (statesResponse.status === 200) {
-                        setStates(statesResponse.data.data);
-                    }
-                    if (familyResponse.status === 200) {
-                        setFamilys(familyResponse.data.data);
-                    }
-                    if (ManagedResponse.status === 200) {
-                        setStaffs(ManagedResponse.data.data);
-                    }
-                    if (staffcustomersResponse.status === 200) {
-                        setCustomers(staffcustomersResponse.data.data);
-                    }
+    
+                    // Set all fetched data
+                    setStates(statesResponse.data.data || []);
+                    setFamilys(familyResponse.data.data || []);
+                    setStaffs(ManagedResponse.data.data || []);
+                    setCustomers(staffcustomersResponse.data.data || []);
+                    setCompany(companyResponse.data.data || []);
+                    setBank(bankResponse.data.data || []);
+    
                     if (StaffResponse.status === 200) {
                         const user = StaffResponse.data.data;
                         setLoggedUser(user);
+    
                         formik.setFieldValue("manage_staff", user.id || "");
                         formik.setFieldValue("family", user.family || "");
-
-                        if (states.length > 0) {
-                            const states = user.allocated_states || [];
-                            const filteredStates = states.filter(state => states.includes(state.id));
-                            setstates(filteredStates);
+    
+                        // Handle allocated states after states have been set
+                        if (statesResponse.data.data && user.allocated_states) {
+                            const allocatedStates = user.allocated_states || [];
+                            const filteredStates = statesResponse.data.data.filter(state => allocatedStates.includes(state.id));
+                            setAllocatedStates(filteredStates);
+                            console.log(filteredStates);
                         }
                     }
-
-                    if (bankResponse.status === 200) {
-                        setBank(bankResponse.data.data);
-                    }
-                    if (companyResponse.status === 200) {
-                        setCompany(companyResponse.data.data);
-                    }
-
                 } catch (error) {
                     setError(prevError => ({ ...prevError, fetchData: error.message || "Failed to fetch data" }));
                 } finally {
                     setLoading(false);
                 }
-            };
-            fetchData();
-        } else {
-            setError(prevError => ({ ...prevError, token: "Token not found" }));
-            setLoading(false);
-        }
-    }, [token,]);
+            } else {
+                setError(prevError => ({ ...prevError, token: "Token not found" }));
+                setLoading(false);
+            }
+        };
+    
+        fetchData();
+    }, [token]);
+    
 
     // Search and select customer
     const handleSearchChange = (event) => {
@@ -206,6 +212,7 @@ const FormLayouts = () => {
                 const data = await response.json();
                 setCartProducts(data.data);
 
+                // Calculate the total amount based on the product price and quantity
                 const totalAmount = data.data.reduce((acc, product) => {
                     return acc + (product.price * product.quantity);
                 }, 0);
@@ -216,9 +223,11 @@ const FormLayouts = () => {
 
                 const finalAmountAfterDiscount = totalAmount - totalDiscount;
 
+                // Update the state for total amount, total discount, and final amount
                 setCartTotalAmount(totalAmount);
                 setCartTotalDiscount(totalDiscount);
                 setFinalAmount(finalAmountAfterDiscount);
+
 
             } else {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -334,12 +343,12 @@ const FormLayouts = () => {
                                                         name="company"
                                                         className="form-control"
                                                         id="company"
-                                                        value={formik.values.company}
+                                                        value={formik.values.company || (companys.length > 0 ? companys[0].id : '')}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
                                                         invalid={formik.touched.company && formik.errors.company ? true : false}
                                                     >
-                                                        <option value="" disabled>Select a company</option>
+                                                        {/* Ensure the default option is selected if no company is provided */}
                                                         {companys.map((company, index) => (
                                                             <option key={index} value={company.id}>
                                                                 {company.name}
@@ -351,6 +360,7 @@ const FormLayouts = () => {
                                                     ) : null}
                                                 </div>
                                             </Col>
+
 
                                             <Col md={6}>
                                                 <div className="mb-3">
@@ -455,7 +465,7 @@ const FormLayouts = () => {
                                                         invalid={formik.touched.state && formik.errors.state ? true : false}
                                                     >
                                                         <option value="">Select a State...</option>
-                                                        {states.map((stat) => (
+                                                        {allocatedStates.map((stat) => (
                                                             <option key={stat.id} value={stat.id}>
                                                                 {stat.name}
                                                             </option>

@@ -30,7 +30,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}orders/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}family/orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -62,7 +62,7 @@ const BasicTable = () => {
 
     // Filtered data based on search and filter conditions
     const filteredOrders = orders.filter((order) =>
-        (order.invoice.toLowerCase().includes(searchTerm.toLowerCase()) || order.manage_staff.toLowerCase().includes(searchTerm.toLowerCase())||
+        (order.invoice.toLowerCase().includes(searchTerm.toLowerCase()) || order.manage_staff.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.customer.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (selectedState === "" || order.status === selectedState) &&
         (selectedStaff === "" || order.manage_staff === selectedStaff)
@@ -76,41 +76,41 @@ const BasicTable = () => {
     // Export to Excel functionality
     // Inside BasicTable component
 
-const exportToExcel = () => {
-    // Flattening the data structure to make it Excel-friendly
-    const formattedData = orders.flatMap((order, index) => {
-        return order.items.map((item, itemIndex) => ({
-            "Order #": index + 1,
-            "Invoice No": order.invoice,
-            "Order Date": order.order_date,
-            "Status": order.status,
-            "Customer Name": order.customer.name,
-            "Customer Phone": order.customer.phone,
-            "Customer Email": order.customer.email,
-            "Billing Address": `${order.billing_address.address}, ${order.billing_address.city}, ${order.billing_address.state}, ${order.billing_address.zipcode}`,  // Combined as a single string
-            "Staff": order.manage_staff,
-            "Family": order.family,
-            "Total Amount": order.total_amount,
-            "Payment Method": order.payment_method,
-            "Bank": order.bank ? order.bank.name : "N/A",
-            "Item #": itemIndex + 1,
-            "Product Name": item.name,
-            "Quantity": item.quantity,
-            "Unit Price": item.price,
-            "Rate (Without GST)": item.rate,
-            "Tax %": item.tax,
-            "Exclude Price": item.exclude_price,
-            "Item Total": item.price * item.quantity,
-            "Images": item.images.join(", ")  // Concatenate image URLs as a single string
-        }));
-    });
+    const exportToExcel = () => {
+        // Flattening the data structure to make it Excel-friendly
+        const formattedData = orders.flatMap((order, index) => {
+            return order.items.map((item, itemIndex) => ({
+                "Order #": index + 1,
+                "Invoice No": order.invoice,
+                "Order Date": order.order_date,
+                "Status": order.status,
+                "Customer Name": order.customer.name,
+                "Customer Phone": order.customer.phone,
+                "Customer Email": order.customer.email,
+                "Billing Address": `${order.billing_address.address}, ${order.billing_address.city}, ${order.billing_address.state}, ${order.billing_address.zipcode}`,  // Combined as a single string
+                "Staff": order.manage_staff,
+                "Family": order.family,
+                "Total Amount": order.total_amount,
+                "Payment Method": order.payment_method,
+                "Bank": order.bank ? order.bank.name : "N/A",
+                "Item #": itemIndex + 1,
+                "Product Name": item.name,
+                "Quantity": item.quantity,
+                "Unit Price": item.price,
+                "Rate (Without GST)": item.rate,
+                "Tax %": item.tax,
+                "Exclude Price": item.exclude_price,
+                "Item Total": item.price * item.quantity,
+                "Images": item.images.join(", ")  // Concatenate image URLs as a single string
+            }));
+        });
 
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
 
-    XLSX.writeFile(workbook, "Orders_List.xlsx");
-};
+        XLSX.writeFile(workbook, "Orders_List.xlsx");
+    };
 
 
     return (

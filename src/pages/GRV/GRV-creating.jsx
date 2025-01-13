@@ -272,7 +272,7 @@ const FormLayouts = () => {
                                                         <td>{index + 1}</td>
                                                         <td>
                                                             <img
-                                                                src={`http://localhost:8000${product.images[0]}`}
+                                                                src={`${product.image}`}
                                                                 alt={product.name}
                                                                 style={{
                                                                     width: "50px",
@@ -415,7 +415,7 @@ const FormLayouts = () => {
                                                 <td>{product.name} </td>
                                                 <td>
                                                     <img
-                                                        src={`http://localhost:8000${product.images[0]}`}
+                                                        src={`${product.image}`}
                                                         alt={product.name}
                                                         style={{
                                                             width: "50px",

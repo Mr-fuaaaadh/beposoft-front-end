@@ -27,7 +27,7 @@ const FormLayouts = () => {
     const [totalNetPrice, settotalNetPrice] = useState(0);
     const [NetAmountBeforTax, setNetAmountBeforTax] = useState(0);
     const [TaxAmount, setTaxAmount] = useState(0);
-    const [shippingCharge, setShippingCharge] = useState(0);
+    const [shippingCharge, setShippingCharge] = useState(0); 
     const [paymentReceipts, setpaymentReceipts] = useState("");
 
     const [modal, setModal] = useState(false);
@@ -61,11 +61,9 @@ const FormLayouts = () => {
     const [billingAddress, setBillingAddress] = useState({
         name: "",
         phone: "",
-        email: "",
         gst: "",
         address: "",
         zipcode: "",
-        phone: "",
         email: "",
     })
 
@@ -96,6 +94,15 @@ const FormLayouts = () => {
 
         onSubmit: async (values) => {
             try {
+                // Calculate the total amount
+                const subtotal = values.items.reduce((sum, item) => {
+                    const itemTotal = item.quantity * (item.rate - item.discount);
+                    return sum + itemTotal;
+                }, 0);
+        
+                const totalAmount = subtotal + parseFloat(values.shipping_charge || 0);
+        
+                // Make the PUT request to save data
                 const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
                     method: "PUT",
                     headers: {
@@ -105,30 +112,35 @@ const FormLayouts = () => {
                     body: JSON.stringify({
                         code_charge: values.code_charge,
                         shipping_mode: values.shipping_mode,
+                        shipping_charge: values.shipping_charge,
+                        total_amount: totalAmount, // Save the total amount
                     }),
                 });
-
+        
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
+        
                 const data = await response.json();
                 console.log("Response:", data);
+        
                 setSuccessMessage("Form submitted successfully!");
             } catch (error) {
                 console.error("Error submitting form data:", error);
-                setErrorMessage("Failed to submit the form. Please try again.")
+                setErrorMessage("Failed to submit the form. Please try again.");
                 setSuccessMessage("");
             }
-        }
+        }        
 
     });
+
+    
 
 
     useEffect(() => {
         const fetchBanks = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}banks`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}banks/`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -183,6 +195,8 @@ const FormLayouts = () => {
                     code_charge: data.order.code_charge || "",
                     check: data.order.check || false,
                     family: data.order.family || "",
+                    shipping_charge: data.order.shipping_charge || "",
+
                 });
                 setOrderItems(data.items || []);
                 setShippingAddress({
@@ -217,6 +231,7 @@ const FormLayouts = () => {
                 });
 
                 setpaymentReceipts(data.order.payment_receipts)
+                setShippingCharge(data.order.shipping_charge || 0);
 
                 calculateTotalAmount(data.items || []);
                 calculateTotalDiscountAmount(data.items || []);
@@ -236,7 +251,7 @@ const FormLayouts = () => {
             return sum + itemTotal;
         }, 0);
 
-        const total = subtotal + shippingCharge; // Add shipping charge to subtotal
+        const total = subtotal; 
         setTotalAmount(total);
     };
 
@@ -326,7 +341,6 @@ const FormLayouts = () => {
         }
 
         try {
-            // Use productId in the URL
             const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}remove/order/${productId}/item/`, {
                 method: 'PUT',
                 headers: {
@@ -341,9 +355,6 @@ const FormLayouts = () => {
                 throw new Error(`Failed to update the product. Status: ${response.status} - ${errorData.message || 'Unknown error'}`);
             }
 
-            const updatedProduct = await response.json();
-
-            // Provide user feedback on success
             setFeedback("Product updated successfully");
         } catch (error) {
         }
@@ -407,87 +418,6 @@ const FormLayouts = () => {
     };
 
     const loggedUser = localStorage.getItem('name');
-    console.log(loggedUser);
-
-
-    const Recieptformik = useFormik({
-        initialValues: {
-            date: new Date().toISOString().slice(0, 10), // Today's date
-            amount: '',
-            bank: '',
-            transactionID: '',
-            receivedBy: '',
-            createdBy: loggedUser || '', // Set loggedUser as default for createdBy
-            remarks: '',
-        },
-        validationSchema: Yup.object({  // Fix: added ":" after validationSchema
-            date: Yup.date().required("Date is required"),
-            amount: Yup.number().required("Amount is required").positive("Amount must be positive"),
-            bank: Yup.string().required("Bank selection is required"),
-            transactionID: Yup.string().required("Transaction ID is required"),
-            receivedBy: Yup.string().required("Receiver's name is required"),
-            createdBy: Yup.string().required("Creator's name is required"),
-            remarks: Yup.string().max(300, "Remarks can't exceed 300 characters"),
-        }),
-        onSubmit: async (values) => {
-            console.log("Form Values Submitted:", values);
-            setLoading(true); // Start loading
-            try {
-                const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}payment/${id}/reciept/`,
-                    values,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${localStorage.getItem('token')}`, // Include token if required
-                        },
-                    }
-                );
-
-                console.log("Receipt saved:", response.data);
-                alert("Receipt saved successfully!");
-                toggleReciptModal(); // Close modal after saving
-            } catch (error) {
-                console.error("Error saving receipt:", error);
-                alert("Failed to save receipt. Please try again.");
-            } finally {
-                setLoading(false); // End loading
-            }
-        },
-    });
-
-    const handleInformationSubmit = async () => {
-        const payload = {
-            shipping_charge: shippingCharge,
-            total_amount: totalAmount + shippingCharge,
-        };
-
-        try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Response:", data);
-                setSuccessMessage("Form submitted successfully!");
-            } else {
-                const errorData = await response.json();
-                console.error("Error response data:", errorData);
-                setErrorMessage("Failed to submit the form. Please check your input and try again.");
-            }
-        } catch (error) {
-            console.error("Error submitting form data:", error);
-            setErrorMessage("An unexpected error occurred. Please try again later.");
-            setSuccessMessage("");
-        }
-    };
-
 
 
     return (
@@ -970,7 +900,7 @@ const FormLayouts = () => {
                                                                     </tr>
                                                                     <tr>
                                                                         <th scope="row" className="text-dark" style={{ backgroundColor: "#f1f3f5", fontWeight: "bold" }}>Total Payable Amount</th>
-                                                                        <td><strong className="text-success" style={{ fontWeight: "700", fontSize: "1.2em" }}>${totalAmount.toFixed(2)}</strong></td>
+                                                                        <td><strong className="text-success" style={{ fontWeight: "700", fontSize: "1.2em" }}>${Number(totalAmount + shippingCharge).toFixed(2)}</strong></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </Table>

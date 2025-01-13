@@ -30,12 +30,12 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}orders/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                setOrders(response.data);
+                setOrders(response.data.data);
             } catch (error) {
                 setError("Error fetching orders data. Please try again later.");
                 console.error("Error fetching orders data:", error);
@@ -62,7 +62,7 @@ const BasicTable = () => {
 
     // Filtered data based on search and filter conditions
     const filteredOrders = orders.filter((order) =>
-        (order.invoice.toLowerCase().includes(searchTerm.toLowerCase()) || order.manage_staff.toLowerCase().includes(searchTerm.toLowerCase())||
+        (order.invoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.customer.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (selectedState === "" || order.status === selectedState) &&
         (selectedStaff === "" || order.manage_staff === selectedStaff)
@@ -153,7 +153,6 @@ const exportToExcel = () => {
                                     <option value="Return">Return</option>
                                     <option value="Completed">Completed</option>
                                     <option value="Cancelled">Cancelled</option>
-
                                 </Input>
                             </FormGroup>
                         </Col>

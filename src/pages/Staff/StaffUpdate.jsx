@@ -103,7 +103,6 @@ const FormLayouts = () => {
 
             approval_status: Yup.string().required("This field is required"),
             gender: Yup.string().required("This field is required"),
-            marital_status: Yup.string().required("This field is required"),
 
             // Other
             check: Yup.string().required("This field is required"),

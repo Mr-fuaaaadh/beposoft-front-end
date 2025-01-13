@@ -11,16 +11,16 @@ import Breadcrumbs from '../../components/Common/Breadcrumb';
 import TableContainer from '../../components/Common/TableContainer';
 
 const StateTable = () => {
-    const [data, setData] = useState([]); 
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null); 
-    const [selectedCustomer, setSelectedCustomer] = useState(null); 
-    const [modal, setModal] = useState(false); 
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [modal, setModal] = useState(false);
     const [isAddMode, setIsAddMode] = useState(false); // New state to differentiate between add and edit
     const [newState, setNewState] = useState({ name: "" }); // State for the new state form
     const token = localStorage.getItem('token');
 
-    const toggleModal = () => setModal(!modal); 
+    const toggleModal = () => setModal(!modal);
 
     const columns = useMemo(
         () => [
@@ -85,7 +85,7 @@ const StateTable = () => {
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
         setIsAddMode(false);
-        toggleModal(); 
+        toggleModal();
     };
 
     const handleDelete = async (id) => {
@@ -134,8 +134,8 @@ const StateTable = () => {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 // Update the specific state entry
-                setData(data.map(customer => customer.id === selectedCustomer.id ? response.data : customer)); 
-                toggleModal(); 
+                setData(data.map(customer => customer.id === selectedCustomer.id ? response.data : customer));
+                toggleModal();
             } catch (error) {
                 console.error("Update failed:", error);
                 setError(error.message || "Failed to update customer");
@@ -152,9 +152,9 @@ const StateTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, {headers: {'Authorization': `Bearer ${token}`}}); 
+                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (response.status === 200) {
-                    setData(response.data.data); 
+                    setData(response.data.data);
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -205,10 +205,10 @@ const StateTable = () => {
                     <ModalBody>
                         <Form>
                             <Label for="name">Name</Label>
-                            <Input 
-                                id="name" 
-                                name="name" 
-                                value={isAddMode ? newState.name : selectedCustomer?.name || ''} 
+                            <Input
+                                id="name"
+                                name="name"
+                                value={isAddMode ? newState.name : selectedCustomer?.name || ''}
                                 onChange={handleInputChange}
                             />
                         </Form>

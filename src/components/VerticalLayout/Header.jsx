@@ -386,9 +386,9 @@ const Header = props => {
 
             <NotificationDropdown />
             <ProfileMenu />
-            
+
             <div
-               onClick={() => {
+              onClick={() => {
                 props.showRightSidebarAction(!props.showRightSidebar);
               }}
               className="dropdown d-inline-block"

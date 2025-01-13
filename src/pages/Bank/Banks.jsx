@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import navigation hook
 import {
     Table,
     Row,
@@ -10,40 +11,46 @@ import {
 } from "reactstrap";
 
 const BasicTable = () => {
-    // State to store data
-    const [loading, setLoading] = useState(true);  
-    const [error, setError] = useState(null); 
-    const [accounts, setAccounts] = useState([]);  // Add state to store accounts data
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [accounts, setAccounts] = useState([]);
+    const navigate = useNavigate(); // Initialize navigate hook
 
     // Document title
     document.title = "beposoft | bank details";
 
     useEffect(() => {
-        // Get token from localStorage or wherever it's stored
-        const token = localStorage.getItem("token"); // Replace with your token storage logic
+        const token = localStorage.getItem("token"); // Retrieve token from storage
 
         axios
             .get(`${import.meta.env.VITE_APP_APIKEY}banks/`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,  // Pass token in headers
+                    Authorization: `Bearer ${token}`, // Include token in headers
                 },
             })
             .then((response) => {
-                setAccounts(response.data.data); 
-                setLoading(false); 
+                setAccounts(response.data.data);
+                setLoading(false);
             })
             .catch((err) => {
-                setError(err); 
-                setLoading(false);
+                if (err.response && err.response.status === 401) {
+                    // Clear token and redirect to login
+                    localStorage.removeItem("token");
+                    alert("Your session has expired. Please log in again.");
+                    navigate("/login");
+                } else {
+                    setError(err);
+                    setLoading(false);
+                }
             });
-    }, []);
+    }, [navigate]);
 
     if (loading) {
-        return <div>Loading...</div>; 
+        return <div>Loading...</div>;
     }
 
     if (error) {
-        return <div>Error: {error.message}</div>; 
+        return <div>Error: {error.message}</div>;
     }
 
     return (
@@ -67,12 +74,12 @@ const BasicTable = () => {
                                                     <th>IFSC CODE</th>
                                                     <th>BRANCH</th>
                                                     <th>OPENING BALANCE</th>
-                                                    <th>created_user</th>
+                                                    <th>Created User</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {accounts.map((account, index) => (
-                                                    <tr key={account.id}> 
+                                                    <tr key={account.id}>
                                                         <th scope="row">{index + 1}</th>
                                                         <td>{account.name}</td>
                                                         <td style={{ color: 'blue' }}>{account.account_number}</td>
@@ -93,6 +100,6 @@ const BasicTable = () => {
             </div>
         </React.Fragment>
     );
-}
+};
 
 export default BasicTable;
