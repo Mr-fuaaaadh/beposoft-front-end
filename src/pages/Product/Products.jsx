@@ -27,7 +27,7 @@ const BasicTable = () => {
                     return;
                 }
 
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}products/`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -64,6 +64,8 @@ const BasicTable = () => {
         fetchProducts();
     }, [token, navigate]);
 
+    console.log("products", products);
+
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
@@ -76,14 +78,8 @@ const BasicTable = () => {
         setFilteredProducts(filtered);
     };
 
-    const handleResetSearch = () => {
-        setSearchTerm("");
-        setFilteredProducts(products);
-    };
 
-    const handleAddProduct = () => {
-        navigate('/ecommerce-add-product');
-    };
+
 
 
     const handleEditVie = (productId) => {
@@ -112,7 +108,7 @@ const BasicTable = () => {
                 return;
             }
 
-            const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}product/update/${productId}/`, {
+            const response = await axios.delete(`${import.meta.env.VITE_APP_KEY}product/update/${productId}/`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -131,6 +127,8 @@ const BasicTable = () => {
     };
 
     document.title = "Product Tables | Beposoft";
+
+    console.log("filterd products..:",filteredProducts);
 
     return (
         <React.Fragment>
@@ -156,15 +154,15 @@ const BasicTable = () => {
                                                     <FaSearch />
                                                 </Button>
                                                 <div className="vr"></div>
-                                                <Button color="outline-danger" onClick={handleResetSearch}>
+                                                {/* <Button color="outline-danger" onClick={handleResetSearch}>
                                                     Reset
-                                                </Button>
+                                                </Button> */}
                                             </div>
                                         </Col>
                                         <Col md={4} className="text-end">
-                                            <Button color="primary" onClick={handleAddProduct}>
+                                            {/* <Button color="primary" onClick={handleAddProduct}>
                                                 Add Product
-                                            </Button>
+                                            </Button> */}
                                         </Col>
                                     </Row>
                                     <CardTitle className="h4 text-center">Product Table</CardTitle>
@@ -185,8 +183,10 @@ const BasicTable = () => {
                                                         <th>UNIT</th>
                                                         <th>PURCHASE RATE</th>
                                                         <th>TAX %</th>
+                                                        <th>LANDING COST</th>
                                                         <th>EXCLUDED PRICE</th>
-                                                        <th>SELLING PRICE</th>
+                                                        <th>WHOLESALE PRICE</th>
+                                                        <th>RETAIL PRICE</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
@@ -197,11 +197,12 @@ const BasicTable = () => {
                                                                 <th scope="row">{index + 1}</th>
                                                                 <td>
                                                                     <img
-                                                                        src={product.image}
+                                                                        src={product.image || (product.images && product.images[0]?.image) || 'fallback-image-url'}
                                                                         alt={product.name}
                                                                         style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "5px" }}
                                                                     />
                                                                 </td>
+
                                                                 <td style={{ cursor: 'pointer' }} onClick={() => handleProductClick(product.id, product.type)}>
                                                                     {truncateText(product.name, 30)}
                                                                 </td>
@@ -210,8 +211,10 @@ const BasicTable = () => {
                                                                 <td>{product.unit}</td>
                                                                 <td>{product.purchase_rate}</td>
                                                                 <td>{product.tax}%</td>
+                                                                <td>{product.landing_cost}</td>
                                                                 <td>{Math.floor(product.exclude_price)}</td>
                                                                 <td>{product.selling_price}</td>
+                                                                <td>{product.retail_price}</td>
                                                                 <td>
                                                                     <UncontrolledDropdown>
                                                                         <DropdownToggle tag="a" className="card-drop">

@@ -25,7 +25,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}grv/data/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}grv/data/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -48,7 +48,7 @@ const BasicTable = () => {
             };
 
             // Update the record on the server using axios (PATCH or PUT depending on your API)
-            const response = await axios.put(`${import.meta.env.VITE_APP_APIKEY}grv/update/${id}/`, data, {
+            const response = await axios.put(`${import.meta.env.VITE_APP_KEY}grv/update/${id}/`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },

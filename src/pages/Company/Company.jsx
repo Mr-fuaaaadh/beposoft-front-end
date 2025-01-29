@@ -46,7 +46,7 @@ const CompanyForm = () => {
             setErrorMessage("");
 
             axios
-                .post(`${import.meta.env.VITE_APP_APIKEY}company/data/`, values, {
+                .post(`${import.meta.env.VITE_APP_KEY}company/data/`, values, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",

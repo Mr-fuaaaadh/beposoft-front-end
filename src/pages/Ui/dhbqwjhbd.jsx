@@ -158,7 +158,7 @@ const DatatableTables = () => {
         }
 
         try {
-            const response = await axios.put(`${import.meta.env.VITE_APP_APIKEY}customer/update/${selectedCustomer.id}/`, selectedCustomer, {
+            const response = await axios.put(`${import.meta.env.VITE_APP_KEY}customer/update/${selectedCustomer.id}/`, selectedCustomer, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -192,9 +192,9 @@ const DatatableTables = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, {headers: {'Authorization': `Bearer ${token}`}});
-                const responseState = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, {headers: {'Authorization': `Bearer ${token}`}});
-                const responseManager = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {headers: {'Authorization': `Bearer ${token}`}});
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}customers/`, {headers: {'Authorization': `Bearer ${token}`}});
+                const responseState = await axios.get(`${import.meta.env.VITE_APP_KEY}states/`, {headers: {'Authorization': `Bearer ${token}`}});
+                const responseManager = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {headers: {'Authorization': `Bearer ${token}`}});
 
                 if (response.status === 200) {
                     setData(response.data.data); 

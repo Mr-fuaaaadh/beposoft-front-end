@@ -37,7 +37,7 @@ const VariantProductCreateForm = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}products/`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -72,7 +72,7 @@ const VariantProductCreateForm = () => {
     useEffect(() => {
         const fetchAttributes = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attributes/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attributes/`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -113,7 +113,7 @@ const VariantProductCreateForm = () => {
             const confirmed = window.confirm("Are you sure you want to delete this item?");
             if (!confirmed) return;
 
-            const url = `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`;
+            const url = `${import.meta.env.VITE_APP_KEY}product/update/${id}/`;
 
             // Add token here
             const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
@@ -141,7 +141,7 @@ const VariantProductCreateForm = () => {
 
     const fetchAttributeValues = useCallback(async (attributeId, attributeName) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attribute/${attributeId}/values/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attribute/${attributeId}/values/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -231,7 +231,7 @@ const VariantProductCreateForm = () => {
         formDataToSend.append('attributes', JSON.stringify(formData.attributes));
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/product/variant/`, formDataToSend, {
+            const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/product/variant/`, formDataToSend, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -253,7 +253,7 @@ const VariantProductCreateForm = () => {
     // Fetch stock data function
     const fetchStockData = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/${id}/variants/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}products/${id}/variants/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,

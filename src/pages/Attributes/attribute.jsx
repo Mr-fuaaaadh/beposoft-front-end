@@ -16,7 +16,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchAttributes = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attributes/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attributes/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -42,8 +42,8 @@ const BasicTable = () => {
     const handleAddOrUpdateAttribute = async (e) => {
         e.preventDefault();
         const apiUrl = editingAttribute
-            ? `${import.meta.env.VITE_APP_APIKEY}product/attribute/${editingAttribute.id}/delete/`
-            : `${import.meta.env.VITE_APP_APIKEY}add/product/attributes/`;
+            ? `${import.meta.env.VITE_APP_KEY}product/attribute/${editingAttribute.id}/delete/`
+            : `${import.meta.env.VITE_APP_KEY}add/product/attributes/`;
 
         const method = editingAttribute ? "PUT" : "POST";
 
@@ -83,7 +83,7 @@ const BasicTable = () => {
     // Handle Delete Action
     const handleDeleteAttribute = async (attributeId) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attribute/${attributeId}/delete/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attribute/${attributeId}/delete/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

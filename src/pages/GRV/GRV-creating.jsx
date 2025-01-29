@@ -45,7 +45,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const endpoint = `${import.meta.env.VITE_APP_APIKEY}orders/`;
+                const endpoint = `${import.meta.env.VITE_APP_KEY}orders/`;
                 const response = await axios.get(endpoint, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -113,7 +113,7 @@ const FormLayouts = () => {
 
         setLoading(true);
         try {
-            const endpoint = `${import.meta.env.VITE_APP_APIKEY}grv/data/`; // Adjust the endpoint for your backend
+            const endpoint = `${import.meta.env.VITE_APP_KEY}grv/data/`; // Adjust the endpoint for your backend
             const response = await axios.post(endpoint, dataToSave, {
                 headers: {
                     Authorization: `Bearer ${token}`,

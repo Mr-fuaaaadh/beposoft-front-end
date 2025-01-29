@@ -30,7 +30,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchOrderData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}order/${id}/items/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

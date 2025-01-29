@@ -27,7 +27,7 @@ const ReceiptFormPage = () => {
             const headers = { Authorization: `Bearer ${token}` };
 
             // Fetch order items
-            const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, {
+            const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}order/${id}/items/`, {
                 headers,
             });
 
@@ -52,7 +52,7 @@ const ReceiptFormPage = () => {
             const formattedDate = values.received_at || getCurrentDate();
 
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}payment/${id}/reciept/`,
+                `${import.meta.env.VITE_APP_KEY}payment/${id}/reciept/`,
                 { ...values, received_at: formattedDate, id },
                 { headers }
             );

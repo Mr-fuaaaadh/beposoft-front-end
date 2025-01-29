@@ -76,7 +76,7 @@ const FormUpload = () => {
 
         // Send the files using axios
         axios
-            .post(`${import.meta.env.VITE_APP_APIKEY}bulk/upload/products/`, formData, {
+            .post(`${import.meta.env.VITE_APP_KEY}bulk/upload/products/`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",

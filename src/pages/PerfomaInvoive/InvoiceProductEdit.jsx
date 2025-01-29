@@ -35,7 +35,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}products/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -142,7 +142,7 @@ const AddProduct = ({ isOpen, toggle, onSelectProduct, onCartUpdate }) => {
 
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}add/order/${id}/product/`,
+                `${import.meta.env.VITE_APP_KEY}add/order/${id}/product/`,
                 cartItem,
                 {
                     headers: {

@@ -13,6 +13,7 @@ const FormLayouts = () => {
     const [family, setFamily] = useState([]);
     const [successMessage, setSuccessMessage] = useState(""); // State for success message
     const [errorMessage, setErrorMessage] = useState(""); 
+    const [warehouseDetails, setWarehouseDetails] = useState([]);
     const token = localStorage.getItem('token');
 
     const UNIT_TYPES = [
@@ -43,7 +44,10 @@ const FormLayouts = () => {
             product_type: "",
             groupID: "",
             stock:"",
-            check: false
+            check: false,
+            warehouse:"",
+            retail_price: "",
+            landing_cost: "",
         },
         validationSchema: Yup.object({
             name: Yup.string().required("This field is required"),
@@ -56,24 +60,27 @@ const FormLayouts = () => {
             product_type: Yup.string().required("This field is required"),
             groupID: Yup.string().required("This field is required"),
             stock : Yup.string().required("This field is required"),
-            check: Yup.bool().oneOf([true], "You must accept the terms")
+            check: Yup.bool().oneOf([true], "You must accept the terms"),
+            warehouse: Yup.string().required("This field is required"),
         }),
         onSubmit: async (values) => {
+
+            console.log("form field valies...:", values);
             try {
                 // Post the form data using axios
-                const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/product/`, values, {
+                const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/product/`, values, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
                 });
 
                 setSuccessMessage("Form submitted successfully!");
-                setErrorMessage(""); // Clear any previous error messages
+                setErrorMessage(""); 
                 console.log('Form submitted successfully:', response.data);
             } catch (error) {
                 // Handle error
                 setErrorMessage("Error submitting form. Please try again.");
-                setSuccessMessage(""); // Clear any previous success messages
+                setSuccessMessage(""); 
                 console.error('Error submitting form:', error); st
                 console.error('Error submitting form:', error);
             }
@@ -83,7 +90,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchProductFamilies = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -97,6 +104,32 @@ const FormLayouts = () => {
 
         fetchProductFamilies();
     }, [token]);
+
+    useEffect(() => {
+        const fetchwarehosue = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}warehouse/add/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                setWarehouseDetails(response.data);
+                console.log(response.data)
+            } catch (error) {
+                console.error('Error fetching warehosue:', error);
+            }
+        };
+
+        fetchwarehosue();
+    }, [token]);
+
+    useEffect(() => {
+        const { purchase_rate, tax } = formik.values;
+        const rate = parseFloat(purchase_rate) || 0;
+        const taxValue = parseFloat(tax) || 0;
+        const calculatedLandingCost = rate + (rate * taxValue / 100);
+        formik.setFieldValue("landing_cost", calculatedLandingCost.toFixed(2)); 
+    }, [formik.values.purchase_rate, formik.values.tax]);
 
     return (
         <React.Fragment>
@@ -133,7 +166,7 @@ const FormLayouts = () => {
                                         </div>
 
                                         <Row>
-                                            <Col md={6}>
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-hsn_code-Input">HSN CODE</Label>
                                                     <Input
@@ -152,7 +185,7 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                            <Col md={6}>
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-purchase_rate-Input">PURCHASE RATE</Label>
                                                     <Input
@@ -171,9 +204,7 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                        </Row>
 
-                                        <Row>
                                             <Col lg={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-tax-Input">Tax</Label>
@@ -193,7 +224,51 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                            <Col lg={4}>
+
+                                         
+                                        </Row>
+
+                                        <Row>
+                                        <Col lg={3}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-selling_price-Input">landing cost</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="landing_cost"
+                                                        className="form-control"
+                                                        id="formrow-selling_price-Input"
+                                                        value={formik.values.landing_cost}
+                                                        invalid={formik.touched.landing_cost && formik.errors.landing_cost}
+                                                    />
+                                                    {formik.errors.landing_cost && formik.touched.landing_cost && (
+                                                        <FormFeedback>{formik.errors.landing_cost}</FormFeedback>
+                                                    )}
+                                                </div>
+                                            </Col>  
+                                   
+                                            <Col md={3}>
+                                            <div className="mb-3">
+                                                    <Label htmlFor="formrow-unit-Input">choose warehouse</Label>
+                                                    <select
+                                                        name="warehouse"
+                                                        id="formrow-unit-Input"
+                                                        className="form-control"
+                                                        value={formik.values.warehouse}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.warehouse && formik.errors.warehouse}
+                                                    >
+                                                        <option value="">Choose...</option>
+                                                        {warehouseDetails.map((unit) => (
+                                                            <option key={unit.id} value={unit.id}>{unit.name}</option>
+                                                        ))}
+                                                    </select>
+                                                    {formik.errors.unit && formik.touched.unit && (
+                                                        <FormFeedback>{formik.errors.unit}</FormFeedback>
+                                                    )}
+                                                </div>
+                                            </Col>
+                                            <Col lg={3}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-family-Input">Family</Label>
                                                     <select
@@ -216,7 +291,7 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                            <Col lg={4}>
+                                            <Col lg={3}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-unit-Input">Unit</Label>
                                                     <select
@@ -243,13 +318,13 @@ const FormLayouts = () => {
                                         <Row>
                                             <Col lg={3}>
                                                 <div className="mb-3">
-                                                    <Label htmlFor="formrow-selling_price-Input">Selling Price</Label>
+                                                    <Label htmlFor="formrow-selling_price-Input">Wholesale Rate</Label>
                                                     <Input
                                                         type="text"
                                                         name="selling_price"
                                                         className="form-control"
                                                         id="formrow-selling_price-Input"
-                                                        placeholder="Enter selling price"
+                                                        placeholder="Enter Wholesale Rate"
                                                         value={formik.values.selling_price}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
@@ -261,6 +336,25 @@ const FormLayouts = () => {
                                                 </div>
                                             </Col>
                                             <Col lg={3}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="formrow-selling_price-Input">retail Rate</Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="retail_price"
+                                                        className="form-control"
+                                                        id="formrow-selling_price-Input"
+                                                        placeholder="Enter Retail Rate"
+                                                        value={formik.values.retail_price}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.retail_price && formik.errors.retail_price}
+                                                    />
+                                                    {formik.errors.selling_price && formik.touched.selling_price && (
+                                                        <FormFeedback>{formik.errors.retail_price}</FormFeedback>
+                                                    )}
+                                                </div>
+                                            </Col>
+                                            <Col lg={2}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-product_type-Input">Product Type</Label>
                                                     <select
@@ -282,7 +376,7 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                            <Col lg={3}>
+                                            <Col lg={2}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-groupID-Input">Group ID</Label>
                                                     <Input
@@ -301,7 +395,7 @@ const FormLayouts = () => {
                                                     )}
                                                 </div>
                                             </Col>
-                                            <Col lg={3}>
+                                            <Col lg={2}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-groupID-Input">Stock</Label>
                                                     <Input
@@ -309,7 +403,7 @@ const FormLayouts = () => {
                                                         name="stock"
                                                         className="form-control"
                                                         id="formrow-stock-Input"
-                                                        placeholder="Enter group ID"
+                                                        placeholder="Enter stock"
                                                         value={formik.values.stock}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}

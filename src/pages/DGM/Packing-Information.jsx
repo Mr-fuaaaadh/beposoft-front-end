@@ -79,7 +79,7 @@ const FormRepeater = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`,{
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`,{
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -124,7 +124,7 @@ const FormRepeater = () => {
             // Proceed with sending the requests
             const responsePromises = formDataList.map((formData) =>
                 axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}warehouse/data/`,
+                    `${import.meta.env.VITE_APP_KEY}warehouse/data/`,
                     formData,
                     {
                         headers: {

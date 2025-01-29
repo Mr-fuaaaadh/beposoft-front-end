@@ -200,6 +200,11 @@ import StaffBasedCustomers from "../pages/Staff-Customers/Staff-based-customers"
 import AddStaffBasedCustomers from "../pages/Staff-Customers/Add-customers"
 
 
+/////warehouse section
+
+import AddWarehousePage from "../pages/warehouse/addwarehouse";
+
+
 
 
 //perfoma Invoice
@@ -222,6 +227,7 @@ import ProductUpdate from "../pages/Ecommerce/ProductUpdateForm";
 
 import Bank from "../pages/Bank/Add-Bank";
 import BankList from "../pages/Bank/Banks";
+import BankModule from "../pages/Bank/BankModule";
 
 
 
@@ -387,16 +393,16 @@ const authProtectedRoutes = [
   {path: "/order/packing/:id/progress/",component:< ParcelDetails/>},
   {path: "/daily/good/movment/",component:< Dailygoodmovment/>},
 
- 
 
 
 
 
 
+  ///warehouse....,
 
 
 
-
+  {path: "/add/warehouse/", component: <AddWarehousePage/>},
 
   //all supervisors
 
@@ -495,6 +501,7 @@ const authProtectedRoutes = [
 
   { path: "/add/bank/", component: <Bank /> },
   { path: "/bank/datas/", component: <BankList /> },
+  { path: "/bank/bankmodule", component: <BankModule /> },
   { path: "/add/expense/", component: <AddExpense />},
   { path: "/expense/list/", component: <ExpenseList />},
 

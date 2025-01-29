@@ -31,7 +31,7 @@ const BasicTable = () => {
         const fetchData = async () => {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}invoice/report/${date}/`,
+                    `${import.meta.env.VITE_APP_KEY}invoice/report/${date}/`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -103,7 +103,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchStates = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}states/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}states/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -128,7 +128,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}company/data/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}company/data/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

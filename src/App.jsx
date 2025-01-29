@@ -24,13 +24,13 @@ import "./assets/scss/theme.scss";
 // Import Firebase Configuration file
 // import { initFirebaseBackend } from "./helpers/firebase_helper"
 
-import fakeBackend from "/src/helpers/AuthType/fakeBackend";
+// import fakeBackend from "/src/helpers/AuthType/fakeBackend";
 
 // Activating fake backend
-fakeBackend();
+// fakeBackend();
 
 // const firebaseConfig = {
-//   apiKey: import.meta.env.VITE_APP_APIKEY,
+//   apiKey: import.meta.env.VITE_APP_KEY,
 //   authDomain: import.meta.env.VITE_APP_AUTHDOMAIN,
 //   databaseURL: import.meta.env.VITE_APP_DATABASEURL,
 //   projectId: import.meta.env.VITE_APP_PROJECTID,

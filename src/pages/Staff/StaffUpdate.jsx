@@ -127,7 +127,7 @@ const FormLayouts = () => {
                 }
 
                 const response = await axios.put(
-                    `${import.meta.env.VITE_APP_APIKEY}staff/update/${id}/`, formData, {
+                    `${import.meta.env.VITE_APP_KEY}staff/update/${id}/`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'multipart/form-data',
@@ -179,11 +179,11 @@ const FormLayouts = () => {
                 setLoading(true);
                 try {
                     const [departmentResponse, statesResponse, supervisorResponse, staffResponse, familyResponse] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/update/${id}/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } })
+                        axios.get(`${import.meta.env.VITE_APP_KEY}departments/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}supervisors/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}staff/update/${id}/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, { headers: { Authorization: `Bearer ${token}` } })
                     ]);
 
                     // Check and handle staff data (renamed from customerData)

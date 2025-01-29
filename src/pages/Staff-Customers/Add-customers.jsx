@@ -57,7 +57,7 @@ const FormLayouts = () => {
             setError(null);
 
             try {
-                const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/customer/`, values, {
+                const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/customer/`, values, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
@@ -95,8 +95,8 @@ const FormLayouts = () => {
                 setLoading(true);
                 try {
                     const [statesResponse, ManagedResponse] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } })
+                        axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } })
                     ]);
 
                     if (statesResponse.status === 200) {

@@ -94,7 +94,7 @@ const DepartmentTable = () => {
         setData(data.filter(customer => customer.id !== id));
 
         try {
-            await axios.delete(`${import.meta.env.VITE_APP_APIKEY}department/update/${id}/`, {
+            await axios.delete(`${import.meta.env.VITE_APP_KEY}department/update/${id}/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log("Delete successful");
@@ -118,7 +118,7 @@ const DepartmentTable = () => {
         if (isAddMode) {
             // Handle Add State
             try {
-                const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/department/`, newState, {
+                const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/department/`, newState, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setData([...data, response.data]); // Add new state to table data
@@ -130,7 +130,7 @@ const DepartmentTable = () => {
         } else {
             // Handle Update State
             try {
-                const response = await axios.put(`${import.meta.env.VITE_APP_APIKEY}department/update/${selectedCustomer.id}/`, selectedCustomer, {
+                const response = await axios.put(`${import.meta.env.VITE_APP_KEY}department/update/${selectedCustomer.id}/`, selectedCustomer, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 // Update the specific state entry
@@ -152,7 +152,7 @@ const DepartmentTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, {headers: {'Authorization': `Bearer ${token}`}}); 
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}departments/`, {headers: {'Authorization': `Bearer ${token}`}}); 
                 if (response.status === 200) {
                     setData(response.data.data); 
                 } else {

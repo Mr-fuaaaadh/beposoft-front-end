@@ -11,7 +11,7 @@ import {
     Collapse,
 } from "reactstrap";
 
-const AddProduct = ({ isOpen, toggle }) => {
+const AddProduct = ({ isOpen, toggle,warehouseId }) => {
     const [products, setProducts] = useState([]); // Initialize products state with an empty array
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
@@ -20,13 +20,17 @@ const AddProduct = ({ isOpen, toggle }) => {
     const [quantity, setQuantity] = useState({});
     const token = localStorage.getItem("token");
 
+ 
+console.log(warehouseId);
+
+
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}all/products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}all/products/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -58,11 +62,50 @@ const AddProduct = ({ isOpen, toggle }) => {
         }
     };
 
-    useEffect(() => {
-        if (isOpen) {
-            fetchProducts();
+    const fetchwarehouseProduct = async () => {
+        setLoading(true);
+        setError(null);
+        const token = localStorage.getItem("token");
+    
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_APP_KEY}warehouse/products/${warehouseId}/`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+    
+            console.log("API response:", response); // Check full response
+    
+            const data = response.data; // Axios automatically parses JSON
+    
+            console.log("API data:", data); // Verify response structure
+    
+            // Ensure the response contains `data` and it is an array
+            if (data && Array.isArray(data.data)) {
+                setProducts(data.data);
+            } else {
+                throw new Error("Unexpected data structure received from API");
+            }
+            
+        } catch (error) {
+            console.error("Error fetching products:", error); // Log error to console
+            setError(error.response?.data?.message || "An error occurred while fetching products.");
+        } finally {
+            setLoading(false);
         }
-    }, [isOpen]);
+    };
+    
+
+    useEffect(() => {
+
+        if(!warehouseId || warehouseId === "" || warehouseId === undefined) {
+            if (isOpen) {
+                fetchProducts();
+            }
+        } else {
+            fetchwarehouseProduct();
+        }  
+    }, [isOpen, warehouseId]);;
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
@@ -87,7 +130,7 @@ const AddProduct = ({ isOpen, toggle }) => {
 
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}cart/product/`,
+                `${import.meta.env.VITE_APP_KEY}cart/product/`,
                 cartItem,
                 {
                     headers: {

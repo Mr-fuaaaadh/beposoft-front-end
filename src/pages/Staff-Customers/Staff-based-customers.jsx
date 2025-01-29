@@ -37,7 +37,7 @@ const BasicTable = () => {
         const fetchCustomers = async () => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_APP_APIKEY}staff/customers/`,
+                    `${import.meta.env.VITE_APP_KEY}staff/customers/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setCustomers(response.data.data);

@@ -25,10 +25,10 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchDepartments = async () => {
             try {
-                const departmentResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, {
+                const departmentResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}departments/`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const staffResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
+                const staffResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setDepartments(departmentResponse.data.data); 
@@ -62,7 +62,7 @@ const FormLayouts = () => {
                     department: values.department, // Send the department ID directly
                 };
 
-                const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/supervisor/`, dataToPost, {
+                const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/supervisor/`, dataToPost, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

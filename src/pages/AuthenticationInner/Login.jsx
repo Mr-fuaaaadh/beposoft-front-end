@@ -39,7 +39,7 @@ const Login = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await Axios.post(`${import.meta.env.VITE_APP_APIKEY}login/`, values);
+        const response = await Axios.post(`${import.meta.env.VITE_APP_KEY}login/`, values);
 
         if (response.status === 200) {
           const { token, active, name } = response.data;

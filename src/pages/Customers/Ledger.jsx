@@ -42,13 +42,13 @@ const BasicTable = () => {
             try {
                 // Fetch ledger data
                 const ledgerResponse = await axios.get(
-                    `${import.meta.env.VITE_APP_APIKEY}customer/${id}/ledger/`,
+                    `${import.meta.env.VITE_APP_KEY}customer/${id}/ledger/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 
                 // Fetch company data
                 const companyResponse = await axios.get(
-                    `${import.meta.env.VITE_APP_APIKEY}company/data/`,
+                    `${import.meta.env.VITE_APP_KEY}company/data/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

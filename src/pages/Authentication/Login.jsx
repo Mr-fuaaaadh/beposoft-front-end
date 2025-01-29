@@ -52,10 +52,13 @@ const Login = (props) => {
       password: Yup.string().required('Please Enter Your Password'),
     }),
 
+
+    
+
     onSubmit: async (values) => {
       try {
         // Using axios method for login
-        const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}login/`, values, {
+        const response = await axios.post(`${import.meta.env.VITE_APP_KEY}login/`, values, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -106,6 +109,8 @@ const Login = (props) => {
   const socialResponse = (type) => {
     signIn(type);
   };
+
+  console.log(`${import.meta.env.VITE_APP_KEY}login/`);
 
   return (
     <React.Fragment>

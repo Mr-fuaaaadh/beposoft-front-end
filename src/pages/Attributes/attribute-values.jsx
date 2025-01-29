@@ -18,7 +18,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchAttributes = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}add/product/attribute/values/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}add/product/attribute/values/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -45,7 +45,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchAvailableAttributes = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attributes/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attributes/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -69,8 +69,8 @@ const BasicTable = () => {
     const handleAddOrUpdateAttribute = async (e) => {
         e.preventDefault();
         const apiUrl = editingAttribute
-            ? `${import.meta.env.VITE_APP_APIKEY}product/attribute/${editingAttribute.id}/values/`
-            : `${import.meta.env.VITE_APP_APIKEY}add/product/attribute/values/`;
+            ? `${import.meta.env.VITE_APP_KEY}product/attribute/${editingAttribute.id}/values/`
+            : `${import.meta.env.VITE_APP_KEY}add/product/attribute/values/`;
 
         const method = editingAttribute ? "PUT" : "POST";
 
@@ -112,7 +112,7 @@ const BasicTable = () => {
     // Handle Delete Action
     const handleDeleteAttribute = async (attributeId) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/attribute/delete/${attributeId}/values/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/attribute/delete/${attributeId}/values/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

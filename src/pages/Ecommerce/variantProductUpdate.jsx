@@ -81,7 +81,7 @@ const FormLayouts = () => {
             console.log("Calling API with values:", values);
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}product/update/${id}/`,
                     {
                         method: "PUT",
                         headers: {
@@ -118,7 +118,7 @@ const FormLayouts = () => {
         const fetchProductData = async () => {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}product/update/${id}/`,
                     {
                         method: "GET",
                         headers: {
@@ -164,7 +164,7 @@ const FormLayouts = () => {
         const fetchFamilyData = async () => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_APP_APIKEY}familys/`,
+                    `${import.meta.env.VITE_APP_KEY}familys/`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

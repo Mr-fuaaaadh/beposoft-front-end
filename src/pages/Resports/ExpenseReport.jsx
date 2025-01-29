@@ -36,7 +36,7 @@ const BasicTable = () => {
     useEffect(() => {
         const token = localStorage.getItem('token'); // Replace with actual method of fetching token
 
-        axios.get(`${import.meta.env.VITE_APP_APIKEY}expense/add/`, {
+        axios.get(`${import.meta.env.VITE_APP_KEY}expense/add/`, {
             headers: {
                 Authorization: `Bearer ${token}` // Pass the token in the Authorization header
             }

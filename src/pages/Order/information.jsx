@@ -35,7 +35,7 @@ const UpdateInformationPage = () => {
             console.log("Submitting values:", values); 
             try {
                 const response = await axios.put(
-                    `${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`,
+                    `${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`,
                     values,
                     {
                         headers: {
@@ -56,7 +56,7 @@ const UpdateInformationPage = () => {
         const fetchOrderAndCustomerData = async () => {
             try {
                 // Step 1: Fetch order data
-                const orderResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, {
+                const orderResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}order/${id}/items/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -71,7 +71,7 @@ const UpdateInformationPage = () => {
                 formik.setValues({ status, address: '', note });
     
                 // Step 2: Fetch customer shipping addresses
-                const customerResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${customerId}/`, {
+                const customerResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}add/customer/address/${customerId}/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

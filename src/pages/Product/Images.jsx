@@ -30,7 +30,7 @@ const FormLayouts = () => {
         async function fetchProducts() {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}products/`,
+                    `${import.meta.env.VITE_APP_KEY}products/`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -61,12 +61,14 @@ const FormLayouts = () => {
         if (products.length > 0) {
             const product = products.find((product) => product.id === parseInt(id));
             setSelectedProduct(product);
-            setImages(product?.images || []); // Set images from the product
+            setImages(product?.images || []); 
         }
     }, [id, products]);
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
+
+        console.log("product imagesss",files);
 
         const imagesWithPreview = files.map((file) => ({
             file,
@@ -81,6 +83,8 @@ const FormLayouts = () => {
         setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
     };
 
+    console.log("selectedImages",selectedImages);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -89,11 +93,13 @@ const FormLayouts = () => {
         formData.append("product_id", selectedProduct.id);
 
         selectedImages.forEach((image) => {
-            formData.append("images", image.file); // Use "images" as the key to match `getlist('images')`
+            formData.append("images", image.file); 
         });
 
+        console.log("formData",formData);   
+
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}image/add/${id}/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}image/add/${id}/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -17,7 +17,7 @@ const ChartSection = () => {
     useEffect(() => {
         const fetchChartData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}dashboard/`,{
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}dashboard/`,{
                     headers: { Authorization: `Bearer ${token}` } 
                 });
                 setChartsData(response.data.data);

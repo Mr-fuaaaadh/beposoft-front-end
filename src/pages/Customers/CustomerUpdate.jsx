@@ -20,7 +20,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchManagers = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -33,7 +33,7 @@ const FormLayouts = () => {
 
         const fetchStates = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}states/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -47,7 +47,7 @@ const FormLayouts = () => {
         const fetchCustomerData = async () => {
             if (id) {
                 try {
-                    const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}customer/update/${id}/`, {
+                    const response = await axios.get(`${import.meta.env.VITE_APP_KEY}customer/update/${id}/`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -94,7 +94,7 @@ const FormLayouts = () => {
         onSubmit: async (values) => {
             try {
                 const response = await axios.put(
-                    `${import.meta.env.VITE_APP_APIKEY}customer/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}customer/update/${id}/`,
                     values,
                     {
                         headers: {

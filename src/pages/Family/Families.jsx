@@ -94,7 +94,7 @@ const FamilyTable = () => {
         setData(data.filter(customer => customer.id !== id));
 
         try {
-            await axios.delete(`${import.meta.env.VITE_APP_APIKEY}family/update/${id}/`, {
+            await axios.delete(`${import.meta.env.VITE_APP_KEY}family/update/${id}/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log("Delete successful");
@@ -118,7 +118,7 @@ const FamilyTable = () => {
         if (isAddMode) {
             // Handle Add State
             try {
-                const response = await axios.post(`${import.meta.env.VITE_APP_APIKEY}add/family/`, newState, {
+                const response = await axios.post(`${import.meta.env.VITE_APP_KEY}add/family/`, newState, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setData([...data, response.data]); // Add new state to table data
@@ -130,7 +130,7 @@ const FamilyTable = () => {
         } else {
             // Handle Update State
             try {
-                const response = await axios.put(`${import.meta.env.VITE_APP_APIKEY}family/update/${selectedCustomer.id}/`, selectedCustomer, {
+                const response = await axios.put(`${import.meta.env.VITE_APP_KEY}family/update/${selectedCustomer.id}/`, selectedCustomer, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 // Update the specific state entry
@@ -152,7 +152,7 @@ const FamilyTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {headers: {'Authorization': `Bearer ${token}`}}); 
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, {headers: {'Authorization': `Bearer ${token}`}}); 
                 if (response.status === 200) {
                     setData(response.data.data); 
                 } else {

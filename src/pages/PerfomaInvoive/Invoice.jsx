@@ -69,7 +69,7 @@ const InvoiceDetail = (props) => {
     const fetchOrderData = async () => {
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_APP_APIKEY}perfoma/${invoice}/invoice/`,
+                `${import.meta.env.VITE_APP_KEY}perfoma/${invoice}/invoice/`,
                 {
                     method: 'GET',
                     headers: {

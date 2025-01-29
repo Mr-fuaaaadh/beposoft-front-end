@@ -27,7 +27,7 @@ const BasicTable = () => {
     // Fetch data using fetch
     const fetchData = async () => {
         try {
-            const url = `${import.meta.env.VITE_APP_APIKEY}product/stock/report/`;
+            const url = `${import.meta.env.VITE_APP_KEY}product/stock/report/`;
             console.log("Fetching data from:", url);
 
             const response = await fetch(url, {

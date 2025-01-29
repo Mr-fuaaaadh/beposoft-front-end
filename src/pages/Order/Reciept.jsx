@@ -41,10 +41,10 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
                 const token = localStorage.getItem('token');
                 const headers = { Authorization: `Bearer ${token}` };
 
-                const bankResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers });
+                const bankResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}banks/`, { headers });
                 setBanks(bankResponse.data.data);
 
-                const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, { headers });
+                const orderItemsResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}order/${id}/items/`, { headers });
                 setOrderItems(orderItemsResponse.data.items);  // Fetch order items here
             } catch (error) {
                 console.error('Error fetching data', error);
@@ -72,7 +72,7 @@ const ReceiptFormPage = ({ toggleReciptModal }) => {
 
             // Submit the receipt data along with order items
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}payment/${id}/reciept/`,
+                `${import.meta.env.VITE_APP_KEY}payment/${id}/reciept/`,
                 { ...values, received_at: formattedDate, id, orderItems: updatedOrderItems },
                 { headers }
             );

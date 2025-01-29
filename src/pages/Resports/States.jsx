@@ -17,7 +17,7 @@ const BasicTable = () => {
         const token = localStorage.getItem("token");
 
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}state/wise/report/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}state/wise/report/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

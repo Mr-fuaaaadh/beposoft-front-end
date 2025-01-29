@@ -28,7 +28,7 @@ const BasicTable = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem("token"); 
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}orders/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

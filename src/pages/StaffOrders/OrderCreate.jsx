@@ -76,7 +76,7 @@ const FormLayouts = () => {
         
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}order/create/`,
+                    `${import.meta.env.VITE_APP_KEY}order/create/`,
                     payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -124,13 +124,13 @@ const FormLayouts = () => {
                         bankResponse,
                         companyResponse
                     ] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/customers/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}staff/customers/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
     
                     // Set all fetched data
@@ -181,7 +181,7 @@ const FormLayouts = () => {
         formik.setFieldValue("customer", selectedCustomerId);
 
         try {
-            const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${selectedCustomerId}/`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await axios.get(`${import.meta.env.VITE_APP_KEY}add/customer/address/${selectedCustomerId}/`, { headers: { Authorization: `Bearer ${token}` } });
             if (response.status === 200) {
                 setCustomerAddresses(response.data.data);
             } else {
@@ -200,7 +200,7 @@ const FormLayouts = () => {
 
     const fetchCartProducts = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}cart/products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}cart/products/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -246,7 +246,7 @@ const FormLayouts = () => {
     // Function to update the cart product
     const updateCartProduct = async (productId, updatedFields) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}cart/update/${productId}/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}cart/update/${productId}/`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -290,7 +290,7 @@ const FormLayouts = () => {
 
     const handleRemoveProduct = async (productId) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}cart/update/${productId}/`, {
+            const response = await axios.delete(`${import.meta.env.VITE_APP_KEY}cart/update/${productId}/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

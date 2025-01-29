@@ -25,6 +25,7 @@ const FormLayouts = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const token = localStorage.getItem("token"); // Token fetching
+    const [warehouseDetails , setWarehouseDetails] = useState([]);
 
     // Formik setup
     const formik = useFormik({
@@ -129,7 +130,7 @@ const FormLayouts = () => {
                 }
         
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}add/staff/`,
+                    `${import.meta.env.VITE_APP_KEY}add/staff/`,
                     formData,
                     {
                         headers: {
@@ -178,10 +179,10 @@ const FormLayouts = () => {
                 setLoading(true);
                 try {
                     const [departmentResponse, statesResponse, familyResponse, supervisorResponse] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, { headers: { Authorization: `Bearer ${token}` } })
+                        axios.get(`${import.meta.env.VITE_APP_KEY}departments/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}supervisors/`, { headers: { Authorization: `Bearer ${token}` } })
                     ]);
 
                     if (departmentResponse.status === 200) {
@@ -231,6 +232,35 @@ const FormLayouts = () => {
         formik.setFieldValue("allocated_states", selectedValues); // Store the selected values as an array
         setSelectedStates(selectedOptions);
     };
+
+
+    const fetchWarehouse = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("No token found in localStorage");
+          }
+      
+          const res = await axios.get(`${import.meta.env.VITE_APP_KEY}warehouse/add/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+      
+          console.log("Response:", res?.data);
+          setWarehouseDetails(res.data || []);
+        } catch (error) {
+          console.error("Error fetching warehouse data:", error);
+        }
+      };
+      
+
+
+    useEffect(() =>{
+        fetchWarehouse()
+    },[]);
+
+
     return (
         <React.Fragment>
             <div className="page-content">
@@ -529,7 +559,33 @@ const FormLayouts = () => {
                                                 </div>
                                             </Col>
 
-                                            <Col md={6}>
+
+                                            <Col md={4}>
+                                                <div className="mb-3">
+                                                <Label htmlFor="formrow-Supervisor-Input">warehouse</Label>
+                                                <select
+                                                        name="warehouse"
+                                                        id="formrow-Supervisor-Input"
+                                                        className={`form-control ${formik.touched.warehouse && formik.errors.warehouse ? 'is-invalid' : ''}`}
+                                                        value={formik.values.warehouse}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                    >
+                                                        <option value="">Select warehouse</option> {/* Add a default option */}
+                                                        {warehouseDetails.length > 0 ? (
+                                                            warehouseDetails.map((sup) => (
+                                                                <option key={sup.id} value={sup.id}>
+                                                                    {sup.name}
+                                                                </option>
+                                                            ))
+                                                        ) : (
+                                                            <option disabled>No warehouse available</option>
+                                                        )}
+                                                    </select>
+                                                </div>
+                                            </Col>
+
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-alt-phone-Input">Alt Phone</Label>
                                                     <Input
@@ -554,7 +610,7 @@ const FormLayouts = () => {
                                                 </div>
                                             </Col>
 
-                                            <Col md={6}>
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-driving-Input">Driving License</Label>
                                                     <Input

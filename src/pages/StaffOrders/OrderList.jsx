@@ -30,7 +30,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staff/orders/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}staff/orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

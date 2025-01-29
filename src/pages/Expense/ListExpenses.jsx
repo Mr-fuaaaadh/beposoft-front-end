@@ -15,7 +15,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchExpenses = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}expense/add/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}expense/add/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

@@ -20,7 +20,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}perfoma/invoices/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}perfoma/invoices/`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },

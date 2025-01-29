@@ -48,7 +48,7 @@ const BasicTable = () => {
         const token = localStorage.getItem('token');  // Replace with actual method of fetching token
 
         // Fetch all staff data
-        axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
+        axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -61,7 +61,7 @@ const BasicTable = () => {
             });
 
         // Fetch all family data
-        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+        axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -76,7 +76,7 @@ const BasicTable = () => {
         // Fetch the sales report data based on the current filters
         const fetchData = () => {
             setLoading(true);
-            axios.get(`${import.meta.env.VITE_APP_APIKEY}COD/sales/`, {
+            axios.get(`${import.meta.env.VITE_APP_KEY}COD/sales/`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },

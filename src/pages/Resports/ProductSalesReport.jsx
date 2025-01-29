@@ -32,7 +32,7 @@ const BasicTable = () => {
     // Fetch data using the fetch API
     const fetchData = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}sold/products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}sold/products/`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,

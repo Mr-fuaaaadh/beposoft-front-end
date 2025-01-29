@@ -30,7 +30,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}orders/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -101,7 +101,7 @@ const exportToExcel = () => {
             "Tax %": item.tax,
             "Exclude Price": item.exclude_price,
             "Item Total": item.price * item.quantity,
-            "Images": item.images.join(", ")  // Concatenate image URLs as a single string
+            // "Images": item.images.join(", ")  
         }));
     });
 

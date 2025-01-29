@@ -19,7 +19,7 @@ const EcommerenceAddProduct = () => {
   useEffect(() => {
     const fetchProductFamilies = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+        const response = await axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -59,6 +59,9 @@ const EcommerenceAddProduct = () => {
 
     setselectedFiles(files);
   };
+
+
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -72,6 +75,9 @@ const EcommerenceAddProduct = () => {
       stock: '',
       image: null
     },
+
+
+    
     validationSchema: yup.object().shape({
       name: yup.string().required('Please Enter Your Product Name'),
       hsn_code: yup.string().required('Please Enter Your HSN Code'),
@@ -89,35 +95,56 @@ const EcommerenceAddProduct = () => {
           return value ? value.size <= 5 * 1024 * 1024 : true;
         })
     }),
+ 
     onSubmit: async (values) => {
       const formData = new FormData();
+    
+      // Log initial formik values
+      console.log("Formik Values:", values);
+    
+      // Append form values to FormData
       formData.append("name", values.name);
+      console.log("After appending name:", [...formData.entries()]);
+    
       formData.append("hsn_code", values.hsn_code);
-
-      // Handle family array (appending as JSON or separate IDs)
+      console.log("After appending HSN Code:", [...formData.entries()]);
+    
+      // Handle family array
       values.family.forEach(familyId => {
-        formData.append("family[]", familyId); // Ensure the key matches what your backend expects
+        formData.append("family[]", familyId);
       });
-
+      console.log("After appending family:", [...formData.entries()]);
+    
       formData.append("purchase_rate", values.purchase_rate);
+      console.log("After appending purchase rate:", [...formData.entries()]);
+    
       formData.append("type", values.type);
+      console.log("After appending type:", [...formData.entries()]);
+    
       formData.append("tax", values.tax);
+      console.log("After appending tax:", [...formData.entries()]);
+    
       formData.append("unit", values.unit);
+      console.log("After appending unit:", [...formData.entries()]);
+    
       formData.append("selling_price", values.selling_price);
-
+      console.log("After appending selling price:", [...formData.entries()]);
+    
       // Conditionally append stock for 'single' type
       if (values.type === 'single') {
         formData.append("stock", values.stock);
+        console.log("After appending stock:", [...formData.entries()]);
       }
-
-      // Append image to formData if exists
+    
+      // Append image if exists
       if (values.image) {
         formData.append("image", values.image);
+        console.log("After appending image:", [...formData.entries()]);
       }
-
+    
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_APP_APIKEY}add/product/`,
+         `${import.meta.env.VITE_APP_KEY}add/product/`,
           formData,
           {
             headers: {
@@ -135,10 +162,8 @@ const EcommerenceAddProduct = () => {
         setSuccessMessage("");
       }
     },
-
+    
   });
-
-
 
 
 

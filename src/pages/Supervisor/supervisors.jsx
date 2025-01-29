@@ -36,7 +36,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}supervisors/`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
                 if (response.status === 200) {
@@ -53,7 +53,7 @@ const BasicTable = () => {
 
         const fetchDepartments = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}departments/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}departments/`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
                 if (response.status === 200) {
@@ -80,7 +80,7 @@ const BasicTable = () => {
     const handleSaveChanges = async () => {
         try {
             const response = await axios.put(
-                `${import.meta.env.VITE_APP_APIKEY}supervisor/update/${selectedSupervisor.id}/`,
+                `${import.meta.env.VITE_APP_KEY}supervisor/update/${selectedSupervisor.id}/`,
                 {
                     name: supervisorName,
                     department: supervisorDepartment,
@@ -91,7 +91,7 @@ const BasicTable = () => {
             );
             if (response.status === 200) {
                 // Re-fetch data after saving changes
-                const updatedResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}supervisors/`, {
+                const updatedResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}supervisors/`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                 });
                 if (updatedResponse.status === 200) {

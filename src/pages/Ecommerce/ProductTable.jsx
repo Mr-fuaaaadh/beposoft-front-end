@@ -27,7 +27,7 @@ const BasicTable = () => {
           return;
         }
 
-        const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}products/`, {
+        const response = await fetch(`${import.meta.env.VITE_APP_KEY}products/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -105,7 +105,7 @@ const BasicTable = () => {
         return;
       }
 
-      const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}product/update/${productId}/`, {
+      const response = await axios.delete(`${import.meta.env.VITE_APP_KEY}product/update/${productId}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

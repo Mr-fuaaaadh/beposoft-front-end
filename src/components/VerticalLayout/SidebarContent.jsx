@@ -15,6 +15,7 @@ import { useCallback } from "react";
 
 import { FaUsers } from 'react-icons/fa';
 import { FaUserTie } from "react-icons/fa";
+import { BsChatSquareQuoteFill } from "react-icons/bs";
 
 
 const role = localStorage.getItem('active')
@@ -159,25 +160,7 @@ const SidebarContent = (props) => {
                 <i className="bx bx-home-circle"></i>
                 <span>{props.t("Dashboards")}</span>
               </Link>
-              <ul className="sub-menu" aria-expanded="false">
-                <li>
-                  <Link to="/dashboard">{props.t("Default")}</Link>
-                </li>
-                <li>
-                  <Link to="/dashboard-saas">{props.t("Saas")}</Link>
-                </li>
-                <li>
-                  <Link to="/dashboard-crypto">{props.t("Crypto")}</Link>
-                </li>
-                <li>
-                  <Link to="/blog">{props.t("Blog")}</Link>
-                </li>
-                <li>
-                  <Link to="/dashboard-job">
-                    {props.t("Job")}
-                  </Link>
-                </li>
-              </ul>
+          
             </li>
 
             {/* <li className="menu-title">{props.t("Apps")}</li> */}
@@ -297,17 +280,17 @@ const SidebarContent = (props) => {
               <li>
                 <Link to="/#" className="has-arrow">
                   <FaUserTie size={17} style={{ marginRight: '6px' }} />
-                  <span>{props.t("Product")}</span>
+                  <span>{props.t("purchase")}</span>
                 </Link>
                 <ul className="sub-menu" aria-expanded="false">
                   <li>
-                    <Link to="/add/products/">{props.t("add Product")}</Link>
+                    <Link to="/add/products/">{props.t("Purchase")}</Link>
                   </li>
                   <li>
-                    <Link to="/add/products/bulk/">{props.t("Bulk Product Upload")}</Link>
+                    <Link to="/add/products/bulk/">{props.t("Bulk purchase Upload")}</Link>
                   </li>
                   <li>
-                    <Link to="/product/list/">{props.t("Product List")}</Link>
+                    <Link to="/product/list/">{props.t("Purchase List")}</Link>
                   </li>
                 </ul>
               </li>
@@ -466,6 +449,9 @@ const SidebarContent = (props) => {
                   <li>
                     <Link to="/bank/datas/">{props.t("Bank List")}</Link>
                   </li>
+                  <li>
+                    <Link to="/bank/bankmodule">{props.t("Bank Module")}</Link>
+                  </li>
                 </ul>
               </li>
             ) : null}
@@ -486,7 +472,7 @@ const SidebarContent = (props) => {
                 </ul>
               </li>
             ) : null}
-            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT'  || role === 'warehouse admin' ? (
 
 
               <li>
@@ -505,7 +491,7 @@ const SidebarContent = (props) => {
               </li>
 
             ) : null}
-            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
+            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' || role === 'warehouse admin' ? (
 
 
               <li>
@@ -523,25 +509,55 @@ const SidebarContent = (props) => {
                 </ul>
               </li>
             ) : null}
-            {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
 
-              <li>
-                <Link to="/#" className="has-arrow">
-                  <FaUsers size={20} style={{ marginRight: '8px' }} />
-                  <span>{props.t("Expense")}</span>
-                </Link>
-                <ul className="sub-menu" aria-expanded="false">
-                  <li>
-                    <Link to="/add/expense/">{props.t("add expense")}</Link>
-                  </li>
-                  <li>
-                    <Link to="/expense/list/">{props.t("Expenses")}</Link>
-                  </li>
-                </ul>
-              </li>
+{role === 'ADMIN' || role === 'ACCOUNTS' || role === 'warehouse admin' ? (
 
-            ) : null}
+
+<li>
+<Link to="/dashboard/" className=" ">
+  <i className="bx bx-box"></i>
+  <span>{props.t("order requist")}</span>
+</Link>
+</li>
+) : null}
+
+
+
+       {(role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT') && (
+  <>
+    {/* Expense Section */}
+    <li>
+      <Link to="/#" className="has-arrow">
+        <FaUsers size={20} style={{ marginRight: '8px' }} />
+        <span>{props.t("Expense")}</span>
+      </Link>
+      <ul className="sub-menu" aria-expanded="false">
+        <li>
+          <Link to="/add/expense/">{props.t("Add Expense")}</Link>
+        </li>
+        <li>
+          <Link to="/expense/list/">{props.t("Expenses")}</Link>
+        </li>
+      </ul>
+    </li>
+
+    {/* Warehouse Section */}
+    <li>
+      <Link to="/#" className="has-arrow">
+        <FaUsers size={20} style={{ marginRight: '8px' }} />
+        <span>{props.t("Warehouse")}</span>
+      </Link>
+      <ul className="sub-menu" aria-expanded="false">
+        <li>
+          <Link to="/add/warehouse/">{props.t("Add Warehouse")}</Link>
+        </li>
+
+      </ul>
+    </li>
+  </>
+)}
+
             {role === 'ADMIN' || role === 'ACCOUNTS' || role === 'IT' ? (
 
               <li>
@@ -577,6 +593,7 @@ const SidebarContent = (props) => {
                   </li>
                 </ul>
               </li>
+
 
             ) : null}
 

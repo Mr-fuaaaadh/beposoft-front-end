@@ -9,6 +9,7 @@ import AddProduct from "./AddCreatedOrderProducts";
 import Information from "./information"
 import Paymentrecipent from "./PaymentRecipt"
 
+
 // Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 
@@ -36,6 +37,10 @@ const FormLayouts = () => {
     const currentDate = new Date().toISOString().split("T")[0];
     const [banks, setBanks] = useState([]);
     const [selectedBank, setSelectedBank] = useState('');
+
+    // const {id} = useParams();
+
+    console.log(id);
 
     // Toggle modal visibility
 
@@ -103,7 +108,7 @@ const FormLayouts = () => {
                 const totalAmount = subtotal + parseFloat(values.shipping_charge || 0);
         
                 // Make the PUT request to save data
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`, {
                     method: "PUT",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -140,7 +145,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchBanks = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}banks/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}banks/`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -169,7 +174,7 @@ const FormLayouts = () => {
     // Fetch order data when component mounts or id changes
     const fetchOrderData = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}order/${id}/items/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}order/${id}/items/`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -308,7 +313,7 @@ const FormLayouts = () => {
     const handleRemoveItem = async (itemId) => {
         try {
             // Replace with your API URL and method to delete the item
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}remove/order/${itemId}/item/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}remove/order/${itemId}/item/`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -341,7 +346,7 @@ const FormLayouts = () => {
         }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}remove/order/${productId}/item/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}remove/order/${productId}/item/`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -392,7 +397,7 @@ const FormLayouts = () => {
         };
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -418,6 +423,14 @@ const FormLayouts = () => {
     };
 
     const loggedUser = localStorage.getItem('name');
+
+    const handleDownloadInvoice = () =>{
+
+        const pdfUrl = `https://will-alerts-bare-pubs.trycloudflare.com/invoice/${id}/`;
+        window.open(pdfUrl, "_blank");
+ 
+    }
+    console.log(orderItems)
 
 
     return (
@@ -584,7 +597,7 @@ const FormLayouts = () => {
                                                         onBlur={formik.handleBlur}
                                                         invalid={
                                                             formik.touched.shipping_mode && formik.errors.shipping_mode ? true : false
-                                                        }
+                                                          }
                                                     />
                                                     {
                                                         formik.errors.shipping_mode && formik.touched.shipping_mode ? (
@@ -1002,7 +1015,7 @@ const FormLayouts = () => {
                                                         <button
                                                             type="button"
                                                             className="btn btn-secondary w-100"
-                                                            onClick={() => handleDownload("invoice")}
+                                                            onClick={() => handleDownloadInvoice()}
                                                         >
                                                             Download Invoice
                                                         </button>

@@ -14,13 +14,14 @@ const FormLayouts = () => {
     const [staffs, setStaffs] = useState([]);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [payment, setPayment] = useState('');
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // Fetch company data
-                const companyResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, {
+                const companyResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}company/data/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -28,7 +29,7 @@ const FormLayouts = () => {
                 setCompanies(companyResponse.data.data);
 
                 // Fetch bank data
-                const bankResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, {
+                const bankResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}banks/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -36,12 +37,14 @@ const FormLayouts = () => {
                 setBanks(bankResponse.data.data);
 
                 // Fetch staff data
-                const staffResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
+                const staffResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
                 setStaffs(staffResponse.data.data);
+
+
             } catch (error) {
                 console.error("Error fetching data:", error);
                 alert("An error occurred while fetching the data.");
@@ -50,6 +53,41 @@ const FormLayouts = () => {
 
         fetchData();
     }, [token]);
+
+    const  purposeofPayment = [
+        { 
+            value: "water",
+            label: "Water",
+        },
+        { 
+            value: "electricity",
+            label: "Electricity",
+        },
+        { 
+            value: "salary",
+            label: "Salary",
+        },
+        { 
+            value: "emi",
+            label: "EMI",
+        },
+        { 
+            value: "rent",
+            label: "Rent",
+        },
+        { 
+            value: "equipments",
+            label: "Equipments",
+        },
+        { 
+            value: "travel",
+            label: "Travel",
+        },
+        { 
+            value: "other",
+            label: "Others",
+        }
+    ]
 
     const formik = useFormik({
         initialValues: {
@@ -80,7 +118,7 @@ const FormLayouts = () => {
         onSubmit: async (values, { resetForm }) => {
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}expense/add/`,
+                    `${import.meta.env.VITE_APP_KEY}expense/add/`,
                     values,
                     {
                         headers: {
@@ -202,17 +240,20 @@ const FormLayouts = () => {
                                             <Col lg={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="formrow-Inputpurpose_of_payment">Purpose Of Payment</Label>
-                                                    <Input
-                                                        type="textarea"
+                                                 <select
                                                         name="purpose_of_payment"
+                                                        id="formrow-product_type-Input"
                                                         className="form-control"
-                                                        id="formrow-Inputpurpose_of_payment"
-                                                        placeholder="Enter the purpose of payment"
                                                         value={formik.values.purpose_of_payment}
                                                         onChange={formik.handleChange}
                                                         onBlur={formik.handleBlur}
-                                                        invalid={formik.touched.purpose_of_payment && formik.errors.purpose_of_payment ? true : false}
-                                                    />
+                                                        invalid={formik.touched.purpose_of_payment && formik.errors.purpose_of_payment}
+                                                    >
+                                                        <option value="">Choose...</option>
+                                                        {purposeofPayment.map((type) => (
+                                                            <option key={type.value} value={type.value}>{type.label}</option>
+                                                        ))}
+                                                    </select>
                                                     {formik.errors.purpose_of_payment && formik.touched.purpose_of_payment ? (
                                                         <FormFeedback type="invalid">{formik.errors.purpose_of_payment}</FormFeedback>
                                                     ) : null}

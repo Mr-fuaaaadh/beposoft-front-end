@@ -72,7 +72,7 @@ const EcommerenceAddProduct = () => {
 
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}product/update/${id}/`,
                     {
                         method: 'PUT',
                         headers: {
@@ -112,7 +112,7 @@ const EcommerenceAddProduct = () => {
     useEffect(() => {
         const fetchFamilyData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -132,7 +132,7 @@ const EcommerenceAddProduct = () => {
 
         const fetchProductData = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}product/update/${id}/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },

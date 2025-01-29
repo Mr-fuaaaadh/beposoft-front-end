@@ -28,7 +28,7 @@ const BasicTable = () => {
 
         // Fetch sales data
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}salesreport/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}salesreport/`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
@@ -39,7 +39,7 @@ const BasicTable = () => {
 
         // Fetch states
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}states/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}states/`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => setStates(response.data.data))
@@ -47,7 +47,7 @@ const BasicTable = () => {
 
         // Fetch families
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}familys/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}familys/`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => setFamilies(response.data.data))

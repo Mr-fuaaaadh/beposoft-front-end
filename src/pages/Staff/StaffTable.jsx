@@ -96,7 +96,7 @@ const DatatableTables = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

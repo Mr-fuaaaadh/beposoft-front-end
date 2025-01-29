@@ -41,7 +41,7 @@ const FormLayouts = () => {
         }),
 
         onSubmit: (values) => {
-            axios.post(`${import.meta.env.VITE_APP_APIKEY}company/data/`,values,{
+            axios.post(`${import.meta.env.VITE_APP_KEY}company/data/`,values,{
                         headers: {
                             Authorization: `Bearer ${token}`,
                         }

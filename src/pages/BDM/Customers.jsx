@@ -32,9 +32,9 @@ const BasicTable = () => {
         const fetchData = async () => {
             try {
                 const [response, responseState, responseManager] = await Promise.all([
-                    axios.get(`${import.meta.env.VITE_APP_APIKEY}manager/customers/`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    axios.get(`${import.meta.env.VITE_APP_KEY}manager/customers/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, { headers: { 'Authorization': `Bearer ${token}` } }),
                 ]);
 
                 if (response.status === 200) setData(response.data);

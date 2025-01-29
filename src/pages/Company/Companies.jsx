@@ -20,7 +20,7 @@ const BasicTable = () => {
         // Fetch companies data from an API
         const fetchCompanies = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_KEY}company/data/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

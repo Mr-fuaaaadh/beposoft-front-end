@@ -39,7 +39,7 @@ const FormLayouts = () => {
                 const token = localStorage.getItem('token');
 
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}add/bank/`,
+                    `${import.meta.env.VITE_APP_KEY}add/bank/`,
                     values,
                     {
                         headers: {

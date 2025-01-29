@@ -48,7 +48,7 @@ const BasicTable = () => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-        const apiKey = import.meta.env.VITE_APP_APIKEY;
+        const apiKey = import.meta.env.VITE_APP_KEY;
 
         if (!apiKey) {
             console.error("API key is missing");

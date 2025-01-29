@@ -44,7 +44,7 @@ const FormLayouts = () => {
         const fetchFamilies = async () => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_APP_APIKEY}familys/`,
+                    `${import.meta.env.VITE_APP_KEY}familys/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const familyData = response.data.data;
@@ -73,7 +73,7 @@ const FormLayouts = () => {
 
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}product/update/${id}/`,
                     {
                         method: 'GET',
                         headers: {
@@ -163,7 +163,7 @@ const FormLayouts = () => {
 
             try {
                 const response = await axios.put(
-                    `${import.meta.env.VITE_APP_APIKEY}product/update/${id}/`,
+                    `${import.meta.env.VITE_APP_KEY}product/update/${id}/`,
                     formData,
                     {
                         headers: {

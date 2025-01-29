@@ -21,9 +21,8 @@ const BasicTable = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token"); // Retrieve token from storage
-
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}banks/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}banks/`, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Include token in headers
                 },

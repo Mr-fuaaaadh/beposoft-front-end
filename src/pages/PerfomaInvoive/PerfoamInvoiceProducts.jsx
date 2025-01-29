@@ -96,7 +96,7 @@ const FormLayouts = () => {
 
         onSubmit: async (values) => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`, {
                     method: "PUT",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -128,7 +128,7 @@ const FormLayouts = () => {
     useEffect(() => {
         const fetchBanks = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}banks`, {
+                const response = await fetch(`${import.meta.env.VITE_APP_KEY}banks`, {
                     method: 'GET',
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -157,7 +157,7 @@ const FormLayouts = () => {
     // Fetch order data when component mounts or id changes
     const fetchOrderData = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}perfoma/${invoice}/invoice/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}perfoma/${invoice}/invoice/`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -295,7 +295,7 @@ const FormLayouts = () => {
     const handleRemoveItem = async (itemId) => {
         try {
             // Replace with your API URL and method to delete the item
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}remove/order/${itemId}/item/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}remove/order/${itemId}/item/`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -329,7 +329,7 @@ const FormLayouts = () => {
 
         try {
             // Use productId in the URL
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}remove/order/${productId}/item/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}remove/order/${productId}/item/`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -383,7 +383,7 @@ const FormLayouts = () => {
         };
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -436,7 +436,7 @@ const FormLayouts = () => {
             setLoading(true); // Start loading
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}payment/${id}/reciept/`,
+                    `${import.meta.env.VITE_APP_KEY}payment/${id}/reciept/`,
                     values,
                     {
                         headers: {
@@ -465,7 +465,7 @@ const FormLayouts = () => {
         };
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}shipping/${id}/order/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}shipping/${id}/order/`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,

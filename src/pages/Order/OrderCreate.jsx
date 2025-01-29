@@ -17,6 +17,7 @@ const FormLayouts = () => {
     const [states, setStates] = useState([]); // All states
     const [staffs, setStaffs] = useState([]);
     const [customers, setCustomers] = useState([]);
+    const [warehouseDetails, setWarehouseDetails] = useState([]);
     const [allocatedStates, setAllocatedStates] = useState([]);
     const [loggedUser, setLoggedUser] = useState(null);
     const [familys, setFamilys] = useState([]);
@@ -45,7 +46,7 @@ const FormLayouts = () => {
         initialValues: {
             state: "",
             check: "",
-            company: "BEPOSITIVERACING PVT LTD",
+            company: "",
             family: "",
             customer: "",
             manage_staff: "",
@@ -55,6 +56,8 @@ const FormLayouts = () => {
             bank: "",
             total_amount: finalAmount,
             order_date: new Date().toISOString().substring(0, 10),
+            status:"Invoice Created",
+            warehouses:"",
         },
         validationSchema: Yup.object({
             state: Yup.string().required("This field is required"),
@@ -67,6 +70,7 @@ const FormLayouts = () => {
             payment_status: Yup.string().required("Payment status is required"),
             payment_method: Yup.string().required("Payment method is required"),
             bank: Yup.string().required("Bank selection is required"),
+            status: Yup.string().required("this field is required"),
         }),
         onSubmit: async (values) => {
             const payload = {
@@ -76,7 +80,7 @@ const FormLayouts = () => {
         
             try {
                 const response = await axios.post(
-                    `${import.meta.env.VITE_APP_APIKEY}order/create/`,
+                    `${import.meta.env.VITE_APP_KEY}order/create/`,
                     payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -94,6 +98,12 @@ const FormLayouts = () => {
             }
         },
     });
+
+    const orderMode =[
+        {name:"Invoice Created", value:"Invoice Created"},
+        {name:"Order Request by Warehouse", value:"Order Request by Warehouse"},
+        {name:"warehouse-warehouse", value:"warehouse-warehouse"},
+    ]
 
     const generateInvoice = async () => {
         const doc = new jsPDF();
@@ -114,14 +124,15 @@ const FormLayouts = () => {
             const fetchData = async () => {
                 setLoading(true);
                 try {
-                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse, companyResponse] = await Promise.all([
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}customers/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${import.meta.env.VITE_APP_APIKEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
+                    const [statesResponse, ManagedResponse, familyResponse, StaffResponse, staffcustomersResponse, bankResponse, companyResponse, warehouseResponse] = await Promise.all([
+                        axios.get(`${import.meta.env.VITE_APP_KEY}states/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}staffs/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}familys/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}profile/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}customers/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}banks/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}company/data/`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${import.meta.env.VITE_APP_KEY}warehouse/add/`, {headers:{Authorization: `Bearer ${token}`}})
                     ]);
 
                     if (statesResponse.status === 200) {
@@ -152,10 +163,17 @@ const FormLayouts = () => {
                     if (companyResponse.status === 200) {
                         setCompany(companyResponse.data.data);
                         console.log(companyResponse.data.data)
+
+                        if (companyResponse.data.data.length > 0 && !formik.values.company) {
+                            formik.setFieldValue("company", companyResponse.data.data[0].id);
+                        }
                     }
 
                     if (bankResponse.status === 200) {
                         setBank(bankResponse.data.data);
+                    }
+                   if (warehouseResponse.status === 200) {
+                        setWarehouseDetails(warehouseResponse.data);
                     }
 
                 } catch (error) {
@@ -171,6 +189,10 @@ const FormLayouts = () => {
         }
     }, [token,]);
 
+
+    console.log("warehouse details..:", warehouseDetails);
+    console.log("componys infomation...:", companys);
+
     // Search and select customer
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
@@ -181,7 +203,7 @@ const FormLayouts = () => {
         formik.setFieldValue("customer", selectedCustomerId);
 
         try {
-            const response = await axios.get(`${import.meta.env.VITE_APP_APIKEY}add/customer/address/${selectedCustomerId}/`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await axios.get(`${import.meta.env.VITE_APP_KEY}add/customer/address/${selectedCustomerId}/`, { headers: { Authorization: `Bearer ${token}` } });
             if (response.status === 200) {
                 setCustomerAddresses(response.data.data);
             } else {
@@ -200,7 +222,7 @@ const FormLayouts = () => {
 
     const fetchCartProducts = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}cart/products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}cart/products/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -246,7 +268,7 @@ const FormLayouts = () => {
     // Function to update the cart product
     const updateCartProduct = async (productId, updatedFields) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}cart/update/${productId}/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}cart/update/${productId}/`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -290,7 +312,7 @@ const FormLayouts = () => {
 
     const handleRemoveProduct = async (productId) => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_APP_APIKEY}cart/update/${productId}/`, {
+            const response = await axios.delete(`${import.meta.env.VITE_APP_KEY}cart/update/${productId}/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -319,6 +341,8 @@ const FormLayouts = () => {
     };
 
     const isInvalid = (name) => formik.touched[name] && formik.errors[name] ? true : false;
+
+
 
 
 
@@ -389,7 +413,7 @@ const FormLayouts = () => {
                                         </Row>
 
                                         <Row>
-                                            <Col md={8}>
+                                            <Col md={4}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="customer">Customer</Label>
                                                     <Input
@@ -424,6 +448,32 @@ const FormLayouts = () => {
 
                                             <Col md={4}>
                                                 <div className="mb-3">
+                                                    <Label htmlFor="manage_staff">order mode</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="status"
+                                                        className="form-control"
+                                                        id="manage_staff"
+                                                        value={formik.values.status}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        invalid={formik.touched.manage_staff && formik.errors.manage_staff ? true : false}
+                                                    >
+                                                        <option value="">Select order mode...</option>
+                                                        {orderMode.map((mode) => (
+                                                            <option key={mode.name} value={mode.name}>
+                                                                {mode.name}
+                                                            </option>
+                                                        ))}
+                                                    </Input>
+                                                    {formik.errors.manage_staff && formik.touched.manage_staff ? (
+                                                        <FormFeedback type="invalid">{formik.errors.manage_staff}</FormFeedback>
+                                                    ) : null}
+                                                </div>
+                                            </Col>
+
+                                            <Col md={4}>
+                                                <div className="mb-3">
                                                     <Label htmlFor="manage_staff">manage_staff</Label>
                                                     <Input
                                                         type="select"
@@ -450,7 +500,7 @@ const FormLayouts = () => {
                                         </Row>
 
                                         <Row>
-                                            <Col md={4}>
+                                            <Col md={3}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="state">State</Label>
                                                     <Input
@@ -476,7 +526,7 @@ const FormLayouts = () => {
                                                 </div>
                                             </Col>
 
-                                            <Col md={4}>
+                                            <Col md={3}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="billing_address">Shipping To</Label>
                                                     <Input
@@ -502,7 +552,7 @@ const FormLayouts = () => {
                                                 </div>
                                             </Col>
 
-                                            <Col md={4}>
+                                            <Col md={3}>
                                                 <div className="mb-3">
                                                     <Label htmlFor="order_date">Current Date</Label>
                                                     <Input
@@ -516,6 +566,29 @@ const FormLayouts = () => {
                                                     />
                                                 </div>
                                             </Col>
+
+                                            <Col md={3}>
+                                          
+                                                      <div className="mb-3">
+                                                                   <Label htmlFor="formrow-unit-Input">choose warehouse</Label>
+                                                                   <select
+                                                                       name="warehouses"
+                                                                       id="formrow-unit-Input"
+                                                                       className="form-control"
+                                                                       value={formik.values.warehouses}
+                                                                       onChange={formik.handleChange}
+                                                                       onBlur={formik.handleBlur}
+                                                                       invalid={formik.touched.warehouses && formik.errors.warehouses}
+                                                                   >
+                                                                       <option value="">Choose...</option>
+                                                                       {warehouseDetails.map((unit) => (
+                                                                           <option key={unit.id} value={unit.id}>{unit.name}</option>
+                                                                       ))}
+                                                                   </select>
+                                                                   {formik.errors.unit && formik.touched.unit && (
+                                                                       <FormFeedback>{formik.errors.unit}</FormFeedback>
+                                                                   )}
+                                                               </div>                                                                       </Col>
                                         </Row>
 
                                         <div className="mb-3">
@@ -641,6 +714,7 @@ const FormLayouts = () => {
                                                                 isOpen={modalOpen}
                                                                 toggle={toggleModal}
                                                                 onSelectProduct={handleProductSelect}
+                                                                warehouseId={formik.values.warehouses || ''} 
                                                             />
                                                         </CardBody>
                                                     </Card>

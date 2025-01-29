@@ -10,7 +10,7 @@ const BasicTable = ({ warehouseData }) => {
     // Fetch parcel services on component mount
     useEffect(() => {
         axios
-            .get(`${import.meta.env.VITE_APP_APIKEY}parcal/service/`, {
+            .get(`${import.meta.env.VITE_APP_KEY}parcal/service/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -43,7 +43,7 @@ const BasicTable = ({ warehouseData }) => {
 
     // Update the server with the edited data
     const updateDataOnServer = (updatedItem) => {
-        const url = `${import.meta.env.VITE_APP_APIKEY}warehouse/detail/${updatedItem.id}/`;
+        const url = `${import.meta.env.VITE_APP_KEY}warehouse/detail/${updatedItem.id}/`;
 
         axios
             .put(url, updatedItem, {

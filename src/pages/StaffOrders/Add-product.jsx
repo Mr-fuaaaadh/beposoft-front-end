@@ -26,7 +26,7 @@ const AddProduct = ({ isOpen, toggle }) => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_APIKEY}all/products/`, {
+            const response = await fetch(`${import.meta.env.VITE_APP_KEY}all/products/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -87,7 +87,7 @@ const AddProduct = ({ isOpen, toggle }) => {
 
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_APP_APIKEY}cart/product/`,
+                `${import.meta.env.VITE_APP_KEY}cart/product/`,
                 cartItem,
                 {
                     headers: {

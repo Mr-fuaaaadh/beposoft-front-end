@@ -30,7 +30,7 @@ const BasicTable = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const ordersResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}orders/`, {
+                const ordersResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}orders/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -39,7 +39,7 @@ const BasicTable = () => {
                 const filteredOrders = ordersResponse.data.filter((order) => order.state == id);
                 setOrders(filteredOrders);
 
-                const stateResponse = await axios.get(`${import.meta.env.VITE_APP_APIKEY}states/`, {
+                const stateResponse = await axios.get(`${import.meta.env.VITE_APP_KEY}states/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
