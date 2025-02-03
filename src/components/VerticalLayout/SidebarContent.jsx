@@ -515,9 +515,9 @@ const SidebarContent = (props) => {
 
 
 <li>
-<Link to="/dashboard/" className=" ">
+<Link to="/order/warehousee/" className=" ">
   <i className="bx bx-box"></i>
-  <span>{props.t("order requist")}</span>
+  <span>{props.t("order request")}</span>
 </Link>
 </li>
 ) : null}

@@ -187,6 +187,8 @@ import SupervisorForm from "../pages/Supervisor/supervisor";
 import CreateOrder from "../pages/Order/OrderCreate";
 import OrderTable from "../pages/Order/OrderList";
 import OrderItems from "../pages/Order/OrderProducts";
+import Warehouseorders from "../pages/Order/orderrequestwarehouse";
+import OrderwarehouseConform from "../pages/Order/wareorderconform"
 
 
 
@@ -412,6 +414,9 @@ const authProtectedRoutes = [
   { path: "/New/Order/", component: <CreateOrder /> },
   { path: "/Orders/", component: <OrderTable /> },
   { path: "/order/:id/items/", component: <OrderItems /> },
+  { path: "/warehouseorder/:id/items", component: <OrderwarehouseConform/>},
+
+  {path: "/order/warehousee/", component: <Warehouseorders />},
 
 
   { path: "/staff/new/order/", component: <StaffOrderCreate /> },
